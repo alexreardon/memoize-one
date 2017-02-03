@@ -1,0 +1,117 @@
+{
+    "extends": [
+        "eslint:recommended",
+        "plugin:flowtype/recommended"
+    ],
+    "parser": "babel-eslint",
+    "plugins": [
+        "flowtype"
+    ],
+    "env": {
+        "node": true,
+        "browser": true
+    },
+    // custom rules
+    "rules": {
+        // http://eslint.org/docs/rules/quotes.html
+        // allows 'single quotes', 'internal "double" quotes' and `es6 backticks`
+        "quotes": [
+            "error",
+            "single"
+        ],
+        // http://eslint.org/docs/rules/space-in-parens
+        // forces no spaces inside of parentheses
+        "space-in-parens": [
+            "error",
+            "never"
+        ],
+        // http://eslint.org/docs/rules/array-bracket-spacing
+        // forces no spaces inside of brackets
+        "array-bracket-spacing": [
+            "error",
+            "never"
+        ],
+        // http://eslint.org/docs/rules/computed-property-spacing
+        // forces no spacing within computed properties
+        "computed-property-spacing": [
+            "error",
+            "never"
+        ],
+        // http://eslint.org/docs/rules/object-curly-spacing
+        // require padding inside curly braces
+        "object-curly-spacing": [
+            "error",
+            "always"
+        ],
+        // http://eslint.org/docs/rules/keyword-spacing
+        // forces spacing after keywords (eg 'if')
+        "keyword-spacing": "error",
+        // http://eslint.org/docs/rules/key-spacing
+        // forces spacing after keys in an object
+        "key-spacing": [
+            "error",
+            {
+                "beforeColon": false,
+                "afterColon": true
+            }
+        ],
+        // http://eslint.org/docs/rules/comma-dangle
+        // require trailing commas in multiline object literals
+        "comma-dangle": ["error", {
+                "arrays": "always-multiline",
+                "objects": "always-multiline",
+                "imports": "always-multiline",
+                "exports": "always-multiline",
+                "functions": "always-multiline"
+            }
+        ],
+        // http://eslint.org/docs/rules/comma-spacing
+        // enforce spacing before and after comma
+        "comma-spacing": ["error", { "before": false, "after": true }],
+
+        // http://eslint.org/docs/rules/comma-style
+        // commas on the end of lines and not the start of new ones
+        "comma-style": ["error", "last"],
+
+        // http://eslint.org/docs/rules/semi
+        // forces the use of semi-colons where valid
+        "semi": [
+            "error",
+            "always"
+        ],
+        // http://eslint.org/docs/rules/no-unused-vars
+        // rule for detecting unused vars (and imports)
+        "no-unused-vars": "error",
+        // http://eslint.org/doc/rules/no-multiple-empty-lines
+        // rule for detecting more than 1 empty line
+        "no-multiple-empty-lines": [
+            "error",
+            {
+                "max": 1
+            }
+        ],
+        // http://eslint.org/docs/rules/prefer-spread
+        // rule for enforcing use of spread operator over .apply()
+        "prefer-spread": "error",
+        // http://eslint.org/docs/rules/prefer-template
+        // rule for enforcing backtick string interpolation over concatenation
+        "prefer-template": "error",
+        // http://eslint.org/docs/rules/no-unneeded-ternary
+        // rule for detecting ternary statements when a simpler alternative exists
+        "no-unneeded-ternary": [
+            "error",
+            {
+                "defaultAssignment": false
+            }
+        ],
+        // http://eslint.org/docs/rules/dot-notation
+        // rule for enforcing dot notation for accessing an object's properties
+        "dot-notation": "error",
+        // http://eslint.org/docs/rules/no-multi-spaces
+        // rule for detecting extra spaces
+        "no-multi-spaces": "error",
+        // http://eslint.org/docs/rules/no-console
+        // disallow console.log but allow .warn and .error
+        "no-console": ["error", { "allow": ["warn", "error"] }]
+    }
+}
