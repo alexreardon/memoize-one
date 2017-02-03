@@ -3,9 +3,9 @@ const isShallowEqual = (array1: Array<any>, array2: Array<any>): boolean =>
     array1.length === array2.length &&
     array1.every((item, i) => array2[i] === item);
 
-type EqualityFn = (array1: Array<any>, array2: Array<any>) => boolean;
+type EqualityFn = (currentArgs: Array<any>, previousArgs: Array<any>) => boolean;
 
-export default function (fn: Function, isEqual: EqualityFn = isShallowEqual) {
+export default function (resultFn: Function, isEqual?: EqualityFn = isShallowEqual) {
     let lastArgs: Array<any> = [];
     let lastResult: any;
     let calledOnce: boolean = false;
@@ -17,7 +17,7 @@ export default function (fn: Function, isEqual: EqualityFn = isShallowEqual) {
 
         calledOnce = true;
         lastArgs = args;
-        lastResult = fn.apply(this, args);
+        lastResult = resultFn.apply(this, args);
         return lastResult;
     };
 }
