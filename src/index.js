@@ -6,9 +6,9 @@ const isShallowEqual = (array1: Array<any>, array2: Array<any>): boolean =>
 type EqualityFn = (array1: Array<any>, array2: Array<any>) => boolean;
 
 export default function (fn: Function, isEqual: EqualityFn = isShallowEqual) {
-    let lastArgs = [];
-    let lastResult;
-    let calledOnce = false;
+    let lastArgs: Array<any> = [];
+    let lastResult: any;
+    let calledOnce: boolean = false;
 
     return function(...args: Array<any>) {
         if (calledOnce && isEqual(args, lastArgs)) {
