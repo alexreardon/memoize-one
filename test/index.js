@@ -4,7 +4,186 @@ import { expect } from 'chai';
 import sinon from 'sinon';
 import memoizeOne from '../src/';
 
+type Expectation = {|
+    args: any[],
+        result: any
+            |};
+
+type Input = {|
+    name: string,
+        first: Expectation,
+            second: Expectation
+                |};
+
 describe('memoizeOne', () => {
+    describe('test', () => {
+        const inputs: Input[] = [
+            {
+                name: 'numbers',
+                first: {
+                    args: [1, 2],
+                    result: 3,
+                },
+                second: {
+                    args: [5, 5],
+                    result: 10,
+                },
+            },
+            {
+                name: 'strings',
+                first: {
+                    args: ['hi', 'there'],
+                    result: 'greetings',
+                },
+                second: {
+                    args: ['luke', 'skywalker'],
+                    result: 'starwars',
+                },
+            },
+            {
+                name: 'undefined',
+                first: {
+                    args: [],
+                    result: false,
+                },
+                second: {
+                    args: [undefined, undefined],
+                    result: undefined,
+                },
+            },
+            {
+                name: 'null',
+                first: {
+                    args: [null, null],
+                    result: true,
+                },
+                second: {
+                    args: [null],
+                    result: false,
+                },
+            },
+            {
+                name: 'object: different values',
+                first: {
+                    args: [{ foo: 'bar' }],
+                    result: { baz: 'bar' },
+                },
+                second: {
+                    args: [{ bar: 'test' }],
+                    result: { baz: true },
+                },
+            },
+            {
+                name: 'object: same values but different references',
+                first: {
+                    args: [{ foo: 'bar' }],
+                    result: { baz: 'bar' },
+                },
+                second: {
+                    args: [{ foo: 'bar' }],
+                    result: { baz: 'bar' },
+                },
+            },
+            {
+                name: 'mixed-inputs',
+                first: {
+                    args: [1, 'hi there'],
+                    result: 3,
+                },
+                second: {
+                    args: ['sup', false],
+                    result: 10,
+                },
+            },
+            {
+                name: 'symbols',
+                first: {
+                    args: [Symbol('first')],
+                    result: true,
+                },
+                second: {
+                    args: [Symbol('second')],
+                    result: false,
+                },
+            },
+            {
+                name: 'mixed-outputs',
+                first: {
+                    args: [1, 2],
+                    result: 'hi there',
+                },
+                second: {
+                    args: [4],
+                    result: {},
+                },
+            },
+
+        ];
+
+        const isShallowEqual = (array1: Array<any>, array2: Array<any>): boolean => {
+            if (array1 === array2) {
+                return true;
+            }
+
+            return array1.length === array2.length &&
+                array1.every((item, i) => array2[i] === item);
+        };
+
+        inputs.forEach(({ name, first, second }) => {
+            describe(`dynamic-${name}`, () => {
+
+                let spy;
+                let memoized;
+
+                beforeEach(() => {
+                    spy = sinon.spy((...args) => {
+                        if (isShallowEqual(args, first.args)) {
+                            return first.result;
+                        }
+                        if (isShallowEqual(args, second.args)) {
+                            return second.result;
+                        }
+                        throw new Error('unmatched argument');
+                    });
+
+                    memoized = memoizeOne(spy);
+                });
+
+                it('should return the result of a function', () => {
+                    expect(memoized(...first.args)).to.equal(first.result);
+                });
+
+                it('should return the same result if the arguments have not changed', () => {
+                    expect(memoized(...first.args)).to.equal(first.result);
+                    expect(memoized(...first.args)).to.equal(first.result);
+                });
+
+                it('should not execute the memoized function if the arguments have not changed', () => {
+                    memoized(...first.args);
+                    memoized(...first.args);
+
+                    expect(spy.callCount).to.equal(1);
+                });
+
+                it('should invalidate a memoize cache if new arguments are provided', () => {
+                    expect(memoized(...first.args)).to.equal(first.result);
+                    expect(memoized(...second.args)).to.equal(second.result);
+                    expect(spy.callCount).to.equal(2);
+                });
+
+                it('should resume memoization after a cache invalidation', () => {
+                    expect(memoized(...first.args)).to.equal(first.result);
+                    expect(spy.callCount).to.equal(1);
+                    expect(memoized(...second.args)).to.equal(second.result);
+                    expect(spy.callCount).to.equal(2);
+                    expect(memoized(...second.args)).to.equal(second.result);
+                    expect(spy.callCount).to.equal(2);
+                });
+            });
+
+        });
+    });
+
     describe('standard behaviour', () => {
         let add;
         let memoizedAdd;
@@ -153,13 +332,16 @@ describe('memoizeOne', () => {
             memoizedAdd = memoizeOne(add, equalityStub);
         });
 
-        it('should call the function with the last arguments', () => {
+        it('should call the equality function with the last arguments', () => {
+            equalityStub.returns(true);
+
             // first call does not trigger equality check
             memoizedAdd(1, 2);
             // will trigger equality check
-            memoizedAdd(3, 4);
+            memoizedAdd(1, 4);
 
-            expect(equalityStub.calledWithExactly([3, 4], [1, 2])).to.be.true;
+            expect(equalityStub.calledWith(1, 1)).to.be.true;
+            expect(equalityStub.calledWith(2, 4)).to.be.true;
         });
 
         it('should return the previous value without executing the result fn if the equality fn returns true', () => {

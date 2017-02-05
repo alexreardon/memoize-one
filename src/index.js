@@ -1,23 +1,22 @@
 // @flow
-const isShallowEqual = (array1: Array<any>, array2: Array<any>): boolean =>
-    array1.length === array2.length &&
-    array1.every((item, i) => array2[i] === item);
+type EqualityFn = (a: any, b: any) => boolean;
 
-type EqualityFn = (currentArgs: Array<any>, previousArgs: Array<any>) => boolean;
+const simpleEquality = (a: any, b: any): boolean => a === b;
 
-export default function (resultFn: Function, isEqual?: EqualityFn = isShallowEqual) {
+export default function (resultFn: Function, equalityCheck?: EqualityFn = simpleEquality) {
     let lastArgs: Array<any> = [];
     let lastResult: any;
     let calledOnce: boolean = false;
 
-    return function(...args: Array<any>) {
-        if (calledOnce && isEqual(args, lastArgs)) {
+    return function (...newArgs: Array<any>) {
+        if (calledOnce && newArgs.length === lastArgs.length &&
+            lastArgs.every((lastArg, i) => equalityCheck(lastArg, newArgs[i]))) {
             return lastResult;
         }
 
         calledOnce = true;
-        lastArgs = args;
-        lastResult = resultFn.apply(this, args);
+        lastArgs = newArgs;
+        lastResult = resultFn.apply(this, newArgs);
         return lastResult;
     };
 }
