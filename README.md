@@ -46,6 +46,7 @@ memoizedAdd(1, 2); // 3
 // While this was previously cached,
 // it is not the latest so the cached result is lost
 ```
+[Play with this example](http://www.webpackbin.com/NkCiYkz_M)
 
 ### Custom equality function
 You can also pass in a custom function for checking the equality of two items.
@@ -69,6 +70,7 @@ const result4 = customMemoization({foo: 'bar'});
 
 result3 === result4 // true - arguments are deep equal
 ```
+[Play with this example](http://www.webpackbin.com/NJW-tJMdf)
 
 ## Installation
 
