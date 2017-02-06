@@ -16,41 +16,18 @@ type Input = {|
                 |};
 
 describe('memoizeOne', () => {
-    describe('test', () => {
+    // JavaScript defines seven built-in types:
+    //     - null
+    //     - undefined
+    //     - boolean
+    //     - number
+    //     - string
+    //     - object
+    //     - symbol-- added in ES6!
+    // https://github.com/getify/You-Dont-Know-JS/blob/master/types%20%26%20grammar/ch1.md
+
+    describe('standard behaviour', () => {
         const inputs: Input[] = [
-            {
-                name: 'numbers',
-                first: {
-                    args: [1, 2],
-                    result: 3,
-                },
-                second: {
-                    args: [5, 5],
-                    result: 10,
-                },
-            },
-            {
-                name: 'strings',
-                first: {
-                    args: ['hi', 'there'],
-                    result: 'greetings',
-                },
-                second: {
-                    args: ['luke', 'skywalker'],
-                    result: 'starwars',
-                },
-            },
-            {
-                name: 'undefined',
-                first: {
-                    args: [],
-                    result: false,
-                },
-                second: {
-                    args: [undefined, undefined],
-                    result: undefined,
-                },
-            },
             {
                 name: 'null',
                 first: {
@@ -63,7 +40,52 @@ describe('memoizeOne', () => {
                 },
             },
             {
-                name: 'object: different values',
+                name: 'undefined',
+                first: {
+                    args: [],
+                    result: true,
+                },
+                second: {
+                    args: [undefined, undefined],
+                    result: false,
+                },
+            },
+            {
+                name: 'boolean',
+                first: {
+                    args: [true, false],
+                    result: true,
+                },
+                second: {
+                    args: [false, true],
+                    result: false,
+                },
+            },
+            {
+                name: 'number',
+                first: {
+                    args: [1, 2],
+                    result: 3,
+                },
+                second: {
+                    args: [1, 5],
+                    result: 6,
+                },
+            },
+            {
+                name: 'string',
+                first: {
+                    args: ['hi', 'there'],
+                    result: 'greetings',
+                },
+                second: {
+                    args: ['luke', 'skywalker'],
+                    result: 'starwars',
+                },
+            },
+
+            {
+                name: 'object: different values and references',
                 first: {
                     args: [{ foo: 'bar' }],
                     result: { baz: 'bar' },
@@ -85,17 +107,6 @@ describe('memoizeOne', () => {
                 },
             },
             {
-                name: 'mixed-inputs',
-                first: {
-                    args: [1, 'hi there'],
-                    result: 3,
-                },
-                second: {
-                    args: ['sup', false],
-                    result: 10,
-                },
-            },
-            {
                 name: 'symbols',
                 first: {
                     args: [Symbol('first')],
@@ -106,18 +117,6 @@ describe('memoizeOne', () => {
                     result: false,
                 },
             },
-            {
-                name: 'mixed-outputs',
-                first: {
-                    args: [1, 2],
-                    result: 'hi there',
-                },
-                second: {
-                    args: [4],
-                    result: {},
-                },
-            },
-
         ];
 
         const isShallowEqual = (array1: Array<any>, array2: Array<any>): boolean => {
@@ -130,7 +129,7 @@ describe('memoizeOne', () => {
         };
 
         inputs.forEach(({ name, first, second }) => {
-            describe(`dynamic-${name}`, () => {
+            describe(`dynamic type test:[${name}]`, () => {
 
                 let spy;
                 let memoized;
@@ -184,59 +183,6 @@ describe('memoizeOne', () => {
         });
     });
 
-    describe('standard behaviour', () => {
-        let add;
-        let memoizedAdd;
-
-        beforeEach(() => {
-            add = sinon.spy((value1: number, value2: number): number => value1 + value2);
-            memoizedAdd = memoizeOne(add);
-        });
-
-        it('should return the result of a function', () => {
-            expect(memoizedAdd(1, 2)).to.equal(3);
-        });
-
-        it('should return the same result if the arguments have not changed', () => {
-            expect(memoizedAdd(1, 2)).to.equal(3);
-            expect(memoizedAdd(1, 2)).to.equal(3);
-        });
-
-        it('should not execute the memoized function if the arguments have not changed', () => {
-            memoizedAdd(1, 2);
-            memoizedAdd(1, 2);
-
-            expect(add.callCount).to.equal(1);
-        });
-
-        it('should invalidate a memoize cache if new arguments are provided', () => {
-            expect(memoizedAdd(1, 2)).to.equal(3);
-            expect(memoizedAdd(2, 2)).to.equal(4);
-            expect(add.callCount).to.equal(2);
-        });
-
-        it('should resume memoization after a cache invalidation', () => {
-            expect(memoizedAdd(1, 2)).to.equal(3);
-            expect(add.callCount).to.equal(1);
-            expect(memoizedAdd(2, 2)).to.equal(4);
-            expect(add.callCount).to.equal(2);
-            expect(memoizedAdd(2, 2)).to.equal(4);
-            expect(add.callCount).to.equal(2);
-        });
-
-        it('should always execute the result function and return the result on the first call', () => {
-            const result = sinon.spy((value) => value);
-            const memoized = memoizeOne(result);
-
-            const values = [undefined, null, true, false, 'hi there', {}, 20, () => { }];
-
-            values.forEach((value) => {
-                expect(memoized(value)).to.equal(value);
-            });
-            expect(result.callCount).to.equal(values.length);
-        });
-    });
-
     describe('respecting "this" context', () => {
         describe('original function', () => {
             function getA() {
@@ -271,6 +217,7 @@ describe('memoizeOne', () => {
                 expect(memoized).to.throw(TypeError);
             });
         });
+
         describe('memoized function', () => {
             function getA() {
                 return this.a;
@@ -381,6 +328,59 @@ describe('memoizeOne', () => {
             expect(equalityStub.called).to.be.true;
             // underlying function called
             expect(add.callCount).to.equal(2);
+        });
+    });
+
+    describe('standard behaviour', () => {
+        let add;
+        let memoizedAdd;
+
+        beforeEach(() => {
+            add = sinon.spy((value1: number, value2: number): number => value1 + value2);
+            memoizedAdd = memoizeOne(add);
+        });
+
+        it('should return the result of a function', () => {
+            expect(memoizedAdd(1, 2)).to.equal(3);
+        });
+
+        it('should return the same result if the arguments have not changed', () => {
+            expect(memoizedAdd(1, 2)).to.equal(3);
+            expect(memoizedAdd(1, 2)).to.equal(3);
+        });
+
+        it('should not execute the memoized function if the arguments have not changed', () => {
+            memoizedAdd(1, 2);
+            memoizedAdd(1, 2);
+
+            expect(add.callCount).to.equal(1);
+        });
+
+        it('should invalidate a memoize cache if new arguments are provided', () => {
+            expect(memoizedAdd(1, 2)).to.equal(3);
+            expect(memoizedAdd(2, 2)).to.equal(4);
+            expect(add.callCount).to.equal(2);
+        });
+
+        it('should resume memoization after a cache invalidation', () => {
+            expect(memoizedAdd(1, 2)).to.equal(3);
+            expect(add.callCount).to.equal(1);
+            expect(memoizedAdd(2, 2)).to.equal(4);
+            expect(add.callCount).to.equal(2);
+            expect(memoizedAdd(2, 2)).to.equal(4);
+            expect(add.callCount).to.equal(2);
+        });
+
+        it('should always execute the result function and return the result on the first call', () => {
+            const result = sinon.spy((value) => value);
+            const memoized = memoizeOne(result);
+
+            const values = [undefined, null, true, false, 'hi there', {}, 20, () => { }];
+
+            values.forEach((value) => {
+                expect(memoized(value)).to.equal(value);
+            });
+            expect(result.callCount).to.equal(values.length);
         });
     });
 });
