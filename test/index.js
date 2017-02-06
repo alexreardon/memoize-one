@@ -6,25 +6,24 @@ import memoizeOne from '../src/';
 
 type Expectation = {|
     args: any[],
-        result: any
-            |};
+    result: any
+|};
 
 type Input = {|
     name: string,
-        first: Expectation,
-            second: Expectation
-                |};
+    first: Expectation,
+    second: Expectation
+|};
 
 describe('memoizeOne', () => {
-    // JavaScript defines seven built-in types:
-    //     - null
-    //     - undefined
-    //     - boolean
-    //     - number
-    //     - string
-    //     - object
-    //     - symbol-- added in ES6!
-    // https://github.com/getify/You-Dont-Know-JS/blob/master/types%20%26%20grammar/ch1.md
+    // [JavaScript defines seven built-in types:](https://github.com/getify/You-Dont-Know-JS/blob/master/types%20%26%20grammar/ch1.md)
+    //    - null
+    //    - undefined
+    //    - boolean
+    //    - number
+    //    - string
+    //    - object
+    //    - symbol
 
     describe('standard behaviour', () => {
         const inputs: Input[] = [

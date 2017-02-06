@@ -1,6 +1,6 @@
 # memoizeOne
 
-A simple memoization library which only remembers the latest arguments
+A simple memoization library which only remembers the latest invokation
 
 [![Build Status](https://travis-ci.org/alexreardon/memoize-one.svg?branch=master)](https://travis-ci.org/alexreardon/memoize-one)
 [![codecov](https://codecov.io/gh/alexreardon/memoize-one/branch/master/graph/badge.svg)](https://codecov.io/gh/alexreardon/memoize-one)
@@ -21,6 +21,8 @@ Unlike other memoization libraries, `memoizeOne` only remembers the latest argum
 
 
 ## Usage
+
+### Standard usage
 
 ```js
 import memoizeOne from 'memoize-one';
@@ -43,6 +45,29 @@ memoizedAdd(1, 2); // 3
 // Add function is called to get new value.
 // While this was previously cached,
 // it is not the latest so the cached result is lost
+```
+
+### Custom equality function
+You can also pass in a custom function for checking the equality of two items.
+
+```js
+import memoizeOne from 'memoize-one';
+import deepEqual from 'lodash.isEqual';
+
+const identity = x => x;
+
+const defaultMemoization = memoizeOne(identity);
+const customMemoization = memoizeOne(identity, deepEqual);
+
+const result1 = defaultMemoization({foo: 'bar'});
+const result2 = defaultMemoization({foo: 'bar'});
+
+result1 === result2 // false - difference reference
+
+const result3 = customMemoization({foo: 'bar'});
+const result4 = customMemoization({foo: 'bar'});
+
+result3 === result4 // true - arguments are deep equal
 ```
 
 ## Installation
