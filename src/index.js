@@ -1,16 +1,16 @@
 // @flow
 type EqualityFn = (a: any, b: any) => boolean;
 
-const simpleEquality = (a: any, b: any): boolean => a === b;
+const simpleIsEqual = (a: any, b: any): boolean => a === b;
 
-export default function (resultFn: Function, equalityCheck?: EqualityFn = simpleEquality) {
+export default function (resultFn: Function, isEqual?: EqualityFn = simpleIsEqual) {
     let lastArgs: Array<any> = [];
     let lastResult: any;
     let calledOnce: boolean = false;
 
     return function (...newArgs: Array<any>) {
         if (calledOnce && newArgs.length === lastArgs.length &&
-            lastArgs.every((lastArg, i) => equalityCheck(lastArg, newArgs[i]))) {
+            lastArgs.every((lastArg, i) => isEqual(lastArg, newArgs[i]))) {
             return lastResult;
         }
 
