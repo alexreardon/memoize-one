@@ -12,3 +12,4 @@ node_modules/
 lib/
 .nyc_output/
 coverage.lcov
+coverage/
