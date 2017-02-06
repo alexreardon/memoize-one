@@ -1,0 +1,3 @@
+# memoize-one
+
+## TODO: docs
