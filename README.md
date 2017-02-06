@@ -13,11 +13,11 @@ Cache invalidation is hard:
 
 > There are only two hard things in Computer Science: cache invalidation and naming things.
 >
-> - Phil Karlton
+> *Phil Karlton*
 
 So keep things simple and just use a cache size of one.
 
-Unlike other memoization libraries, `memoizeOne` only remembers the latest argument - a cache size of one. No need to worry about `maxAge`, `maxSize`, `exlusions` and so on. It simply remembers the last arguments, and if the function next called with the same arguments then it returns the previously computed result.
+Unlike other memoization libraries, `memoizeOne` only remembers the latest arguments. No need to worry about cache busting mechanisms such as `maxAge`, `maxSize`, `exlusions` and so on which can be prone to memory leaks. `memoizeOne` simply remembers the last arguments, and if the function is next called with the same arguments then it returns the previous result.
 
 
 ## Usage
@@ -30,16 +30,16 @@ const memoizedAdd = memoizeOne(add);
 
 memoizedAdd(1, 2); // 3
 
-memoizedOne(1, 2); // 3
+memoizedAdd(1, 2); // 3
 // Add function is not executed: previous result is returned
 
 memoizedAdd(2, 3); // 5
 // Add function is called to get new value
 
-memoizedOne(2, 3); // 5
+memoizedAdd(2, 3); // 5
 // Add function is not executed: previous result is returned
 
-memoizedOne(1, 2); // 3
+memoizedAdd(1, 2); // 3
 // Add function is called to get new value.
 // While this was previously cached,
 // it is not the latest so the cached result is lost
@@ -63,7 +63,7 @@ npm install memoize-one --save
 
 ### Code health
 
-- Tested with all JavaScript *types*
+- Tested with [all JavaScript *types*](https://github.com/getify/You-Dont-Know-JS/blob/master/types%20%26%20grammar/ch1.md)
 - 100% code coverage
-- flow types for safer internal execution and type checking / auto complete for editors
-- Semantically versioned
+- [flow types](http://flowtype.org) for safer internal execution and type checking / auto complete for editors
+- [Semantically versioning (2.0)](http://semver.org/)

@@ -1,6 +1,6 @@
 {
   "name": "memoize-one",
-  "version": "0.0.2-beta",
+  "version": "1.0.0-rc.1",
   "description": "A memoization library for memoizing a function with a cache size of one",
   "main": "lib/index.js",
   "module": "src/index.js",

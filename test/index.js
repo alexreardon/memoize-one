@@ -370,18 +370,6 @@ describe('memoizeOne', () => {
             expect(memoizedAdd(2, 2)).to.equal(4);
             expect(add.callCount).to.equal(2);
         });
-
-        it('should always execute the result function and return the result on the first call', () => {
-            const result = sinon.spy((value) => value);
-            const memoized = memoizeOne(result);
-
-            const values = [undefined, null, true, false, 'hi there', {}, 20, () => { }];
-
-            values.forEach((value) => {
-                expect(memoized(value)).to.equal(value);
-            });
-            expect(result.callCount).to.equal(values.length);
-        });
     });
 });
 
