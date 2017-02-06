@@ -4,9 +4,12 @@
   "description": "A memoization library for memoizing a function with a cache size of one",
   "main": "lib/index.js",
   "module": "src/index.js",
-  "repository": {},
   "author": "Alex Reardon <alexreardon@gmail.com>",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alexreardon/memoize-one.git"
+  },
   "dependencies": {},
   "devDependencies": {
     "babel-cli": "6.22.2",
