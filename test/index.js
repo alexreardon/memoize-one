@@ -6,26 +6,66 @@ import memoizeOne from '../src/';
 
 type Expectation = {|
     args: any[],
-    result: any
-|};
+        result: any
+            |};
 
 type Input = {|
     name: string,
-    first: Expectation,
-    second: Expectation
-|};
+        first: Expectation,
+            second: Expectation
+                |};
 
 describe('memoizeOne', () => {
-    // [JavaScript defines seven built-in types:](https://github.com/getify/You-Dont-Know-JS/blob/master/types%20%26%20grammar/ch1.md)
-    //    - null
-    //    - undefined
-    //    - boolean
-    //    - number
-    //    - string
-    //    - object
-    //    - symbol
+    describe('standard behaviour - baseline', () => {
+        let add;
+        let memoizedAdd;
+
+        beforeEach(() => {
+            add = sinon.spy((value1: number, value2: number): number => value1 + value2);
+            memoizedAdd = memoizeOne(add);
+        });
+
+        it('should return the result of a function', () => {
+            expect(memoizedAdd(1, 2)).to.equal(3);
+        });
+
+        it('should return the same result if the arguments have not changed', () => {
+            expect(memoizedAdd(1, 2)).to.equal(3);
+            expect(memoizedAdd(1, 2)).to.equal(3);
+        });
+
+        it('should not execute the memoized function if the arguments have not changed', () => {
+            memoizedAdd(1, 2);
+            memoizedAdd(1, 2);
+
+            expect(add.callCount).to.equal(1);
+        });
+
+        it('should invalidate a memoize cache if new arguments are provided', () => {
+            expect(memoizedAdd(1, 2)).to.equal(3);
+            expect(memoizedAdd(2, 2)).to.equal(4);
+            expect(add.callCount).to.equal(2);
+        });
+
+        it('should resume memoization after a cache invalidation', () => {
+            expect(memoizedAdd(1, 2)).to.equal(3);
+            expect(add.callCount).to.equal(1);
+            expect(memoizedAdd(2, 2)).to.equal(4);
+            expect(add.callCount).to.equal(2);
+            expect(memoizedAdd(2, 2)).to.equal(4);
+            expect(add.callCount).to.equal(2);
+        });
+    });
 
     describe('standard behaviour', () => {
+        // [JavaScript defines seven built-in types:](https://github.com/getify/You-Dont-Know-JS/blob/master/types%20%26%20grammar/ch1.md)
+        //    - null
+        //    - undefined
+        //    - boolean
+        //    - number
+        //    - string
+        //    - object
+        //    - symbol
         const inputs: Input[] = [
             {
                 name: 'null',
@@ -128,7 +168,7 @@ describe('memoizeOne', () => {
         };
 
         inputs.forEach(({ name, first, second }) => {
-            describe(`dynamic type test:[${name}]`, () => {
+            describe(`type test:[${name}]`, () => {
 
                 let spy;
                 let memoized;
@@ -188,6 +228,20 @@ describe('memoizeOne', () => {
                 return this.a;
             }
 
+            it('should respect new bindings', () => {
+                const Foo = function (bar) {
+                    this.bar = bar;
+                };
+                const memoized = memoizeOne(function (bar) {
+                    return new Foo(bar);
+                });
+
+                const result = memoized('baz');
+
+                expect(result instanceof Foo).to.equal(true);
+                expect(result.bar).to.equal('baz');
+            });
+
             it('should respect explicit bindings', () => {
                 const temp = {
                     a: 10,
@@ -210,8 +264,39 @@ describe('memoizeOne', () => {
                 expect(memoized()).to.equal(20);
             });
 
-            it('should respect default bindings', () => {
-                const memoized = memoizeOne(getA);
+            it('should respect implicit bindings', () => {
+                const temp = {
+                    a: 2,
+                    getA,
+                };
+
+                const memoized = memoizeOne(function () {
+                    return temp.getA();
+                });
+
+                expect(memoized()).to.equal(2);
+            });
+
+            it('should respect fat arrow bindings', () => {
+                const temp = {
+                    a: 50,
+                };
+                function foo() {
+                    // return an arrow function
+                    return () => {
+                        // `this` here is lexically adopted from `foo()`
+                        return this.a;
+                    };
+                }
+                const bound = foo.call(temp);
+                const memoized = memoizeOne(bound);
+
+                expect(memoized()).to.equal(50);
+            });
+
+            it('should respect ignored bindings', () => {
+                const bound = getA.bind(null);
+                const memoized = memoizeOne(bound);
 
                 expect(memoized).to.throw(TypeError);
             });
@@ -221,6 +306,8 @@ describe('memoizeOne', () => {
             function getA() {
                 return this.a;
             }
+
+            it('should respect new bindings');
 
             it('should respect implicit bindings', () => {
                 const getAMemoized = memoizeOne(getA);
@@ -263,6 +350,49 @@ describe('memoizeOne', () => {
                 expect(getAMemoized()).to.equal(40);
                 expect(getAMemoized()).to.equal(40);
                 expect(spy.callCount).to.equal(1);
+            });
+
+            it('should respect implicit bindings', () => {
+                const getAMemoized = memoizeOne(getA);
+                const temp = {
+                    a: 2,
+                    getAMemoized,
+                };
+
+                expect(temp.getAMemoized()).to.equal(2);
+            });
+
+            it('should respect fat arrow bindings', () => {
+
+            });
+
+            it('should respect ignored bindings', () => {
+                const memoized = memoizeOne(getA);
+
+                const getResult = function () {
+                    return memoized.call(null);
+                };
+
+                expect(getResult).to.throw(TypeError);
+            });
+
+            // This behaviour is debatable.
+            // For: sometimes you might call a function in different `this` without knowing it and this would bust your cache
+            // Against: if your function is reading a value from `this` then your memoized function would be returning the wrong result.
+            it('should memoize the previous result even if the this context changes', () => {
+                const memoized = memoizeOne(getA);
+                const temp1 = {
+                    a: 20,
+                    getMemoizedA: memoized,
+                };
+                const temp2 = {
+                    a: 30,
+                    getMemoizedA: memoized,
+                };
+
+                expect(temp1.getMemoizedA()).to.equal(20);
+                // this might be unexpected
+                expect(temp2.getMemoizedA()).to.equal(20);
             });
         });
     });
@@ -326,47 +456,6 @@ describe('memoizeOne', () => {
             // equality test occured
             expect(equalityStub.called).to.be.true;
             // underlying function called
-            expect(add.callCount).to.equal(2);
-        });
-    });
-
-    describe('standard behaviour', () => {
-        let add;
-        let memoizedAdd;
-
-        beforeEach(() => {
-            add = sinon.spy((value1: number, value2: number): number => value1 + value2);
-            memoizedAdd = memoizeOne(add);
-        });
-
-        it('should return the result of a function', () => {
-            expect(memoizedAdd(1, 2)).to.equal(3);
-        });
-
-        it('should return the same result if the arguments have not changed', () => {
-            expect(memoizedAdd(1, 2)).to.equal(3);
-            expect(memoizedAdd(1, 2)).to.equal(3);
-        });
-
-        it('should not execute the memoized function if the arguments have not changed', () => {
-            memoizedAdd(1, 2);
-            memoizedAdd(1, 2);
-
-            expect(add.callCount).to.equal(1);
-        });
-
-        it('should invalidate a memoize cache if new arguments are provided', () => {
-            expect(memoizedAdd(1, 2)).to.equal(3);
-            expect(memoizedAdd(2, 2)).to.equal(4);
-            expect(add.callCount).to.equal(2);
-        });
-
-        it('should resume memoization after a cache invalidation', () => {
-            expect(memoizedAdd(1, 2)).to.equal(3);
-            expect(add.callCount).to.equal(1);
-            expect(memoizedAdd(2, 2)).to.equal(4);
-            expect(add.callCount).to.equal(2);
-            expect(memoizedAdd(2, 2)).to.equal(4);
             expect(add.callCount).to.equal(2);
         });
     });
