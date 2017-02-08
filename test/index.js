@@ -4,18 +4,12 @@ import { expect } from 'chai';
 import sinon from 'sinon';
 import memoizeOne from '../src/';
 
-type Expectation = {|
-    args: any[],
-        result: any
-            |};
-
-type Input = {|
-    name: string,
-        first: Expectation,
-            second: Expectation
-                |};
-
 describe('memoizeOne', () => {
+    function getA() {
+        // $FlowSuppressError: allowing many values for `this`
+        return this.a;
+    }
+
     describe('standard behaviour - baseline', () => {
         let add;
         let memoizedAdd;
@@ -57,7 +51,18 @@ describe('memoizeOne', () => {
         });
     });
 
-    describe('standard behaviour', () => {
+    describe('standard behaviour - dynamic', () => {
+        type Expectation = {|
+            args: any[],
+            result: any
+        |};
+
+        type Input = {|
+            name: string,
+            first: Expectation,
+            second: Expectation
+        |};
+
         // [JavaScript defines seven built-in types:](https://github.com/getify/You-Dont-Know-JS/blob/master/types%20%26%20grammar/ch1.md)
         //    - null
         //    - undefined
@@ -168,7 +173,7 @@ describe('memoizeOne', () => {
         };
 
         inputs.forEach(({ name, first, second }) => {
-            describe(`type test:[${name}]`, () => {
+            describe(`type: [${name}]`, () => {
 
                 let spy;
                 let memoized;
@@ -224,10 +229,6 @@ describe('memoizeOne', () => {
 
     describe('respecting "this" context', () => {
         describe('original function', () => {
-            function getA() {
-                return this.a;
-            }
-
             it('should respect new bindings', () => {
                 const Foo = function (bar) {
                     this.bar = bar;
@@ -285,7 +286,7 @@ describe('memoizeOne', () => {
                     // return an arrow function
                     return () => {
                         // `this` here is lexically adopted from `foo()`
-                        return this.a;
+                        return getA.call(this);
                     };
                 }
                 const bound = foo.call(temp);
@@ -303,11 +304,19 @@ describe('memoizeOne', () => {
         });
 
         describe('memoized function', () => {
-            function getA() {
-                return this.a;
-            }
+            it('should respect new bindings', () => {
+                const memoizedGetA = memoizeOne(getA);
+                const Foo = function (a) {
+                    this.a = a;
+                    this.result = memoizedGetA.call(this);
+                };
 
-            it('should respect new bindings');
+                const foo1 = new Foo(10);
+                const foo2 = new Foo(20);
+
+                expect(foo1.result).to.equal(10);
+                expect(foo2.result).to.equal(20);
+            });
 
             it('should respect implicit bindings', () => {
                 const getAMemoized = memoizeOne(getA);
@@ -363,7 +372,21 @@ describe('memoizeOne', () => {
             });
 
             it('should respect fat arrow bindings', () => {
+                const temp = {
+                    a: 50,
+                };
+                const memoizedGetA = memoizeOne(getA);
+                function foo() {
+                    // return an arrow function
+                    return () => {
+                        // `this` here is lexically adopted from `foo()`
+                        return memoizedGetA.call(this);
+                    };
+                }
+                const bound = foo.call(temp);
+                const memoized = memoizeOne(bound);
 
+                expect(memoized()).to.equal(50);
             });
 
             it('should respect ignored bindings', () => {
@@ -375,25 +398,23 @@ describe('memoizeOne', () => {
 
                 expect(getResult).to.throw(TypeError);
             });
+        });
+    });
 
-            // This behaviour is debatable.
-            // For: sometimes you might call a function in different `this` without knowing it and this would bust your cache
-            // Against: if your function is reading a value from `this` then your memoized function would be returning the wrong result.
-            it('should memoize the previous result even if the this context changes', () => {
-                const memoized = memoizeOne(getA);
-                const temp1 = {
-                    a: 20,
-                    getMemoizedA: memoized,
-                };
-                const temp2 = {
-                    a: 30,
-                    getMemoizedA: memoized,
-                };
+    describe('context change', () => {
+        it('should break the memoization cache if the execution context changes', () => {
+            const memoized = memoizeOne(getA);
+            const temp1 = {
+                a: 20,
+                getMemoizedA: memoized,
+            };
+            const temp2 = {
+                a: 30,
+                getMemoizedA: memoized,
+            };
 
-                expect(temp1.getMemoizedA()).to.equal(20);
-                // this might be unexpected
-                expect(temp2.getMemoizedA()).to.equal(20);
-            });
+            expect(temp1.getMemoizedA()).to.equal(20);
+            expect(temp2.getMemoizedA()).to.equal(30);
         });
     });
 

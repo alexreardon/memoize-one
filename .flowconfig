@@ -5,3 +5,7 @@
 [libs]
 
 [options]
+
+# Provides a way to suppress flow errors in the following line.
+# Example: // $FlowSuppressError: This following line is borked because of reasons.
+suppress_comment= \\(.\\|\n\\)*\\$FlowSuppressError

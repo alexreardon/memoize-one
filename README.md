@@ -85,11 +85,11 @@ yarn add memoize-one
 npm install memoize-one --save
 ```
 
-## Other
+## Correctly handling execution context (`this`)
 
 ### memoizeOne correctly supports `this` control
 
-This library takes special care to maintain, and allow control over the the `this` context just like a regular function. Both the original function and the memoized function's can be controlled using all the standard `this` controlling techniques:
+This library takes special care to maintain, and allow control over the the `this` context for **both** the original function being memoized as well as the returned memoized function. Both the original function and the memoized function's `this` context respect all the standard `this` controlling techniques:
 
 - new bindings (`new`)
 - explicit binding (`call`, `apply`, `bind`);
@@ -98,9 +98,35 @@ This library takes special care to maintain, and allow control over the the `thi
 - fat arrow binding (binding to lexical `this`)
 - ignored this (pass `null` as `this` to explicit binding)
 
-### Code health
+### Changes to `this` are considered argument changes
+
+Changes to the running context (`this`) of a function can result in the function returning a different value event though its arguments have stayed the same:
+
+```js
+function getA() {
+    return this.a;
+}
+
+const temp1 = {
+    a: 20,
+};
+const temp2 = {
+    a: 30,
+}
+
+getA.call(temp1); // 20
+getA.call(temp2); // 30
+```
+
+Therefore, in order to prevent against unexpected results, `memoizeOne` takes into account the current execution context (`this`) of the memoized function. If `this` is different to the previous invokation then it is considered a change in argument. [further discussion](https://github.com/alexreardon/memoize-one/issues/3).
+
+Generally this will be of no impact if you are not explicity controlling the `this` context of functions you want to memoize with [explicit binding](https://github.com/getify/You-Dont-Know-JS/blob/master/this%20%26%20object%20prototypes/ch2.md#explicit-binding)  or [implicit binding](https://github.com/getify/You-Dont-Know-JS/blob/master/this%20%26%20object%20prototypes/ch2.md#implicit-binding). `memoizeOne` will detect when you are manipulating `this` and will then consider the `this` context as an argument. If `this` changes, it will re-execute the original function even if the arguments have not changed.
+
+
+## Code health
 
 - Tested with all built in [JavaScript types](https://github.com/getify/You-Dont-Know-JS/blob/master/types%20%26%20grammar/ch1.md).
 - 100% code coverage.
 - [flow types](http://flowtype.org) for safer internal execution and external consumption. Also allows for editor autocompletion.
 - Follows [Semantic versioning (2.0)](http://semver.org/) for safer versioning.
+- Lightweight with no dependencies

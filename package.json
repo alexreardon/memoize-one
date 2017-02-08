@@ -1,7 +1,7 @@
 {
   "name": "memoize-one",
-  "version": "1.0.0-rc.2",
-  "description": "A memoization library for memoizing a function with a cache size of one",
+  "version": "1.0.0-rc.3",
+  "description": "A memoization library which only remembers the latest invokation",
   "main": "lib/index.js",
   "module": "src/index.js",
   "author": "Alex Reardon <alexreardon@gmail.com>",
@@ -44,5 +44,10 @@
     "coverage:report": "nyc report --reporter=text-lcov > coverage.lcov",
     "coverage:publish": "codecov",
     "prepublish": "yarn run build"
-  }
+  },
+  "keywords": [
+    "memoize",
+    "cache",
+    "performance"
+  ]
 }
