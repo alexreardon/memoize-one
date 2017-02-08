@@ -1,7 +1,7 @@
 {
   "name": "memoize-one",
   "version": "1.0.0",
-  "description": "A memoization library which only remembers the latest invokation",
+  "description": "A memoization library which only remembers the latest invocation",
   "main": "lib/index.js",
   "module": "src/index.js",
   "author": "Alex Reardon <alexreardon@gmail.com>",

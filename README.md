@@ -1,6 +1,6 @@
 # memoizeOne
 
-A memoization library which only remembers the latest invokation
+A memoization library which only remembers the latest invocation
 
 [![Build Status](https://travis-ci.org/alexreardon/memoize-one.svg?branch=master)](https://travis-ci.org/alexreardon/memoize-one) [![codecov](https://codecov.io/gh/alexreardon/memoize-one/branch/master/graph/badge.svg)](https://codecov.io/gh/alexreardon/memoize-one) [![dependencies](https://david-dm.org/alexreardon/memoize-one.svg)](https://david-dm.org/alexreardon/memoize-one) [![SemVer](https://img.shields.io/badge/SemVer-2.0.0-brightgreen.svg)](http://semver.org/spec/v2.0.0.html)
 
@@ -118,7 +118,7 @@ getA.call(temp1); // 20
 getA.call(temp2); // 30
 ```
 
-Therefore, in order to prevent against unexpected results, `memoizeOne` takes into account the current execution context (`this`) of the memoized function. If `this` is different to the previous invokation then it is considered a change in argument. [further discussion](https://github.com/alexreardon/memoize-one/issues/3).
+Therefore, in order to prevent against unexpected results, `memoizeOne` takes into account the current execution context (`this`) of the memoized function. If `this` is different to the previous invocation then it is considered a change in argument. [further discussion](https://github.com/alexreardon/memoize-one/issues/3).
 
 Generally this will be of no impact if you are not explicity controlling the `this` context of functions you want to memoize with [explicit binding](https://github.com/getify/You-Dont-Know-JS/blob/master/this%20%26%20object%20prototypes/ch2.md#explicit-binding)  or [implicit binding](https://github.com/getify/You-Dont-Know-JS/blob/master/this%20%26%20object%20prototypes/ch2.md#implicit-binding). `memoizeOne` will detect when you are manipulating `this` and will then consider the `this` context as an argument. If `this` changes, it will re-execute the original function even if the arguments have not changed.
 
