@@ -85,9 +85,9 @@ yarn add memoize-one
 npm install memoize-one --save
 ```
 
-## Correctly handling execution context (`this`)
+## `this`
 
-### memoizeOne correctly supports `this` control
+### memoizeOne correctly respects `this` control
 
 This library takes special care to maintain, and allow control over the the `this` context for **both** the original function being memoized as well as the returned memoized function. Both the original function and the memoized function's `this` context respect all the standard `this` controlling techniques:
 
