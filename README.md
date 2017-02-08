@@ -2,7 +2,7 @@
 
 A memoization library which only remembers the latest invokation
 
-[![Build Status](https://travis-ci.org/alexreardon/memoize-one.svg?branch=master)](https://travis-ci.org/alexreardon/memoize-one) [![codecov](https://codecov.io/gh/alexreardon/memoize-one/branch/master/graph/badge.svg)](https://codecov.io/gh/alexreardon/memoize-one) [![dependencies](https://david-dm.org/alexreardon/memoize-one.svg)](https://david-dm.org/alexreardon/memoize-one)
+[![Build Status](https://travis-ci.org/alexreardon/memoize-one.svg?branch=master)](https://travis-ci.org/alexreardon/memoize-one) [![codecov](https://codecov.io/gh/alexreardon/memoize-one/branch/master/graph/badge.svg)](https://codecov.io/gh/alexreardon/memoize-one) [![dependencies](https://david-dm.org/alexreardon/memoize-one.svg)](https://david-dm.org/alexreardon/memoize-one) [![SemVer](https://img.shields.io/badge/SemVer-2.0.0-brightgreen.svg)](http://semver.org/spec/v2.0.0.html)
 
 ## Rationale
 
@@ -89,7 +89,7 @@ npm install memoize-one --save
 
 ### memoizeOne correctly respects `this` control
 
-This library takes special care to maintain, and allow control over the the `this` context for **both** the original function being memoized as well as the returned memoized function. Both the original function and the memoized function's `this` context respect all the standard `this` controlling techniques:
+This library takes special care to maintain, and allow control over the the `this` context for **both** the original function being memoized as well as the returned memoized function. Both the original function and the memoized function's `this` context respect [all the `this` controlling techniques](https://github.com/getify/You-Dont-Know-JS/blob/master/this%20%26%20object%20prototypes/ch2.md):
 
 - new bindings (`new`)
 - explicit binding (`call`, `apply`, `bind`);
@@ -98,7 +98,7 @@ This library takes special care to maintain, and allow control over the the `thi
 - fat arrow binding (binding to lexical `this`)
 - ignored this (pass `null` as `this` to explicit binding)
 
-### Changes to `this` are considered argument changes
+### Changes to `this` is considered an argument change
 
 Changes to the running context (`this`) of a function can result in the function returning a different value event though its arguments have stayed the same:
 
