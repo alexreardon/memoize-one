@@ -1,6 +1,6 @@
 {
   "name": "memoize-one",
-  "version": "1.0.0-rc.3",
+  "version": "1.0.0",
   "description": "A memoization library which only remembers the latest invokation",
   "main": "lib/index.js",
   "module": "src/index.js",
