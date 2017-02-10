@@ -6,7 +6,10 @@ import memoizeOne from '../src/';
 
 describe('memoizeOne', () => {
     function getA() {
-        // $FlowSuppressError: allowing many values for `this`
+        // [appeasing flow](https://flowtype.org/docs/nullable-types.html)
+        if (this == null) {
+            throw new TypeError();
+        }
         return this.a;
     }
 
