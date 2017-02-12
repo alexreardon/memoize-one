@@ -441,7 +441,7 @@ describe('memoizeOne', () => {
             memoizedAdd(1, 4);
 
             expect(equalityStub.calledWith(1, 1)).to.be.true;
-            expect(equalityStub.calledWith(2, 4)).to.be.true;
+            expect(equalityStub.calledWith(4, 2)).to.be.true;
         });
 
         it('should return the previous value without executing the result fn if the equality fn returns true', () => {
