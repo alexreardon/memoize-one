@@ -9,12 +9,14 @@ export default function (resultFn: Function, isEqual?: EqualityFn = simpleIsEqua
     let lastResult: any;
     let calledOnce: boolean = false;
 
-    // breaking cache when arguments or context changes
+    const isNewArgEqualToLast = (newArg, index) => isEqual(newArg, lastArgs[index]);
+
+    // breaking cache when context (this) or arguments change
     return function (...newArgs: Array<any>) {
         if (calledOnce &&
             lastThis === this &&
             newArgs.length === lastArgs.length &&
-            lastArgs.every((lastArg, i) => isEqual(lastArg, newArgs[i]))) {
+            newArgs.every(isNewArgEqualToLast)) {
             return lastResult;
         }
 
