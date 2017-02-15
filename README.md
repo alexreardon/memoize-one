@@ -122,11 +122,25 @@ Therefore, in order to prevent against unexpected results, `memoizeOne` takes in
 
 Generally this will be of no impact if you are not explicity controlling the `this` context of functions you want to memoize with [explicit binding](https://github.com/getify/You-Dont-Know-JS/blob/master/this%20%26%20object%20prototypes/ch2.md#explicit-binding)  or [implicit binding](https://github.com/getify/You-Dont-Know-JS/blob/master/this%20%26%20object%20prototypes/ch2.md#implicit-binding). `memoizeOne` will detect when you are manipulating `this` and will then consider the `this` context as an argument. If `this` changes, it will re-execute the original function even if the arguments have not changed.
 
+## Performance :rocket:
 
-## Code health
+### Tiny
+`memoizeOne` is super lightweight at `457 bytes` minified and `299 bytes` gzipped. (`1kb` = `1000 bytes`)
+
+### Extremely fast
+`memoizeOne` performs better or on par with than other popular memoization libraries for the purpose of remembering the latest invocation.
+
+**Results**
+- [simple arguments](https://www.measurethat.net/Benchmarks/ShowResult/4452)
+- [complex arguments](https://www.measurethat.net/Benchmarks/ShowResult/4488)
+
+The comparisions are not exhaustive and are primiarly to show that `memoizeOne` accomplishes remembering the latest invocation really fast. The benchmarks do not take into account the differences in feature sets, library sizes, parse time, and so on.
+
+## Code health :thumbsup:
 
 - Tested with all built in [JavaScript types](https://github.com/getify/You-Dont-Know-JS/blob/master/types%20%26%20grammar/ch1.md).
-- 100% code coverage.
-- [flow types](http://flowtype.org) for safer internal execution and external consumption. Also allows for editor autocompletion.
-- Follows [Semantic versioning (2.0)](http://semver.org/) for safer versioning.
-- Lightweight with no dependencies
+- [100% code coverage](https://codecov.io/gh/alexreardon/memoize-one).
+- [Continuous integration](https://travis-ci.org/alexreardon/memoize-one) to run tests and type checks.
+- [`Flow` types](http://flowtype.org) for safer internal execution and external consumption. Also allows for editor autocompletion.
+- Follows [Semantic versioning (2.0)](http://semver.org/) for safer consumption.
+- No dependencies
