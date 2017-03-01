@@ -85,6 +85,22 @@ yarn add memoize-one
 npm install memoize-one --save
 ```
 
+## Module usage
+
+### ES6 module
+
+```js
+import memoizeOne from 'memoize-one';
+```
+
+### CommonJS
+
+If you are in a CommonJS environment (eg [Node](https://nodejs.org)), then **you will need add `.default` to your import**:
+
+```js
+const memoizeOne = require('memoize-one').default;
+```
+
 ## `this`
 
 ### memoizeOne correctly respects `this` control
