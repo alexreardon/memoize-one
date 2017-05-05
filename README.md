@@ -120,14 +120,14 @@ Changes to the running context (`this`) of a function can result in the function
 
 ```js
 function getA() {
-    return this.a;
+  return this.a;
 }
 
 const temp1 = {
-    a: 20,
+  a: 20,
 };
 const temp2 = {
-    a: 30,
+  a: 30,
 }
 
 getA.call(temp1); // 20
