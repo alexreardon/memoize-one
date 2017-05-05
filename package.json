@@ -3,7 +3,6 @@
   "version": "1.0.2",
   "description": "A memoization library which only remembers the latest invocation",
   "main": "lib/index.js",
-  "module": "src/index.js",
   "author": "Alex Reardon <alexreardon@gmail.com>",
   "license": "MIT",
   "repository": {
