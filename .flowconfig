@@ -6,6 +6,8 @@
 
 [options]
 
+experimental.strict_call_arity=true
+
 # Provides a way to suppress flow errors in the following line.
 # Example: // $FlowFixMe: This following line is borked because of reasons.
 suppress_comment= \\(.\\|\n\\)*\\$FlowFixMe
