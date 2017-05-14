@@ -21,7 +21,7 @@
     "codecov": "2.1.0",
     "eslint": "3.19.0",
     "eslint-plugin-flowtype": "2.32.1",
-    "flow-bin": "0.45.0",
+    "flow-bin": "0.46.0",
     "flow-copy-source": "1.1.0",
     "mocha": "3.3.0",
     "nyc": "10.3.0",
