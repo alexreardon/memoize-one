@@ -3,6 +3,12 @@ type EqualityFn = (a: mixed, b: mixed) => boolean;
 
 const simpleIsEqual: EqualityFn = (a: mixed, b: mixed): boolean => a === b;
 
+// <ResultFn: (...Array<any>) => mixed>
+// The purpose of this typing is to ensure that the returned memoized
+// function has the same type as the provided function (`resultFn`).
+// ResultFn:        Generic type (which is the same as the resultFn).
+// (...Array<any>): Accepts any length of arguments - and they are not checked
+// mixed:           The result can be anything but needs to be checked before usage
 export default function <ResultFn: (...Array<any>) => mixed>(resultFn: ResultFn, isEqual?: EqualityFn = simpleIsEqual): ResultFn {
   let lastThis: mixed;
   let lastArgs: Array<mixed> = [];
