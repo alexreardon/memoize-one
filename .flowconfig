@@ -6,6 +6,8 @@
 
 [options]
 
+# Opting in to 'Strict Checking of Function Call Arity'
+# https://flow.org/blog/2017/05/07/Strict-Function-Call-Arity/
 experimental.strict_call_arity=true
 
 # Provides a way to suppress flow errors in the following line.
