@@ -482,5 +482,23 @@ describe('memoizeOne', () => {
       expect(add.callCount).to.equal(2);
     });
   });
+
+  describe('flow typing', () => {
+    it('should maintain the type of the original function', () => {
+      // this test will create a flow error if the typing is incorrect
+      type SubtractFn = (a: number, b: number) => number;
+      const subtract: SubtractFn = (a: number, b: number): number => a - b;
+      const requiresASubtractFn = (fn: SubtractFn): number => fn(2, 1);
+
+      const memoizedSubtract: SubtractFn = memoizeOne(subtract);
+
+      // will cause a flow error if `fn` is not of type `SubtractFn`
+      const result1 = requiresASubtractFn(memoizedSubtract);
+      const result2 = requiresASubtractFn(memoizeOne(subtract));
+
+      expect(result1).to.equal(1);
+      expect(result2).to.equal(1);
+    });
+  });
 });
 
