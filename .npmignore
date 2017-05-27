@@ -1,1 +1,4 @@
 # Ignoring nothing. Publishing both src and lib to npm
+# ...
+# except for test cause that breaks flow
+test
