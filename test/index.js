@@ -483,6 +483,10 @@ describe('memoizeOne', () => {
     });
   });
 
+  describe('clearing the cache', () => {
+    // TODO
+  });
+
   describe('flow typing', () => {
     it('should maintain the type of the original function', () => {
       // this test will create a flow error if the typing is incorrect
