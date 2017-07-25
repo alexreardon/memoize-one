@@ -11,9 +11,9 @@ const simpleIsEqual: EqualityFn = (a: mixed, b: mixed): boolean => a === b;
 // mixed:           The result can be anything but needs to be checked before usage
 export default function <ResultFn: (...Array<any>) => mixed>(resultFn: ResultFn, isEqual?: EqualityFn = simpleIsEqual): ResultFn {
   let lastThis: mixed;
-  let lastArgs: Array<mixed> = [];
+  let lastArgs: Array<mixed>;
   let lastResult: mixed;
-  let calledOnce: boolean = false;
+  let calledOnce: boolean;
 
   const isNewArgEqualToLast = (newArg: mixed, index: number): boolean => isEqual(newArg, lastArgs[index]);
 
@@ -31,6 +31,14 @@ export default function <ResultFn: (...Array<any>) => mixed>(resultFn: ResultFn,
     lastArgs = newArgs;
     lastResult = resultFn.apply(this, newArgs);
     return lastResult;
+  };
+
+  // optionally clear the current cache
+  result.reset = () => {
+    lastThis = undefined;
+    lastArgs = [];
+    lastResult = undefined;
+    calledOnce = false;
   };
 
   // telling flow to ignore the type of `result` as we know it is `ResultFn`
