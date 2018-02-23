@@ -33,6 +33,12 @@ export default function <ResultFn: (...Array<any>) => mixed>(resultFn: ResultFn,
     return lastResult;
   };
 
+  Object.defineProperty(result, 'length', {
+    writable: false,
+    configurable: true,
+    value: resultFn.length,
+  });
+
   // telling flow to ignore the type of `result` as we know it is `ResultFn`
   return (result: any);
 }

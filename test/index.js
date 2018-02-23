@@ -483,6 +483,15 @@ describe('memoizeOne', () => {
     });
   });
 
+  describe('js typing', () => {
+    it('should maintain function arguments count', () => {
+      expect(memoizeOne(a => a).length).to.equal(1);
+      expect(memoizeOne((a, b) => a + b).length).to.equal(2);
+      expect(memoizeOne((...rest) => rest).length).to.equal(0);
+      expect(memoizeOne((a, ...rest) => a + rest).length).to.equal(1);
+    });
+  });
+
   describe('flow typing', () => {
     it('should maintain the type of the original function', () => {
       // this test will create a flow error if the typing is incorrect
