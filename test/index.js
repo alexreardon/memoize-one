@@ -492,9 +492,9 @@ describe('memoizeOne', () => {
     });
 
     it('should maintain function name', () => {
-      const fn = a => a;
-      expect(memoizeOne(fn).name).to.equal('memoized_fn');
-      expect(memoizeOne(a => a).name).to.equal('memoized_one');
+      const foo = a => a;
+      expect(memoizeOne(foo).name).to.equal('memoized_foo');
+      expect(memoizeOne(a => a).name).to.equal('memoized_fn');
       expect(memoizeOne(function test(a) {
         return a;
       }).name).to.equal('memoized_test');

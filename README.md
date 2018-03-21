@@ -45,6 +45,7 @@ memoizedAdd(1, 2); // 3
 [Play with this example](http://www.webpackbin.com/NkCiYkz_M)
 
 ### Custom equality function
+
 You can also pass in a custom function for checking the equality of two items.
 
 ```js
@@ -66,14 +67,21 @@ const result4 = customMemoization({foo: 'bar'});
 
 result3 === result4 // true - arguments are deep equal
 ```
+
 [Play with this example](http://www.webpackbin.com/NJW-tJMdf)
 
-#### Type signature
+#### Equality function type signature
+
 Here is the expected [flow](http://flowtype.org) type signature for a custom equality function:
 
 ```js
 type EqualityFn = (a: any, b: any) => boolean;
 ```
+
+### Dynamic properties
+
+- The result function will have the same [`.length` property](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/length) as the provided function.
+- For debug purposes we add a [`.name` property](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/name) to the result function. If provided function has a name then the name will be `memoized_${yourFunction.name}`. Otherwise it will be `memoized_fn`. This assists in debugging memoized functions.
 
 ## Installation
 
@@ -141,12 +149,15 @@ Generally this will be of no impact if you are not explicity controlling the `th
 ## Performance :rocket:
 
 ### Tiny
+
 `memoizeOne` is super lightweight at `457 bytes` minified and `299 bytes` gzipped. (`1kb` = `1000 bytes`)
 
 ### Extremely fast
+
 `memoizeOne` performs better or on par with than other popular memoization libraries for the purpose of remembering the latest invocation.
 
 **Results**
+
 - [simple arguments](https://www.measurethat.net/Benchmarks/ShowResult/4452)
 - [complex arguments](https://www.measurethat.net/Benchmarks/ShowResult/4488)
 

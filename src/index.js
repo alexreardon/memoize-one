@@ -46,7 +46,8 @@ export default function <ResultFn: (...Array<any>) => mixed>(resultFn: ResultFn,
 
   // Giving a useful name to the resulting function
   // This is helpful for debug purposes
-  defineProperty(result, 'name', `memoized_${resultFn.name || 'one'}`);
+  const name: string = `memoized_${resultFn.name || 'fn'}`;
+  defineProperty(result, 'name', name);
 
   // telling flow to ignore the type of `result` as we know it is `ResultFn`
   return (result: any);
