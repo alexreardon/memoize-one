@@ -2,7 +2,7 @@
 
 A memoization library which only remembers the latest invocation
 
-[![Build Status](https://travis-ci.org/alexreardon/memoize-one.svg?branch=master)](https://travis-ci.org/alexreardon/memoize-one) [![codecov](https://codecov.io/gh/alexreardon/memoize-one/branch/master/graph/badge.svg)](https://codecov.io/gh/alexreardon/memoize-one) [![dependencies](https://david-dm.org/alexreardon/memoize-one.svg)](https://david-dm.org/alexreardon/memoize-one) [![SemVer](https://img.shields.io/badge/SemVer-2.0.0-brightgreen.svg)](http://semver.org/spec/v2.0.0.html)
+[![Build Status](https://travis-ci.org/alexreardon/memoize-one.svg?branch=master)](https://travis-ci.org/alexreardon/memoize-one) [![dependencies](https://david-dm.org/alexreardon/memoize-one.svg)](https://david-dm.org/alexreardon/memoize-one) [![SemVer](https://img.shields.io/badge/SemVer-2.0.0-brightgreen.svg)](http://semver.org/spec/v2.0.0.html)
 
 ## Rationale
 
@@ -45,6 +45,7 @@ memoizedAdd(1, 2); // 3
 [Play with this example](http://www.webpackbin.com/NkCiYkz_M)
 
 ### Custom equality function
+
 You can also pass in a custom function for checking the equality of two items.
 
 ```js
@@ -66,13 +67,46 @@ const result4 = customMemoization({foo: 'bar'});
 
 result3 === result4 // true - arguments are deep equal
 ```
+
 [Play with this example](http://www.webpackbin.com/NJW-tJMdf)
 
-#### Type signature
+#### Equality function type signature
+
 Here is the expected [flow](http://flowtype.org) type signature for a custom equality function:
 
 ```js
 type EqualityFn = (a: any, b: any) => boolean;
+```
+
+### Dynamic properties
+
+The result function will have the same [`.length` property](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/length) as the provided function.
+
+```js
+const add = (a, b) => a + b;
+const memoizedAdd = memoizeOne(add);
+
+memoizedAdd.length === 2; // true
+```
+
+- For debug purposes we add a [`.name` property](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/name) to the result function. If provided function has a name then the name will be `memoized_${yourFunction.name}`. Otherwise it will be `memoized_fn`. This assists in debugging memoized functions.
+
+```js
+// function has a name
+const add = (a, b) => a + b;
+
+// the original name is 'add'
+add.name === 'add'; // true
+
+// our new memoizedAdd function has a prefixed name
+const memoizedAdd = memoizeOne(add);
+memoizedAdd.name === 'memoized_add'; // true
+```
+
+```js
+// function does not have a name
+const memoizedInline = memoizeOne((a, b) => a + b);
+memoizedInline.name === 'memoized_fn';
 ```
 
 ## Installation
@@ -141,12 +175,15 @@ Generally this will be of no impact if you are not explicity controlling the `th
 ## Performance :rocket:
 
 ### Tiny
+
 `memoizeOne` is super lightweight at `457 bytes` minified and `299 bytes` gzipped. (`1kb` = `1000 bytes`)
 
 ### Extremely fast
+
 `memoizeOne` performs better or on par with than other popular memoization libraries for the purpose of remembering the latest invocation.
 
 **Results**
+
 - [simple arguments](https://www.measurethat.net/Benchmarks/ShowResult/4452)
 - [complex arguments](https://www.measurethat.net/Benchmarks/ShowResult/4488)
 
@@ -155,7 +192,7 @@ The comparisions are not exhaustive and are primiarly to show that `memoizeOne` 
 ## Code health :thumbsup:
 
 - Tested with all built in [JavaScript types](https://github.com/getify/You-Dont-Know-JS/blob/master/types%20%26%20grammar/ch1.md).
-- [100% code coverage](https://codecov.io/gh/alexreardon/memoize-one).
+- 100% code coverage
 - [Continuous integration](https://travis-ci.org/alexreardon/memoize-one) to run tests and type checks.
 - [`Flow` types](http://flowtype.org) for safer internal execution and external consumption. Also allows for editor autocompletion.
 - Follows [Semantic versioning (2.0)](http://semver.org/) for safer consumption.

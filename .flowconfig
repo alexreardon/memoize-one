@@ -1,15 +1,5 @@
-[ignore]
-
-[include]
-
-[libs]
-
 [options]
 
-# Opting in to 'Strict Checking of Function Call Arity'
-# https://flow.org/blog/2017/05/07/Strict-Function-Call-Arity/
-experimental.strict_call_arity=true
-
 # Provides a way to suppress flow errors in the following line.
-# Example: // $FlowFixMe: This following line is borked because of reasons.
 suppress_comment= \\(.\\|\n\\)*\\$FlowFixMe
+suppress_comment= \\(.\\|\n\\)*\\$ExpectEror
