@@ -40,8 +40,12 @@ export default function <ResultFn: (...Array<any>) => mixed>(resultFn: ResultFn,
     return lastResult;
   };
 
+  // Adding a length property
+  // This is useful for some memoization checks that inspect the length of the function arguments
   defineProperty(result, 'length', resultFn.length);
 
+  // Giving a useful name to the resulting function
+  // This is helpful for debug purposes
   defineProperty(result, 'name', `memoized_${resultFn.name || 'one'}`);
 
   // telling flow to ignore the type of `result` as we know it is `ResultFn`
