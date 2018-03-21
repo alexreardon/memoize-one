@@ -5,5 +5,3 @@ node_js:
 script:
   - yarn run validate
   - yarn run test
-after_success:
-  - yarn run coverage

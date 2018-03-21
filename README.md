@@ -2,7 +2,7 @@
 
 A memoization library which only remembers the latest invocation
 
-[![Build Status](https://travis-ci.org/alexreardon/memoize-one.svg?branch=master)](https://travis-ci.org/alexreardon/memoize-one) [![codecov](https://codecov.io/gh/alexreardon/memoize-one/branch/master/graph/badge.svg)](https://codecov.io/gh/alexreardon/memoize-one) [![dependencies](https://david-dm.org/alexreardon/memoize-one.svg)](https://david-dm.org/alexreardon/memoize-one) [![SemVer](https://img.shields.io/badge/SemVer-2.0.0-brightgreen.svg)](http://semver.org/spec/v2.0.0.html)
+[![Build Status](https://travis-ci.org/alexreardon/memoize-one.svg?branch=master)](https://travis-ci.org/alexreardon/memoize-one) [![dependencies](https://david-dm.org/alexreardon/memoize-one.svg)](https://david-dm.org/alexreardon/memoize-one) [![SemVer](https://img.shields.io/badge/SemVer-2.0.0-brightgreen.svg)](http://semver.org/spec/v2.0.0.html)
 
 ## Rationale
 
@@ -166,7 +166,7 @@ The comparisions are not exhaustive and are primiarly to show that `memoizeOne` 
 ## Code health :thumbsup:
 
 - Tested with all built in [JavaScript types](https://github.com/getify/You-Dont-Know-JS/blob/master/types%20%26%20grammar/ch1.md).
-- [100% code coverage](https://codecov.io/gh/alexreardon/memoize-one).
+- 100% code coverage
 - [Continuous integration](https://travis-ci.org/alexreardon/memoize-one) to run tests and type checks.
 - [`Flow` types](http://flowtype.org) for safer internal execution and external consumption. Also allows for editor autocompletion.
 - Follows [Semantic versioning (2.0)](http://semver.org/) for safer consumption.

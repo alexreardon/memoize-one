@@ -32,7 +32,6 @@
     "babel-preset-env": "^1.6.1",
     "babel-preset-flow": "^6.23.0",
     "chai": "4.1.2",
-    "codecov": "3.0.0",
     "cross-env": "^5.1.4",
     "eslint": "4.19.0",
     "eslint-plugin-flowtype": "^2.46.1",
@@ -40,7 +39,6 @@
     "flow-bin": "0.68.0",
     "flow-copy-source": "1.3.0",
     "jest": "^22.4.2",
-    "nyc": "^11.6.0",
     "rimraf": "2.6.2"
   },
   "scripts": {
@@ -54,10 +52,6 @@
     "build:lib": "cross-env NODE_ENV=cjs babel src -d lib",
     "build:esm": "babel src --out-dir esm",
     "build:flow": "flow-copy-source --verbose src lib && flow-copy-source --verbose src esm",
-    "coverage": "yarn run coverage:analyise && yarn run coverage:report && yarn run coverage:publish",
-    "coverage:analyise": "nyc --check-coverage --statements 100 --branches 100 --functions 100 --lines 100 yarn run test:fast",
-    "coverage:report": "nyc report --reporter=text-lcov > coverage.lcov",
-    "coverage:publish": "codecov",
     "prepublish": "yarn run build"
   }
 }

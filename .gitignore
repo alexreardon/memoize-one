@@ -11,6 +11,7 @@ node_modules/
 # generated files
 lib/
 esm/
-.nyc_output/
-coverage.lcov
-coverage/
+
+# editors
+.idea
+.vscode
