@@ -11,12 +11,18 @@
     "type": "git",
     "url": "https://github.com/alexreardon/memoize-one.git"
   },
-  "dependencies": {},
   "files": [
     "/lib",
     "/esm",
     "/src"
   ],
+  "keywords": [
+    "memoize",
+    "memoization",
+    "cache",
+    "performance"
+  ],
+  "dependencies": {},
   "devDependencies": {
     "babel-cli": "6.26.0",
     "babel-core": "6.26.0",
@@ -53,11 +59,5 @@
     "coverage:report": "nyc report --reporter=text-lcov > coverage.lcov",
     "coverage:publish": "codecov",
     "prepublish": "yarn run build"
-  },
-  "keywords": [
-    "memoize",
-    "memoization",
-    "cache",
-    "performance"
-  ]
+  }
 }

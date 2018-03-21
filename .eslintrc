@@ -12,7 +12,6 @@
     "node": true,
     "browser": true,
     "es6": true,
-    "jest": true,
     "jest/globals": true
   },
   // custom rules

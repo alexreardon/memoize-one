@@ -10,7 +10,7 @@ describe('memoizeOne', () => {
     return this.a;
   }
 
-  describe.only('standard behaviour - baseline', () => {
+  describe('standard behaviour - baseline', () => {
     let add;
     let memoizedAdd;
 
@@ -32,22 +32,22 @@ describe('memoizeOne', () => {
       memoizedAdd(1, 2);
       memoizedAdd(1, 2);
 
-      expect(add.callCount).toBe(1);
+      expect(add).toHaveBeenCalledTimes(1);
     });
 
     it('should invalidate a memoize cache if new arguments are provided', () => {
       expect(memoizedAdd(1, 2)).toBe(3);
       expect(memoizedAdd(2, 2)).toBe(4);
-      expect(add.callCount).toBe(2);
+      expect(add).toHaveBeenCalledTimes(2);
     });
 
     it('should resume memoization after a cache invalidation', () => {
       expect(memoizedAdd(1, 2)).toBe(3);
-      expect(add.callCount).toBe(1);
+      expect(add).toHaveBeenCalledTimes(1);
       expect(memoizedAdd(2, 2)).toBe(4);
-      expect(add.callCount).toBe(2);
+      expect(add).toHaveBeenCalledTimes(2);
       expect(memoizedAdd(2, 2)).toBe(4);
-      expect(add.callCount).toBe(2);
+      expect(add).toHaveBeenCalledTimes(2);
     });
   });
 
@@ -175,11 +175,11 @@ describe('memoizeOne', () => {
     inputs.forEach(({ name, first, second }) => {
       describe(`type: [${name}]`, () => {
 
-        let spy;
+        let mock;
         let memoized;
 
         beforeEach(() => {
-          spy = sinon.spy((...args) => {
+          mock = jest.fn().mockImplementation((...args) => {
             if (isShallowEqual(args, first.args)) {
               return first.result;
             }
@@ -189,7 +189,7 @@ describe('memoizeOne', () => {
             throw new Error('unmatched argument');
           });
 
-          memoized = memoizeOne(spy);
+          memoized = memoizeOne(mock);
         });
 
         it('should return the result of a function', () => {
@@ -205,22 +205,22 @@ describe('memoizeOne', () => {
           memoized(...first.args);
           memoized(...first.args);
 
-          expect(spy.callCount).toBe(1);
+          expect(mock).toHaveBeenCalledTimes(1);
         });
 
         it('should invalidate a memoize cache if new arguments are provided', () => {
           expect(memoized(...first.args)).toEqual(first.result);
           expect(memoized(...second.args)).toEqual(second.result);
-          expect(spy.callCount).toBe(2);
+          expect(mock).toHaveBeenCalledTimes(2);
         });
 
         it('should resume memoization after a cache invalidation', () => {
           expect(memoized(...first.args)).toEqual(first.result);
-          expect(spy.callCount).toBe(1);
-          expect(memoized(...second.args)).to.equal(second.result);
-          expect(spy.callCount).toBe(2);
+          expect(mock).toHaveBeenCalledTimes(1);
           expect(memoized(...second.args)).toEqual(second.result);
-          expect(spy.callCount).toBe(2);
+          expect(mock).toHaveBeenCalledTimes(2);
+          expect(memoized(...second.args)).toEqual(second.result);
+          expect(mock).toHaveBeenCalledTimes(2);
         });
       });
     });
@@ -298,7 +298,7 @@ describe('memoizeOne', () => {
         const bound = getA.bind(null);
         const memoized = memoizeOne(bound);
 
-        expect(memoized).to.throw(TypeError);
+        expect(memoized).toThrow(TypeError);
       });
     });
 
@@ -351,13 +351,13 @@ describe('memoizeOne', () => {
         const temp = {
           a: 40,
         };
-        const spy = sinon.spy(getA);
+        const spy = jest.fn().mockImplementation(getA);
 
         const getAMemoized = memoizeOne(spy).bind(temp);
 
         expect(getAMemoized()).toBe(40);
         expect(getAMemoized()).toBe(40);
-        expect(spy.callCount).toBe(1);
+        expect(spy).toHaveBeenCalledTimes(1);
       });
 
       it('should respect implicit bindings', () => {
@@ -395,7 +395,7 @@ describe('memoizeOne', () => {
           return memoized.call(null);
         };
 
-        expect(getResult).to.throw(TypeError);
+        expect(getResult).toThrow(TypeError);
       });
     });
   });
@@ -423,78 +423,80 @@ describe('memoizeOne', () => {
     let equalityStub;
 
     beforeEach(() => {
-      add = sinon.spy((value1: number, value2: number): number => value1 + value2);
-      equalityStub = sinon.stub();
+      add = jest.fn().mockImplementation((value1: number, value2: number): number => value1 + value2);
+      equalityStub = jest.fn();
       memoizedAdd = memoizeOne(add, equalityStub);
     });
 
     it('should call the equality function with the last arguments', () => {
-      equalityStub.returns(true);
+      equalityStub.mockReturnValue(true);
 
       // first call does not trigger equality check
       memoizedAdd(1, 2);
       // will trigger equality check
       memoizedAdd(1, 4);
 
-      expect(equalityStub.calledWith(1, 1)).to.be.true;
-      expect(equalityStub.calledWith(4, 2)).to.be.true;
+      expect(equalityStub).toHaveBeenCalledWith(1, 1);
+      expect(equalityStub).toHaveBeenCalledWith(4, 2);
     });
 
     it('should return the previous value without executing the result fn if the equality fn returns true', () => {
-      equalityStub.returns(true);
+      equalityStub.mockReturnValue(true);
 
       // hydrate the first value
-      memoizedAdd(1, 2);
-      expect(add.callCount).to.equal(1);
+      const first: number = memoizedAdd(1, 2);
+      expect(first).toBe(3);
+      expect(add).toHaveBeenCalledTimes(1);
 
       // equality test should not be called yet
-      expect(equalityStub.called).to.be.false;
+      expect(equalityStub).not.toHaveBeenCalled();
 
       // normally would return false - but our custom equality function returns true
-      const result = memoizedAdd(4, 10);
+      const second = memoizedAdd(4, 10);
 
-      expect(result).to.equal(3);
+      expect(second).toBe(3);
       // equality test occured
-      expect(equalityStub.called).to.be.true;
+      expect(equalityStub).toHaveBeenCalled();
       // underlying function not called
-      expect(add.callCount).to.equal(1);
+      expect(add).toHaveBeenCalledTimes(1);
     });
 
     it('should return execute and return the result of the result fn if the equality fn returns false', () => {
-      equalityStub.returns(false);
+      equalityStub.mockReturnValue(false);
 
       // hydrate the first value
-      memoizedAdd(1, 2);
-      expect(add.callCount).to.equal(1);
+      const first: number = memoizedAdd(1, 2);
+      expect(first).toBe(3);
+      expect(add).toHaveBeenCalledTimes(1);
 
       // equality test should not be called yet
-      expect(equalityStub.called).to.be.false;
+      expect(equalityStub).not.toHaveBeenCalled();
 
-      const result = memoizedAdd(4, 10);
+      const second = memoizedAdd(4, 10);
 
-      expect(result).to.equal(14);
+      expect(second).toBe(14);
       // equality test occured
-      expect(equalityStub.called).to.be.true;
+      expect(equalityStub).toHaveBeenCalled();
       // underlying function called
-      expect(add.callCount).to.equal(2);
+      expect(add).toHaveBeenCalledTimes(2);
     });
   });
 
   describe('js typing', () => {
     it('should maintain function arguments count', () => {
-      expect(memoizeOne(a => a).length).to.equal(1);
-      expect(memoizeOne((a, b) => a + b).length).to.equal(2);
-      expect(memoizeOne((...rest) => rest).length).to.equal(0);
-      expect(memoizeOne((a, ...rest) => a + rest).length).to.equal(1);
+      expect(memoizeOne(a => a).length).toBe(1);
+      expect(memoizeOne((a, b) => a + b).length).toBe(2);
+      expect(memoizeOne((...rest) => rest).length).toBe(0);
+      expect(memoizeOne((a, ...rest) => a + rest).length).toBe(1);
     });
 
     it('should maintain function name', () => {
       const foo = a => a;
-      expect(memoizeOne(foo).name).to.equal('memoized_foo');
-      expect(memoizeOne(a => a).name).to.equal('memoized_fn');
+      expect(memoizeOne(foo).name).toBe('memoized_foo');
+      expect(memoizeOne(a => a).name).toBe('memoized_fn');
       expect(memoizeOne(function test(a) {
         return a;
-      }).name).to.equal('memoized_test');
+      }).name).toBe('memoized_test');
     });
   });
 
@@ -511,8 +513,8 @@ describe('memoizeOne', () => {
       const result1 = requiresASubtractFn(memoizedSubtract);
       const result2 = requiresASubtractFn(memoizeOne(subtract));
 
-      expect(result1).to.equal(1);
-      expect(result2).to.equal(1);
+      expect(result1).toBe(1);
+      expect(result2).toBe(1);
     });
   });
 });
