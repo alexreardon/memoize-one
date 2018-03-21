@@ -482,7 +482,7 @@ describe('memoizeOne', () => {
     });
   });
 
-  describe('js typing', () => {
+  describe('dynamic properties', () => {
     it('should maintain function arguments count', () => {
       expect(memoizeOne(a => a).length).toBe(1);
       expect(memoizeOne((a, b) => a + b).length).toBe(2);

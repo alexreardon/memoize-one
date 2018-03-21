@@ -80,8 +80,34 @@ type EqualityFn = (a: any, b: any) => boolean;
 
 ### Dynamic properties
 
-- The result function will have the same [`.length` property](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/length) as the provided function.
+The result function will have the same [`.length` property](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/length) as the provided function.
+
+```js
+const add = (a, b) => a + b;
+const memoizedAdd = memoizeOne(add);
+
+memoizedAdd.length === 2; // true
+```
+
 - For debug purposes we add a [`.name` property](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/name) to the result function. If provided function has a name then the name will be `memoized_${yourFunction.name}`. Otherwise it will be `memoized_fn`. This assists in debugging memoized functions.
+
+```js
+// function has a name
+const add = (a, b) => a + b;
+
+// the original name is 'add'
+add.name === 'add'; // true
+
+// our new memoizedAdd function has a prefixed name
+const memoizedAdd = memoizeOne(add);
+memoizedAdd.name === 'memoized_add'; // true
+```
+
+```js
+// function does not have a name
+const memoizedInline = memoizeOne((a, b) => a + b);
+memoizedInline.name === 'memoized_fn';
+```
 
 ## Installation
 
