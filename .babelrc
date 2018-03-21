@@ -1,3 +1,22 @@
 {
-  "presets": ["./.babelrc.js"]
+  "presets": [
+    "flow",
+    ["env", { "modules": false, "loose": true }]
+  ],
+  "comments": false,
+  "plugins": [
+    "transform-object-rest-spread"
+  ],
+  "env": {
+    "cjs": {
+      "plugins": [
+        "transform-es2015-modules-commonjs"
+      ]
+    },
+    "test": {
+      "plugins": [
+        "transform-es2015-modules-commonjs"
+      ]
+    }
+  }
 }

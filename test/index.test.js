@@ -1,7 +1,4 @@
 // @flow
-import { it, beforeEach, describe } from 'mocha';
-import { expect } from 'chai';
-import sinon from 'sinon';
 import memoizeOne from '../src/';
 
 describe('memoizeOne', () => {
@@ -13,44 +10,44 @@ describe('memoizeOne', () => {
     return this.a;
   }
 
-  describe('standard behaviour - baseline', () => {
+  describe.only('standard behaviour - baseline', () => {
     let add;
     let memoizedAdd;
 
     beforeEach(() => {
-      add = sinon.spy((value1: number, value2: number): number => value1 + value2);
+      add = jest.fn().mockImplementation((value1: number, value2: number): number => value1 + value2);
       memoizedAdd = memoizeOne(add);
     });
 
     it('should return the result of a function', () => {
-      expect(memoizedAdd(1, 2)).to.equal(3);
+      expect(memoizedAdd(1, 2)).toBe(3);
     });
 
     it('should return the same result if the arguments have not changed', () => {
-      expect(memoizedAdd(1, 2)).to.equal(3);
-      expect(memoizedAdd(1, 2)).to.equal(3);
+      expect(memoizedAdd(1, 2)).toBe(3);
+      expect(memoizedAdd(1, 2)).toBe(3);
     });
 
     it('should not execute the memoized function if the arguments have not changed', () => {
       memoizedAdd(1, 2);
       memoizedAdd(1, 2);
 
-      expect(add.callCount).to.equal(1);
+      expect(add.callCount).toBe(1);
     });
 
     it('should invalidate a memoize cache if new arguments are provided', () => {
-      expect(memoizedAdd(1, 2)).to.equal(3);
-      expect(memoizedAdd(2, 2)).to.equal(4);
-      expect(add.callCount).to.equal(2);
+      expect(memoizedAdd(1, 2)).toBe(3);
+      expect(memoizedAdd(2, 2)).toBe(4);
+      expect(add.callCount).toBe(2);
     });
 
     it('should resume memoization after a cache invalidation', () => {
-      expect(memoizedAdd(1, 2)).to.equal(3);
-      expect(add.callCount).to.equal(1);
-      expect(memoizedAdd(2, 2)).to.equal(4);
-      expect(add.callCount).to.equal(2);
-      expect(memoizedAdd(2, 2)).to.equal(4);
-      expect(add.callCount).to.equal(2);
+      expect(memoizedAdd(1, 2)).toBe(3);
+      expect(add.callCount).toBe(1);
+      expect(memoizedAdd(2, 2)).toBe(4);
+      expect(add.callCount).toBe(2);
+      expect(memoizedAdd(2, 2)).toBe(4);
+      expect(add.callCount).toBe(2);
     });
   });
 
@@ -196,34 +193,34 @@ describe('memoizeOne', () => {
         });
 
         it('should return the result of a function', () => {
-          expect(memoized(...first.args)).to.equal(first.result);
+          expect(memoized(...first.args)).toEqual(first.result);
         });
 
         it('should return the same result if the arguments have not changed', () => {
-          expect(memoized(...first.args)).to.equal(first.result);
-          expect(memoized(...first.args)).to.equal(first.result);
+          expect(memoized(...first.args)).toEqual(first.result);
+          expect(memoized(...first.args)).toEqual(first.result);
         });
 
         it('should not execute the memoized function if the arguments have not changed', () => {
           memoized(...first.args);
           memoized(...first.args);
 
-          expect(spy.callCount).to.equal(1);
+          expect(spy.callCount).toBe(1);
         });
 
         it('should invalidate a memoize cache if new arguments are provided', () => {
-          expect(memoized(...first.args)).to.equal(first.result);
-          expect(memoized(...second.args)).to.equal(second.result);
-          expect(spy.callCount).to.equal(2);
+          expect(memoized(...first.args)).toEqual(first.result);
+          expect(memoized(...second.args)).toEqual(second.result);
+          expect(spy.callCount).toBe(2);
         });
 
         it('should resume memoization after a cache invalidation', () => {
-          expect(memoized(...first.args)).to.equal(first.result);
-          expect(spy.callCount).to.equal(1);
+          expect(memoized(...first.args)).toEqual(first.result);
+          expect(spy.callCount).toBe(1);
           expect(memoized(...second.args)).to.equal(second.result);
-          expect(spy.callCount).to.equal(2);
-          expect(memoized(...second.args)).to.equal(second.result);
-          expect(spy.callCount).to.equal(2);
+          expect(spy.callCount).toBe(2);
+          expect(memoized(...second.args)).toEqual(second.result);
+          expect(spy.callCount).toBe(2);
         });
       });
     });
@@ -241,8 +238,8 @@ describe('memoizeOne', () => {
 
         const result = memoized('baz');
 
-        expect(result instanceof Foo).to.equal(true);
-        expect(result.bar).to.equal('baz');
+        expect(result instanceof Foo).toBe(true);
+        expect(result.bar).toBe('baz');
       });
 
       it('should respect explicit bindings', () => {
@@ -254,7 +251,7 @@ describe('memoizeOne', () => {
           return getA.call(temp);
         });
 
-        expect(memoized()).to.equal(10);
+        expect(memoized()).toBe(10);
       });
 
       it('should respect hard bindings', () => {
@@ -264,7 +261,7 @@ describe('memoizeOne', () => {
 
         const memoized = memoizeOne(getA.bind(temp));
 
-        expect(memoized()).to.equal(20);
+        expect(memoized()).toBe(20);
       });
 
       it('should respect implicit bindings', () => {
@@ -277,7 +274,7 @@ describe('memoizeOne', () => {
           return temp.getA();
         });
 
-        expect(memoized()).to.equal(2);
+        expect(memoized()).toBe(2);
       });
 
       it('should respect fat arrow bindings', () => {
@@ -294,7 +291,7 @@ describe('memoizeOne', () => {
         const bound = foo.call(temp);
         const memoized = memoizeOne(bound);
 
-        expect(memoized()).to.equal(50);
+        expect(memoized()).toBe(50);
       });
 
       it('should respect ignored bindings', () => {
@@ -316,8 +313,8 @@ describe('memoizeOne', () => {
         const foo1 = new Foo(10);
         const foo2 = new Foo(20);
 
-        expect(foo1.result).to.equal(10);
-        expect(foo2.result).to.equal(20);
+        expect(foo1.result).toBe(10);
+        expect(foo2.result).toBe(20);
       });
 
       it('should respect implicit bindings', () => {
@@ -327,7 +324,7 @@ describe('memoizeOne', () => {
           getAMemoized,
         };
 
-        expect(temp.getAMemoized()).to.equal(5);
+        expect(temp.getAMemoized()).toBe(5);
       });
 
       it('should respect explicit bindings', () => {
@@ -337,7 +334,7 @@ describe('memoizeOne', () => {
 
         const memoized = memoizeOne(getA);
 
-        expect(memoized.call(temp)).to.equal(10);
+        expect(memoized.call(temp)).toBe(10);
       });
 
       it('should respect hard bindings', () => {
@@ -347,7 +344,7 @@ describe('memoizeOne', () => {
 
         const getAMemoized = memoizeOne(getA).bind(temp);
 
-        expect(getAMemoized()).to.equal(20);
+        expect(getAMemoized()).toBe(20);
       });
 
       it('should memoize hard bound memoized functions', () => {
@@ -358,9 +355,9 @@ describe('memoizeOne', () => {
 
         const getAMemoized = memoizeOne(spy).bind(temp);
 
-        expect(getAMemoized()).to.equal(40);
-        expect(getAMemoized()).to.equal(40);
-        expect(spy.callCount).to.equal(1);
+        expect(getAMemoized()).toBe(40);
+        expect(getAMemoized()).toBe(40);
+        expect(spy.callCount).toBe(1);
       });
 
       it('should respect implicit bindings', () => {
@@ -370,7 +367,7 @@ describe('memoizeOne', () => {
           getAMemoized,
         };
 
-        expect(temp.getAMemoized()).to.equal(2);
+        expect(temp.getAMemoized()).toBe(2);
       });
 
       it('should respect fat arrow bindings', () => {
@@ -388,7 +385,7 @@ describe('memoizeOne', () => {
         const bound = foo.call(temp);
         const memoized = memoizeOne(bound);
 
-        expect(memoized()).to.equal(50);
+        expect(memoized()).toBe(50);
       });
 
       it('should respect ignored bindings', () => {
@@ -415,8 +412,8 @@ describe('memoizeOne', () => {
         getMemoizedA: memoized,
       };
 
-      expect(temp1.getMemoizedA()).to.equal(20);
-      expect(temp2.getMemoizedA()).to.equal(30);
+      expect(temp1.getMemoizedA()).toBe(20);
+      expect(temp2.getMemoizedA()).toBe(30);
     });
   });
 

@@ -5,12 +5,15 @@
   ],
   "parser": "babel-eslint",
   "plugins": [
+    "jest",
     "flowtype"
   ],
   "env": {
     "node": true,
     "browser": true,
-    "es6": true
+    "es6": true,
+    "jest": true,
+    "jest/globals": true
   },
   // custom rules
   "rules": {
@@ -136,6 +139,8 @@
     "indent": [
       "error",
       2
-    ]
+    ],
+    // Require // @flow at the top of files
+    "flowtype/require-valid-file-annotation": ["error", "always", { "annotationStyle": "line" }]
   }
 }

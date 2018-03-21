@@ -10,7 +10,7 @@ node_modules/
 
 # generated files
 lib/
-es/
+esm/
 .nyc_output/
 coverage.lcov
 coverage/
