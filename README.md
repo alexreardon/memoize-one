@@ -109,6 +109,8 @@ const memoizedInline = memoizeOne((a, b) => a + b);
 memoizedInline.name === 'memoized_fn';
 ```
 
+> **Note** the `.length` and `.name` properties will not be applied to the result function in IE11 as IE11 does not support the controlling of these properties.
+
 ## Installation
 
 ```bash

@@ -500,7 +500,24 @@ describe('memoizeOne', () => {
     });
 
     it('should not throw if unable to overwrite the properties', () => {
-      // TODO
+      jest.spyOn(Object, 'defineProperty').mockImplementation(() => {
+        throw new Error();
+      });
+
+      // validation that using defineProperty will throw
+      expect(() => Object.defineProperty({}, 'value', {
+        writable: false,
+        configurable: true,
+        value: 5,
+      })).toThrow();
+
+      const add = (a, b) => a + b;
+      const memoizedAdd = memoizeOne(add);
+
+      expect(memoizedAdd.length).toBe(0);
+
+      // cleanup
+      Object.defineProperty.mockRestore();
     });
   });
 

@@ -12,6 +12,7 @@ const tryDefineProperty = (target: Object, property: string, value: mixed) => {
       value: value,
     });
   } catch (e) {
+    // swallow error
     return;
   }
 };
