@@ -3,13 +3,6 @@ type EqualityFn = (a: mixed, b: mixed) => boolean;
 
 const simpleIsEqual: EqualityFn = (a: mixed, b: mixed): boolean => a === b;
 
-const defineProperty = (target: Object, property: string, value: mixed) =>
-  Object.defineProperty(target, property, {
-    writable: false,
-    configurable: true,
-    value: value,
-  });
-
 // <ResultFn: (...Array<any>) => mixed>
 // The purpose of this typing is to ensure that the returned memoized
 // function has the same type as the provided function (`resultFn`).
@@ -39,15 +32,6 @@ export default function <ResultFn: (...Array<any>) => mixed>(resultFn: ResultFn,
     lastResult = resultFn.apply(this, newArgs);
     return lastResult;
   };
-
-  // Adding a length property
-  // This is useful for some memoization checks that inspect the length of the function arguments
-  defineProperty(result, 'length', resultFn.length);
-
-  // Giving a useful name to the resulting function
-  // This is helpful for debug purposes
-  const name: string = `memoized_${resultFn.name || 'fn'}`;
-  defineProperty(result, 'name', name);
 
   // telling flow to ignore the type of `result` as we know it is `ResultFn`
   return (result: any);
