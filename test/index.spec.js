@@ -482,24 +482,6 @@ describe('memoizeOne', () => {
     });
   });
 
-  describe('dynamic properties', () => {
-    it('should maintain function arguments count', () => {
-      expect(memoizeOne(a => a).length).toBe(1);
-      expect(memoizeOne((a, b) => a + b).length).toBe(2);
-      expect(memoizeOne((...rest) => rest).length).toBe(0);
-      expect(memoizeOne((a, ...rest) => a + rest).length).toBe(1);
-    });
-
-    it('should maintain function name', () => {
-      const foo = a => a;
-      expect(memoizeOne(foo).name).toBe('memoized_foo');
-      expect(memoizeOne(a => a).name).toBe('memoized_fn');
-      expect(memoizeOne(function test(a) {
-        return a;
-      }).name).toBe('memoized_test');
-    });
-  });
-
   describe('flow typing', () => {
     it('should maintain the type of the original function', () => {
       // this test will create a flow error if the typing is incorrect
