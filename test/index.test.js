@@ -498,6 +498,10 @@ describe('memoizeOne', () => {
         return a;
       }).name).toBe('memoized_test');
     });
+
+    it('should not throw if unable to overwrite the properties', () => {
+      // TODO
+    });
   });
 
   describe('flow typing', () => {
