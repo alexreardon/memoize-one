@@ -1,4 +1,4 @@
-# memoizeOne
+# memoize-one
 
 A memoization library which only remembers the latest invocation
 
