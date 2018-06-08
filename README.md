@@ -106,7 +106,7 @@ const memoizeOne = require('memoize-one').default;
 
 ## `this`
 
-### memoizeOne correctly respects `this` control
+### `memoize-one` correctly respects `this` control
 
 This library takes special care to maintain, and allow control over the the `this` context for **both** the original function being memoized as well as the returned memoized function. Both the original function and the memoized function's `this` context respect [all the `this` controlling techniques](https://github.com/getify/You-Dont-Know-JS/blob/master/this%20%26%20object%20prototypes/ch2.md):
 
@@ -137,26 +137,26 @@ getA.call(temp1); // 20
 getA.call(temp2); // 30
 ```
 
-Therefore, in order to prevent against unexpected results, `memoizeOne` takes into account the current execution context (`this`) of the memoized function. If `this` is different to the previous invocation then it is considered a change in argument. [further discussion](https://github.com/alexreardon/memoize-one/issues/3).
+Therefore, in order to prevent against unexpected results, `memoize-one` takes into account the current execution context (`this`) of the memoized function. If `this` is different to the previous invocation then it is considered a change in argument. [further discussion](https://github.com/alexreardon/memoize-one/issues/3).
 
-Generally this will be of no impact if you are not explicity controlling the `this` context of functions you want to memoize with [explicit binding](https://github.com/getify/You-Dont-Know-JS/blob/master/this%20%26%20object%20prototypes/ch2.md#explicit-binding)  or [implicit binding](https://github.com/getify/You-Dont-Know-JS/blob/master/this%20%26%20object%20prototypes/ch2.md#implicit-binding). `memoizeOne` will detect when you are manipulating `this` and will then consider the `this` context as an argument. If `this` changes, it will re-execute the original function even if the arguments have not changed.
+Generally this will be of no impact if you are not explicity controlling the `this` context of functions you want to memoize with [explicit binding](https://github.com/getify/You-Dont-Know-JS/blob/master/this%20%26%20object%20prototypes/ch2.md#explicit-binding)  or [implicit binding](https://github.com/getify/You-Dont-Know-JS/blob/master/this%20%26%20object%20prototypes/ch2.md#implicit-binding). `memoize-One` will detect when you are manipulating `this` and will then consider the `this` context as an argument. If `this` changes, it will re-execute the original function even if the arguments have not changed.
 
 ## Performance :rocket:
 
 ### Tiny
 
-`memoizeOne` is super lightweight at `457 bytes` minified and `299 bytes` gzipped. (`1kb` = `1000 bytes`)
+`memoize-one` is super lightweight at `457 bytes` minified and `299 bytes` gzipped. (`1kb` = `1000 bytes`)
 
 ### Extremely fast
 
-`memoizeOne` performs better or on par with than other popular memoization libraries for the purpose of remembering the latest invocation.
+`memoize-one` performs better or on par with than other popular memoization libraries for the purpose of remembering the latest invocation.
 
 **Results**
 
 - [simple arguments](https://www.measurethat.net/Benchmarks/ShowResult/4452)
 - [complex arguments](https://www.measurethat.net/Benchmarks/ShowResult/4488)
 
-The comparisions are not exhaustive and are primiarly to show that `memoizeOne` accomplishes remembering the latest invocation really fast. The benchmarks do not take into account the differences in feature sets, library sizes, parse time, and so on.
+The comparisions are not exhaustive and are primiarly to show that `memoize-one` accomplishes remembering the latest invocation really fast. The benchmarks do not take into account the differences in feature sets, library sizes, parse time, and so on.
 
 ## Code health :thumbsup:
 
