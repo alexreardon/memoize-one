@@ -14,3 +14,6 @@ dist/
 # editors
 .idea
 .vscode
+
+# yard
+yarn-error.log
