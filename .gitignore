@@ -9,8 +9,7 @@ node_modules/
 .DS_Store
 
 # generated files
-lib/
-esm/
+dist/
 
 # editors
 .idea

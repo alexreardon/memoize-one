@@ -1,4 +1,0 @@
-# Ignoring nothing. Publishing src, lib and es to npm
-# ...
-# except for test cause that breaks flow
-test
