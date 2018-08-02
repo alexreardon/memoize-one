@@ -72,7 +72,7 @@ result3 === result4 // true - arguments are deep equal
 Here is the expected [flow](http://flowtype.org) type signature for a custom equality function:
 
 ```js
-type EqualityFn = (a: any, b: any) => boolean;
+type EqualityFn = (a: mixed, b: mixed) => boolean;
 ```
 
 ## Installation
