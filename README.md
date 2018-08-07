@@ -75,6 +75,38 @@ Here is the expected [flow](http://flowtype.org) type signature for a custom equ
 type EqualityFn = (a: mixed, b: mixed) => boolean;
 ```
 
+#### Custom equality function with multiple arguments
+
+If the function you want to memoize takes multiple arguments, your custom equality function will be called once for each argument and will be passed each argument's new value and last value.
+
+```js
+import memoizeOne from 'memoize-one';
+
+const makeCountObj = (first, second, third) => ({
+  first: first.count,
+  second: second.count,
+  third: third.count,
+});
+
+const areCountPropertiesEqual = (newArg, lastArg) => newArg.count === lastArg.count;
+// runs once for first's new and last values, once for second's, etc.
+
+const memoizedMakeCountObj = memoizeOne(makeCountObj, areCountPropertiesEqual);
+
+const result1 = memoizedMakeCountObj(
+  {a: '?', count: 1},
+  {a: '$', count: 2},
+  {a: '#', count: 3}
+);
+const result2 = memoizedMakeCountObj(
+  {b: null, count: 1},
+  {b: null, count: 2},
+  {b: null, count: 3}
+);
+
+result1 === result2; // true - same reference
+```
+
 ## Installation
 
 ```bash
