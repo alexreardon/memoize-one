@@ -103,6 +103,8 @@ const result2 = memoizedMakeCountObj(
   {b: null, count: 2},
   {b: null, count: 3}
 );
+
+result1 === result2; // true - same reference
 ```
 
 ## Installation
