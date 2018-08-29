@@ -482,6 +482,137 @@ describe('memoizeOne', () => {
     });
   });
 
+  describe('throwing', () => {
+    const willThrow = (message?: string = 'hello') => {
+      throw new Error(message);
+    };
+    it('should throw when the memoized function throws', () => {
+      const memoized = memoizeOne(willThrow);
+
+      expect(memoized).toThrow();
+    });
+
+    it('should memoize a thrown result', () => {
+      const memoized = memoizeOne(willThrow);
+      let firstError;
+      let secondError;
+
+      try {
+        memoized();
+      } catch (e) {
+        firstError = e;
+      }
+
+      try {
+        memoized();
+      } catch (e) {
+        secondError = e;
+      }
+
+      expect(firstError).toEqual(Error('hello'));
+      expect(firstError).toBe(secondError);
+    });
+
+    it('should break memoization when the arguments change', () => {
+      const memoized = memoizeOne(willThrow);
+      let firstError;
+      let secondError;
+
+      try {
+        memoized('first');
+      } catch (e) {
+        firstError = e;
+      }
+
+      try {
+        memoized('second');
+      } catch (e) {
+        secondError = e;
+      }
+
+      expect(firstError).toEqual(Error('first'));
+      expect(secondError).toEqual(Error('second'));
+      expect(firstError).not.toBe(secondError);
+    });
+
+    it('should forget a thrown result after a successful call', () => {
+      const canThrow = jest.fn().mockImplementation((shouldThrow: boolean) => {
+        if (shouldThrow) {
+          throw new Error('hey friend');
+        }
+        return 'Hi there';
+      });
+      const memoized = memoizeOne(canThrow);
+      let firstError;
+      let secondError;
+
+      try {
+        memoized(true);
+      } catch (e) {
+        firstError = e;
+      }
+
+      const result1 = memoized(false);
+      expect(canThrow).toHaveBeenCalledTimes(2);
+
+      // function is now correctly memoized
+      const result2 = memoized(false);
+      expect(canThrow).toHaveBeenCalledTimes(2);
+
+      expect(result1).toBe('Hi there');
+      expect(result1).toBe(result2);
+
+      // now going to throw again
+      try {
+        memoized(true);
+      } catch (e) {
+        secondError = e;
+      }
+
+      expect(canThrow).toHaveBeenCalledTimes(3);
+      expect(firstError).toEqual(secondError);
+      expect(firstError).not.toBe(secondError);
+    });
+
+    it('should throw regardless of the type of the thrown value', () => {
+      // [JavaScript defines seven built-in types:](https://github.com/getify/You-Dont-Know-JS/blob/master/types%20%26%20grammar/ch1.md)
+      //    - null
+      //    - undefined
+      //    - boolean
+      //    - number
+      //    - string
+      //    - object
+      //    - symbol
+      const values = [null, undefined, true, false, 10, 'hi', { name: 'Alex' }, Symbol('sup')];
+
+      values.forEach((value: mixed) => {
+        const throwValue = jest.fn().mockImplementation(() => {
+          throw value;
+        });
+        const memoized = memoizeOne(throwValue);
+        let firstError;
+        let secondError;
+
+        try {
+          memoized();
+        } catch (e) {
+          firstError = e;
+        }
+
+        try {
+          memoized();
+        } catch (e) {
+          secondError = e;
+        }
+
+        expect(firstError).toBe(secondError);
+        expect(throwValue).toHaveBeenCalledTimes(1);
+        // little validation
+        expect(firstError).toEqual(value);
+      });
+    });
+  });
+
   describe('flow typing', () => {
     it('should maintain the type of the original function', () => {
       // this test will create a flow error if the typing is incorrect
