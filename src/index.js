@@ -26,10 +26,10 @@ export default function <ResultFn: (...Array<any>) => mixed>(resultFn: ResultFn,
       return lastResult;
     }
 
+    lastResult = resultFn.apply(this, newArgs);
     calledOnce = true;
     lastThis = this;
     lastArgs = newArgs;
-    lastResult = resultFn.apply(this, newArgs);
     return lastResult;
   };
 

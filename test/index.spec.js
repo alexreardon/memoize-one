@@ -417,6 +417,20 @@ describe('memoizeOne', () => {
     });
   });
 
+  describe('handling errors', () => {
+    it('should throw errors on subsequent calls if first call did', () => {
+      const thrower = jest.fn().mockImplementation((value) => {
+        if (value === 0) {
+          throw Error('value is zero');
+        }
+      });
+      const memoizedThrower = memoizeOne(thrower);
+
+      expect(()=>memoizedThrower(0)).toThrow();
+      expect(()=>memoizedThrower(0)).toThrow();
+    });
+  });
+
   describe('custom equality function', () => {
     let add;
     let memoizedAdd;
