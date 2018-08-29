@@ -36,13 +36,14 @@ export default function <ResultFn: (...Array<any>) => mixed>(resultFn: ResultFn,
     lastArgs = newArgs;
     lastException = null;
     lastThrew = false;
+
     try {
       lastResult = resultFn.apply(this, newArgs);
       return lastResult;
     } catch (e) {
       lastThrew = true;
       lastException = e;
-      throw e;
+      throw lastException;
     }
   };
 
