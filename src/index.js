@@ -13,7 +13,9 @@ export default function <ResultFn: (...Array<any>) => mixed>(resultFn: ResultFn,
   let lastThis: mixed;
   let lastArgs: Array<mixed> = [];
   let lastResult: mixed;
+  let lastException: mixed;
   let calledOnce: boolean = false;
+  let lastThrew: boolean = false;
 
   const isNewArgEqualToLast = (newArg: mixed, index: number): boolean => isEqual(newArg, lastArgs[index]);
 
@@ -23,14 +25,26 @@ export default function <ResultFn: (...Array<any>) => mixed>(resultFn: ResultFn,
       lastThis === this &&
       newArgs.length === lastArgs.length &&
       newArgs.every(isNewArgEqualToLast)) {
+      if (lastThrew) {
+        throw lastException;
+      }
       return lastResult;
     }
 
     calledOnce = true;
     lastThis = this;
     lastArgs = newArgs;
-    lastResult = resultFn.apply(this, newArgs);
-    return lastResult;
+    lastException = null;
+    lastThrew = false;
+
+    try {
+      lastResult = resultFn.apply(this, newArgs);
+      return lastResult;
+    } catch (e) {
+      lastThrew = true;
+      lastException = e;
+      throw lastException;
+    }
   };
 
   // telling flow to ignore the type of `result` as we know it is `ResultFn`
