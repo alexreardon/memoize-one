@@ -29,9 +29,9 @@ export default function <ResultFn: (...Array<any>) => mixed>(resultFn: ResultFn,
     }
 
     calledOnce = true;
+    lastThrew = false;
     lastThis = this;
     lastArgs = newArgs;
-    lastThrew = false;
 
     try {
       lastResult = resultFn.apply(this, newArgs);
