@@ -28,6 +28,7 @@
     "@babel/preset-env": "^7.0.0",
     "@babel/preset-flow": "^7.0.0",
     "babel-eslint": "9.0.0",
+    "babel-jest": "^23.4.2",
     "chai": "4.1.2",
     "cross-env": "^5.2.0",
     "eslint": "5.4.0",
