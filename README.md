@@ -175,6 +175,52 @@ Therefore, in order to prevent against unexpected results, `memoize-one` takes i
 
 Generally this will be of no impact if you are not explicity controlling the `this` context of functions you want to memoize with [explicit binding](https://github.com/getify/You-Dont-Know-JS/blob/master/this%20%26%20object%20prototypes/ch2.md#explicit-binding)  or [implicit binding](https://github.com/getify/You-Dont-Know-JS/blob/master/this%20%26%20object%20prototypes/ch2.md#implicit-binding). `memoize-One` will detect when you are manipulating `this` and will then consider the `this` context as an argument. If `this` changes, it will re-execute the original function even if the arguments have not changed.
 
+## Exceptions
+
+> What do we do when the wrapped function throws?
+
+If your memoized function throws then we will record the thrown value. If the function is next called with the same arguments then we will not call the underlying function and throw the previously thrown value.
+
+```js
+const willThrow = (message) => {
+  console.log('called!');
+  throw new Error(message);
+}
+
+const memoized = memoizeOne(willThrow);
+let firstError;
+let secondError;
+
+try {
+  memoized('first message');
+  // console.log => 'first message'
+} catch (e) {
+  firstError = e;
+}
+
+try {
+  memoized('first message');
+  // underlying willThrow function is not called,
+  // previous exception is thrown
+} catch (e) {
+  secondError = e;
+}
+
+console.log(firstError === secondError);
+// true
+
+try {
+  memoized('a different message');
+  // console.log => 'a different message'
+  // willThrow is called again as the argument has changed
+} catch (e) {
+  thirdError = e;
+}
+
+console.log(thirdError === secondError);
+// false
+```
+
 ## Performance :rocket:
 
 ### Tiny
