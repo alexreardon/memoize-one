@@ -483,37 +483,45 @@ describe('memoizeOne', () => {
   });
 
   describe('throwing', () => {
-    const willThrow = (message?: string = 'hello') => {
-      throw new Error(message);
-    };
+
     it('should throw when the memoized function throws', () => {
+      const willThrow = (message: string) => {
+        throw new Error(message);
+      };
       const memoized = memoizeOne(willThrow);
 
       expect(memoized).toThrow();
     });
 
     it('should memoize a thrown result', () => {
+      const willThrow = jest.fn().mockImplementation((message: string) => {
+        throw new Error(message);
+      });
       const memoized = memoizeOne(willThrow);
       let firstError;
       let secondError;
 
       try {
-        memoized();
+        memoized('hello');
       } catch (e) {
         firstError = e;
       }
 
       try {
-        memoized();
+        memoized('hello');
       } catch (e) {
         secondError = e;
       }
 
+      expect(willThrow).toHaveBeenCalledTimes(1);
       expect(firstError).toEqual(Error('hello'));
       expect(firstError).toBe(secondError);
     });
 
     it('should break memoization when the arguments change', () => {
+      const willThrow = jest.fn().mockImplementation((message: string) => {
+        throw new Error(message);
+      });
       const memoized = memoizeOne(willThrow);
       let firstError;
       let secondError;
@@ -533,6 +541,7 @@ describe('memoizeOne', () => {
       expect(firstError).toEqual(Error('first'));
       expect(secondError).toEqual(Error('second'));
       expect(firstError).not.toBe(secondError);
+      expect(willThrow).toHaveBeenCalledTimes(2);
     });
 
     it('should forget a thrown result after a successful call', () => {
@@ -540,7 +549,8 @@ describe('memoizeOne', () => {
         if (shouldThrow) {
           throw new Error('hey friend');
         }
-        return 'Hi there';
+        // will return a new object reference each time
+        return { hello: 'world' };
       });
       const memoized = memoizeOne(canThrow);
       let firstError;
@@ -558,8 +568,7 @@ describe('memoizeOne', () => {
       // function is now correctly memoized
       const result2 = memoized(false);
       expect(canThrow).toHaveBeenCalledTimes(2);
-
-      expect(result1).toBe('Hi there');
+      // referential equality maintained
       expect(result1).toBe(result2);
 
       // now going to throw again
@@ -569,9 +578,16 @@ describe('memoizeOne', () => {
         secondError = e;
       }
 
+      // underlying function is called
       expect(canThrow).toHaveBeenCalledTimes(3);
       expect(firstError).toEqual(secondError);
       expect(firstError).not.toBe(secondError);
+
+      // last successful cache value is lost
+      const result3 = memoized(false);
+      expect(canThrow).toHaveBeenCalledTimes(4);
+      // new result
+      expect(result3).not.toBe(result2);
     });
 
     it('should throw regardless of the type of the thrown value', () => {
