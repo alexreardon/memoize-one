@@ -200,8 +200,8 @@ try {
 
 try {
   memoized('first message');
-  // underlying function is called again
   // console.log => 'first message'
+  // even though the arguments are the same the result function was called again
 } catch (e) {
   secondError = e;
 }
