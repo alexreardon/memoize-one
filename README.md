@@ -179,7 +179,7 @@ Generally this will be of no impact if you are not explicity controlling the `th
 
 > What do we do when the wrapped function throws?
 
-If your memoized function throws then we will record the thrown value. If the function is next called with the same arguments then we will not call the underlying function and throw the previously thrown value.
+If your memoized function `throw`s then we will we will not cache the thrown result. If the function is next called with the same arguments then we will re execute the memoized function.
 
 ```js
 const willThrow = (message) => {
@@ -200,24 +200,13 @@ try {
 
 try {
   memoized('first message');
-  // underlying willThrow function is not called,
-  // previous exception is thrown
+  // underlying function is called again
+  // console.log => 'first message'
 } catch (e) {
   secondError = e;
 }
 
 console.log(firstError === secondError);
-// true
-
-try {
-  memoized('a different message');
-  // console.log => 'a different message'
-  // willThrow is called again as the argument has changed
-} catch (e) {
-  thirdError = e;
-}
-
-console.log(thirdError === secondError);
 // false
 ```
 
