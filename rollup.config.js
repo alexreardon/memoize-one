@@ -45,7 +45,19 @@ export default [
       file: 'dist/memoize-one.esm.js',
       format: 'es',
     },
-    plugins: [babel()],
+    plugins: [babel({
+      // straight up esmodules
+      'presets': [
+        [
+          '@babel/preset-env',
+          {
+            'targets': {
+              'esmodules': true,
+            },
+          },
+        ],
+      ],
+    })],
   },
   // CommonJS build
   {
