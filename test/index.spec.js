@@ -493,7 +493,7 @@ describe('memoizeOne', () => {
       expect(memoized).toThrow();
     });
 
-    it('should memoize a thrown result', () => {
+    it('should not memoize a thrown result', () => {
       const willThrow = jest.fn().mockImplementation((message: string) => {
         throw new Error(message);
       });
@@ -513,35 +513,9 @@ describe('memoizeOne', () => {
         secondError = e;
       }
 
-      expect(willThrow).toHaveBeenCalledTimes(1);
-      expect(firstError).toEqual(Error('hello'));
-      expect(firstError).toBe(secondError);
-    });
-
-    it('should break memoization when the arguments change', () => {
-      const willThrow = jest.fn().mockImplementation((message: string) => {
-        throw new Error(message);
-      });
-      const memoized = memoizeOne(willThrow);
-      let firstError;
-      let secondError;
-
-      try {
-        memoized('first');
-      } catch (e) {
-        firstError = e;
-      }
-
-      try {
-        memoized('second');
-      } catch (e) {
-        secondError = e;
-      }
-
-      expect(firstError).toEqual(Error('first'));
-      expect(secondError).toEqual(Error('second'));
-      expect(firstError).not.toBe(secondError);
       expect(willThrow).toHaveBeenCalledTimes(2);
+      expect(firstError).toEqual(Error('hello'));
+      expect(firstError).not.toBe(secondError);
     });
 
     it('should forget a thrown result after a successful call', () => {
@@ -621,10 +595,13 @@ describe('memoizeOne', () => {
           secondError = e;
         }
 
-        expect(firstError).toBe(secondError);
-        expect(throwValue).toHaveBeenCalledTimes(1);
-        // little validation
+        // no memoization
         expect(firstError).toEqual(value);
+
+        // validation - no memoization
+        expect(throwValue).toHaveBeenCalledTimes(2);
+        expect(firstError).toEqual(secondError);
+
       });
     });
   });
