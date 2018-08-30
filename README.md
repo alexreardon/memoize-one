@@ -183,7 +183,7 @@ If your memoized function throws then we will record the thrown value. If the fu
 
 ```js
 const willThrow = (message) => {
-  console.log('called!');
+  console.log(message);
   throw new Error(message);
 }
 
