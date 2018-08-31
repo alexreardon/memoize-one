@@ -518,7 +518,7 @@ describe('memoizeOne', () => {
       expect(firstError).not.toBe(secondError);
     });
 
-    it('should forget a thrown result after a successful call', () => {
+    it('should not break the memoization cache of a successful call', () => {
       const canThrow = jest.fn().mockImplementation((shouldThrow: boolean) => {
         if (shouldThrow) {
           throw new Error('hey friend');
@@ -530,20 +530,28 @@ describe('memoizeOne', () => {
       let firstError;
       let secondError;
 
+      // standard memoization
+      const result1 = memoized(false);
+      const result2 = memoized(false);
+      expect(result1).toBe(result2);
+      expect(canThrow).toHaveBeenCalledTimes(1);
+      canThrow.mockClear();
+
+      // a call that throws
       try {
         memoized(true);
       } catch (e) {
         firstError = e;
       }
 
-      const result1 = memoized(false);
-      expect(canThrow).toHaveBeenCalledTimes(2);
+      expect(canThrow).toHaveBeenCalledTimes(1);
+      canThrow.mockClear();
 
-      // function is now correctly memoized
-      const result2 = memoized(false);
-      expect(canThrow).toHaveBeenCalledTimes(2);
-      // referential equality maintained
-      expect(result1).toBe(result2);
+      // call with last successful arguments has not had its cache busted
+      const result3 = memoized(false);
+      expect(canThrow).not.toHaveBeenCalled();
+      expect(result3).toBe(result2);
+      canThrow.mockClear();
 
       // now going to throw again
       try {
@@ -553,15 +561,15 @@ describe('memoizeOne', () => {
       }
 
       // underlying function is called
-      expect(canThrow).toHaveBeenCalledTimes(3);
+      expect(canThrow).toHaveBeenCalledTimes(1);
       expect(firstError).toEqual(secondError);
       expect(firstError).not.toBe(secondError);
+      canThrow.mockClear();
 
-      // last successful cache value is not lost
-      const result3 = memoized(false);
-      expect(canThrow).toHaveBeenCalledTimes(3);
-      // new result
-      expect(result3).toBe(result2);
+      // last successful cache value is not lost and result fn not called
+      const result4 = memoized(false);
+      expect(canThrow).not.toHaveBeenCalled();
+      expect(result4).toBe(result3);
     });
 
     it('should throw regardless of the type of the thrown value', () => {
@@ -601,7 +609,6 @@ describe('memoizeOne', () => {
         // validation - no memoization
         expect(throwValue).toHaveBeenCalledTimes(2);
         expect(firstError).toEqual(secondError);
-
       });
     });
   });
