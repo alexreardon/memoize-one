@@ -1,0 +1,9 @@
+{
+  "presets": [
+    "@babel/flow",
+    ["@babel/env", {
+      "loose": true
+    }]
+  ],
+  "comments": false
+}
