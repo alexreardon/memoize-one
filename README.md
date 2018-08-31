@@ -175,11 +175,11 @@ Therefore, in order to prevent against unexpected results, `memoize-one` takes i
 
 Generally this will be of no impact if you are not explicity controlling the `this` context of functions you want to memoize with [explicit binding](https://github.com/getify/You-Dont-Know-JS/blob/master/this%20%26%20object%20prototypes/ch2.md#explicit-binding)  or [implicit binding](https://github.com/getify/You-Dont-Know-JS/blob/master/this%20%26%20object%20prototypes/ch2.md#implicit-binding). `memoize-One` will detect when you are manipulating `this` and will then consider the `this` context as an argument. If `this` changes, it will re-execute the original function even if the arguments have not changed.
 
-## Exceptions
+## When your result function `throw`s
 
 > There is no caching when your result function throws
 
-If your result function `throw`s then we will we will not break your existing argument cache. If the memoized function is next called with the same arguments then we will re-execute the memoized function.
+If your result function `throw`s then the memoized function will also throw. The throw will not break the memoized functions existing argument cache. It means the memoized function will pretend like it was never called with arguments that made it `throw`.
 
 ```js
 const canThrow = (name: string) => {
