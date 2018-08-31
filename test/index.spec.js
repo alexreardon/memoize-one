@@ -557,11 +557,11 @@ describe('memoizeOne', () => {
       expect(firstError).toEqual(secondError);
       expect(firstError).not.toBe(secondError);
 
-      // last successful cache value is lost
+      // last successful cache value is not lost
       const result3 = memoized(false);
-      expect(canThrow).toHaveBeenCalledTimes(4);
+      expect(canThrow).toHaveBeenCalledTimes(3);
       // new result
-      expect(result3).not.toBe(result2);
+      expect(result3).toBe(result2);
     });
 
     it('should throw regardless of the type of the thrown value', () => {

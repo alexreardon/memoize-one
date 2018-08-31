@@ -175,40 +175,54 @@ Therefore, in order to prevent against unexpected results, `memoize-one` takes i
 
 Generally this will be of no impact if you are not explicity controlling the `this` context of functions you want to memoize with [explicit binding](https://github.com/getify/You-Dont-Know-JS/blob/master/this%20%26%20object%20prototypes/ch2.md#explicit-binding)  or [implicit binding](https://github.com/getify/You-Dont-Know-JS/blob/master/this%20%26%20object%20prototypes/ch2.md#implicit-binding). `memoize-One` will detect when you are manipulating `this` and will then consider the `this` context as an argument. If `this` changes, it will re-execute the original function even if the arguments have not changed.
 
-## Exceptions
+## When your result function `throw`s
 
 > There is no caching when your result function throws
 
-If your result function `throw`s then we will we will not cache the thrown result. If the memoized function is next called with the same arguments then we will re-execute the memoized function.
+If your result function `throw`s then the memoized function will also throw. The throw will not break the memoized functions existing argument cache. It means the memoized function will pretend like it was never called with arguments that made it `throw`.
 
 ```js
-const willThrow = (message) => {
-  console.log(message);
-  throw new Error(message);
+const canThrow = (name: string) => {
+  console.log('called');
+  if(name === 'throw') {
+    throw new Error(name);
+  }
+  return { name };
 }
 
-const memoized = memoizeOne(willThrow);
-let firstError;
-let secondError;
+const memoized = memoizeOne(canThrow);
+
+const value1 = memoized('Alex');
+// console.log => 'called'
+const value2 = memoized('Alex');
+// result function not called
+
+console.log(value1 === value2);
+// console.log => true
 
 try {
-  memoized('first message');
-  // console.log => 'first message'
-} catch (e) {
+  memoized('throw');
+  // console.log => 'called'
+} catch(e) {
   firstError = e;
 }
 
 try {
-  memoized('first message');
-  // console.log => 'first message'
-  // even though the arguments are the same the result function was called again
-} catch (e) {
+  memoized('throw');
+  // console.log => 'called'
+  // the result function was called again even though it was called twice
+  // with the 'throw' string
+} catch(e) {
   secondError = e;
 }
 
-// error has a new reference as the function was called again
-console.log(firstError === secondError);
-// console.log => false
+console.log(firstError !== secondError);
+
+
+const value3 = memoized('Alex');
+// result function not called as the original memoization cache has not been busted
+console.log(value1 === value3);
+// console.log => true
 ```
 
 ## Performance :rocket:

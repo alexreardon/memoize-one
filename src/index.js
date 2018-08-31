@@ -14,32 +14,26 @@ export default function <ResultFn: (...Array<any>) => mixed>(resultFn: ResultFn,
   let lastArgs: Array<mixed> = [];
   let lastResult: mixed;
   let calledOnce: boolean = false;
-  let lastThrew: boolean = false;
 
   const isNewArgEqualToLast = (newArg: mixed, index: number): boolean => isEqual(newArg, lastArgs[index]);
 
   // breaking cache when context (this) or arguments change
   const result = function (...newArgs: Array<mixed>) {
     if (calledOnce &&
-      !lastThrew &&
       lastThis === this &&
       newArgs.length === lastArgs.length &&
       newArgs.every(isNewArgEqualToLast)) {
       return lastResult;
     }
 
+    // Throwing during an assignment aborts the assignment: https://codepen.io/alexreardon/pen/RYKoaz
+    // Doing the lastResult assignment first so that if it throws
+    // nothing will be overwritten
+    lastResult = resultFn.apply(this, newArgs);
     calledOnce = true;
-    lastThrew = false;
     lastThis = this;
     lastArgs = newArgs;
-
-    try {
-      lastResult = resultFn.apply(this, newArgs);
-      return lastResult;
-    } catch (e) {
-      lastThrew = true;
-      throw e;
-    }
+    return lastResult;
   };
 
   // telling flow to ignore the type of `result` as we know it is `ResultFn`
