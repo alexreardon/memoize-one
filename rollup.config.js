@@ -43,7 +43,7 @@ export default [
     input,
     output: {
       file: 'dist/memoize-one.esm.js',
-      format: 'es',
+      format: 'esm',
     },
     plugins: [babel()],
   },
