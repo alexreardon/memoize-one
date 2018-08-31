@@ -177,9 +177,9 @@ Generally this will be of no impact if you are not explicity controlling the `th
 
 ## Exceptions
 
-> What do we do when the wrapped function throws?
+> There is no caching when your result function throws
 
-If your memoized function `throw`s then we will we will not cache the thrown result. If the function is next called with the same arguments then we will re execute the memoized function.
+If your result function `throw`s then we will we will not cache the thrown result. If the memoized function is next called with the same arguments then we will re-execute the memoized function.
 
 ```js
 const willThrow = (message) => {
@@ -206,8 +206,9 @@ try {
   secondError = e;
 }
 
+// error has a new reference as the function was called again
 console.log(firstError === secondError);
-// false
+// console.log => false
 ```
 
 ## Performance :rocket:
