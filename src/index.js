@@ -26,8 +26,8 @@ export default function <ResultFn: (...Array<any>) => mixed>(resultFn: ResultFn,
       return lastResult;
     }
 
-    // Assignments during a throw aborts the assignment: https://codepen.io/alexreardon/pen/RYKoaz
-    // Doing result result assignment first so that if it throws
+    // Throwing during an assignment aborts the assignment: https://codepen.io/alexreardon/pen/RYKoaz
+    // Doing the lastResult assignment first so that if it throws
     // nothing will be overwritten
     lastResult = resultFn.apply(this, newArgs);
     calledOnce = true;
