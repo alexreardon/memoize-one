@@ -13,7 +13,6 @@ export default function <ResultFn: (...Array<any>) => mixed>(resultFn: ResultFn,
   let lastThis: mixed;
   let lastArgs: Array<mixed> = [];
   let lastResult: mixed;
-  let lastException: mixed;
   let calledOnce: boolean = false;
   let lastThrew: boolean = false;
 
@@ -22,28 +21,24 @@ export default function <ResultFn: (...Array<any>) => mixed>(resultFn: ResultFn,
   // breaking cache when context (this) or arguments change
   const result = function (...newArgs: Array<mixed>) {
     if (calledOnce &&
+      !lastThrew &&
       lastThis === this &&
       newArgs.length === lastArgs.length &&
       newArgs.every(isNewArgEqualToLast)) {
-      if (lastThrew) {
-        throw lastException;
-      }
       return lastResult;
     }
 
     calledOnce = true;
+    lastThrew = false;
     lastThis = this;
     lastArgs = newArgs;
-    lastException = null;
-    lastThrew = false;
 
     try {
       lastResult = resultFn.apply(this, newArgs);
       return lastResult;
     } catch (e) {
       lastThrew = true;
-      lastException = e;
-      throw lastException;
+      throw e;
     }
   };
 
