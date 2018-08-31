@@ -179,36 +179,50 @@ Generally this will be of no impact if you are not explicity controlling the `th
 
 > There is no caching when your result function throws
 
-If your result function `throw`s then we will we will not cache the thrown result. If the memoized function is next called with the same arguments then we will re-execute the memoized function.
+If your result function `throw`s then we will we will not break your existing argument cache. If the memoized function is next called with the same arguments then we will re-execute the memoized function.
 
 ```js
-const willThrow = (message) => {
-  console.log(message);
-  throw new Error(message);
+const canThrow = (name: string) => {
+  console.log('called');
+  if(name === 'throw') {
+    throw new Error(name);
+  }
+  return { name };
 }
 
-const memoized = memoizeOne(willThrow);
-let firstError;
-let secondError;
+const memoized = memoizeOne(canThrow);
+
+const value1 = memoized('Alex');
+// console.log => 'called'
+const value2 = memoized('Alex');
+// result function not called
+
+console.log(value1 === value2);
+// console.log => true
 
 try {
-  memoized('first message');
-  // console.log => 'first message'
-} catch (e) {
+  memoized('throw');
+  // console.log => 'called'
+} catch(e) {
   firstError = e;
 }
 
 try {
-  memoized('first message');
-  // console.log => 'first message'
-  // even though the arguments are the same the result function was called again
-} catch (e) {
+  memoized('throw');
+  // console.log => 'called'
+  // the result function was called again even though it was called twice
+  // with the 'throw' string
+} catch(e) {
   secondError = e;
 }
 
-// error has a new reference as the function was called again
-console.log(firstError === secondError);
-// console.log => false
+console.log(firstError !== secondError);
+
+
+const value3 = memoized('Alex');
+// result function not called as the original memoization cache has not been busted
+console.log(value1 === value3);
+// console.log => true
 ```
 
 ## Performance :rocket:
