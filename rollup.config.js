@@ -53,6 +53,7 @@ export default [
     output: {
       file: 'dist/memoize-one.cjs.js',
       format: 'cjs',
+      exports: 'named'
     },
     plugins: [babel()],
   },
