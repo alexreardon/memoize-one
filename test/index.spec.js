@@ -436,8 +436,8 @@ describe('memoizeOne', () => {
       // will trigger equality check
       memoizedAdd(1, 4);
 
-      expect(equalityStub).toHaveBeenCalledWith(1, 1);
-      expect(equalityStub).toHaveBeenCalledWith(4, 2);
+      expect(equalityStub).toHaveBeenCalledWith(1, 1, 0);
+      expect(equalityStub).toHaveBeenCalledWith(4, 2, 1);
     });
 
     it('should return the previous value without executing the result fn if the equality fn returns true', () => {
