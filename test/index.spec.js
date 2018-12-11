@@ -629,6 +629,21 @@ describe('memoizeOne', () => {
       expect(result1).toBe(1);
       expect(result2).toBe(1);
     });
+
+    it('should allow a custom equality fn with an index argument', () => {
+      const fn = (...args: mixed[]) => {
+        // eslint-disable-next-line no-console
+        console.log(...args);
+      };
+
+      const withIndex = (a: mixed, b: mixed, index: number): boolean => {
+        return index > 0 ? a === b : a !== b;
+      };
+      memoizeOne(fn, withIndex);
+
+      const withoutIndex = (a: mixed, b: mixed): boolean => a === b;
+      memoizeOne(fn, withoutIndex);
+    });
   });
 });
 
