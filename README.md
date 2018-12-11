@@ -50,7 +50,7 @@ memoizedAdd(1, 2); // 3
 
 ### Custom equality function
 
-You can also pass in a custom function for checking the equality of two items. The equality function will is used to compare the value of every individual argument.
+You can also pass in a custom function for checking the equality of two items. The equality function will be used to compare the value of every individual argument.
 
 ```js
 import memoizeOne from 'memoize-one';
