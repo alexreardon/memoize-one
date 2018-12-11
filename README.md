@@ -50,7 +50,7 @@ memoizedAdd(1, 2); // 3
 
 ### Custom equality function
 
-You can also pass in a custom function for checking the equality of two items.
+You can also pass in a custom function for checking the equality of two items. The equality function will is used to compare the value of every individual argument.
 
 ```js
 import memoizeOne from 'memoize-one';
@@ -77,10 +77,16 @@ result3 === result4 // true - arguments are deep equal
 Here is the expected [flow](http://flowtype.org) type signature for a custom equality function:
 
 ```js
-type EqualityFn = (a: mixed, b: mixed, index: number) => boolean;
+type EqualityFn = (newValue: mixed, oldValue: mixed, index: number) => boolean;
 ```
 
-#### Custom equality function with multiple arguments
+The default equality function is a simple shallow equal check
+
+```js
+const simpleIsEqual: EqualityFn = (a: mixed, b: mixed): boolean => a === b;
+```
+
+#### Equality function with multiple arguments
 
 If the function you want to memoize takes multiple arguments, your custom equality function will be called once for each argument and will be passed each argument's new value and last value.
 
@@ -110,6 +116,35 @@ const result2 = memoizedMakeCountObj(
 );
 
 result1 === result2; // true - same reference
+```
+
+#### Equality function index
+
+For each call of the equality function you are provided with the index of the argument.
+
+```js
+import memoizeOne from 'memoize-one';
+import deepEqual from 'lodash.isEqual';
+
+const myEqualFn = (newArg, lastArg, index) => {
+  // use deep equal for first arg
+  if(index === 0) {
+    return deepEqual(newArg, lastArg);
+  }
+  // use shallow equal for all other arguments
+  return newArg === lastArg;
+}
+
+const fn = (...args) => {
+  console.log('called with', ...args);
+};
+const memoized = memoizeOne(fn, myEqualFn);
+
+memoized({hello: 'world'}, 5);
+// console.log('called with', {hello: 'world'}, 5);
+
+memoized({hello: 'world'}, 5);
+// no call to console.log
 ```
 
 ## Installation
