@@ -1,7 +1,7 @@
 // @flow
 type EqualityFn = (newValue: mixed, oldValue: mixed, index: number) => boolean;
 
-const simpleIsEqual: EqualityFn = (a: mixed, b: mixed): boolean => a === b;
+const simpleIsEqual: EqualityFn = (newValue: mixed, oldValue: mixed): boolean => newValue === oldValue;
 
 // <ResultFn: (...Array<any>) => mixed>
 // The purpose of this typing is to ensure that the returned memoized

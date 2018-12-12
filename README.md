@@ -50,7 +50,7 @@ memoizedAdd(1, 2); // 3
 
 ### Custom equality function
 
-You can also pass in a custom function for checking the equality of two items. The equality function will is used to compare the value of every individual argument.
+You can also pass in a custom function for checking the equality of two items. The equality function will be used to compare the value of every individual argument.
 
 ```js
 import memoizeOne from 'memoize-one';
@@ -83,7 +83,7 @@ type EqualityFn = (newValue: mixed, oldValue: mixed, index: number) => boolean;
 The default equality function is a simple shallow equal check
 
 ```js
-const simpleIsEqual: EqualityFn = (a: mixed, b: mixed): boolean => a === b;
+const simpleIsEqual: EqualityFn = (newValue: mixed, oldValue: mixed): boolean => newValue === oldValue;
 ```
 
 #### Equality function with multiple arguments
@@ -99,7 +99,7 @@ const makeCountObj = (first, second, third) => ({
   third: third.count,
 });
 
-const areCountPropertiesEqual = (newArg, lastArg) => newArg.count === lastArg.count;
+const areCountPropertiesEqual = (newValue, oldValue) => newValue.count === oldValue.count;
 // runs once for first's new and last values, once for second's, etc.
 
 const memoizedMakeCountObj = memoizeOne(makeCountObj, areCountPropertiesEqual);
@@ -126,13 +126,13 @@ For each call of the equality function you are provided with the index of the ar
 import memoizeOne from 'memoize-one';
 import deepEqual from 'lodash.isEqual';
 
-const myEqualFn = (newArg, lastArg, index) => {
+const myEqualFn = (newValue, oldValue, index) => {
   // use deep equal for first arg
   if(index === 0) {
-    return deepEqual(newArg, lastArg);
+    return deepEqual(newValue, oldValue);
   }
   // use shallow equal for all other arguments
-  return newArg === lastArg;
+  return newValue === oldValue;
 }
 
 const fn = (...args) => {
