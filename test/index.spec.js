@@ -636,12 +636,12 @@ describe('memoizeOne', () => {
         console.log(...args);
       };
 
-      const withIndex = (a: mixed, b: mixed, index: number): boolean => {
-        return index > 0 ? a === b : a !== b;
+      const withIndex = (newValue: mixed, oldValue: mixed, index: number): boolean => {
+        return index > 0 ? newValue === oldValue : newValue !== oldValue;
       };
       memoizeOne(fn, withIndex);
 
-      const withoutIndex = (a: mixed, b: mixed): boolean => a === b;
+      const withoutIndex = (newValue: mixed, oldValue: mixed): boolean => newValue === oldValue;
       memoizeOne(fn, withoutIndex);
     });
   });
