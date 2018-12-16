@@ -74,7 +74,7 @@ If you are in a CommonJS environment (eg [Node](https://nodejs.org)), then **you
 const memoizeOne = require('memoize-one').default;
 ```
 
-### Custom equality function
+## Custom equality function
 
 The default equality function is a simple shallow equal check
 
@@ -110,7 +110,7 @@ const result4 = customMemoization({foo: 'bar'});
 result3 === result4 // true - arguments are deep equal
 ```
 
-#### Custom equality function behaviour
+### Custom equality function behaviour
 
 - The equality function is only called if the `this` context of the function has not changed, and the `length` of the arguments has not changed.
 - The equality function is used to compare the value of every individual argument by index.
@@ -125,7 +125,7 @@ equality function calls:
 first call: `isEqual(0, 0)`
 second call: `isEqual(1, 2)`
 
-#### Custom equality function higher order functions
+### Custom equality function higher order functions
 
 > This is super advanced behaviour. Generally you will not need to do this!
 
