@@ -129,7 +129,7 @@ second call: `isEqual(1, 2)`
 
 > This is super advanced behaviour. Generally you will not need to do this!
 
-We do not provide extra details to custom equality functions such as argument `index` for [compatibility reasons](TODO). However, you can add extra information yourself to your custom equality functions with a higher order function (wrapping a function in another function).
+We do not provide extra details to custom equality functions such as argument `index` for [compatibility reasons](https://github.com/alexreardon/memoize-one/issues/47). However, you can add extra information yourself to your custom equality functions with a higher order function (wrapping a function in another function).
 
 #### Example: `index`
 
