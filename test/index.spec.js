@@ -673,7 +673,13 @@ describe('memoizeOne', () => {
       const getMemoizedWithIndex = (fn: Function) => {
         let argIndex: number = 0;
         const withIndex = (newValue: mixed, oldValue: mixed) => customIsEqual(newValue, oldValue, argIndex++);
-        return memoizeOne(fn, withIndex);
+        const memoized = memoizeOne(fn, withIndex);
+
+        // every time this function is called it will reset our argIndex
+        return (...args: mixed[]) => {
+          argIndex = 0;
+          return memoized(...args);
+        };
       };
 
       const memoized = getMemoizedWithIndex(mock);
@@ -707,8 +713,10 @@ describe('memoizeOne', () => {
         const withIndex = (newValue: mixed, oldValue: mixed) => customIsEqual(newValue, oldValue, argIndex++, args);
         const memoized = memoizeOne(fn, withIndex);
 
+        // every time this function is called it will reset our args and argIndex
         return (...newArgs: mixed[]) => {
           args = newArgs;
+          argIndex = 0;
           return memoized(...newArgs);
         };
       };

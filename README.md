@@ -48,6 +48,32 @@ memoizedAdd(1, 2); // 3
 // it is not the latest so the cached result is lost
 ```
 
+## Installation
+
+```bash
+# yarn
+yarn add memoize-one
+
+# npm
+npm install memoize-one --save
+```
+
+## Module usage
+
+### ES6 module
+
+```js
+import memoizeOne from 'memoize-one';
+```
+
+### CommonJS
+
+If you are in a CommonJS environment (eg [Node](https://nodejs.org)), then **you will need to add `.default` to your import**:
+
+```js
+const memoizeOne = require('memoize-one').default;
+```
+
 ### Custom equality function
 
 The default equality function is a simple shallow equal check
@@ -110,24 +136,8 @@ We do not provide extra details to custom equality functions such as argument `i
 Here is an example of a higher order function that allow you to pass an `index` to your custom equality function.
 
 ```js
-const getMemoizedWithIndex = (fn: Function) => {
-  let argIndex: number = 0;
-  const withIndex = (newValue: mixed, oldValue: mixed) => customIsEqual(newValue, oldValue, argIndex++);
-  return memoizeOne(fn, withIndex);
-};
-
-const memoized = getMemoizedWithIndex(mock);
-```
-
-In this example we do a different check for the second argument
-
-```js
-function isDate(value: mixed): boolean %checks {
-  return value instanceof Date;
-}
-
 // this function will do some special checking for the second argument
-const isEqual = (newValue: mixed, oldValue: mixed, index: number): boolean => {
+const customIsEqual = (newValue: mixed, oldValue: mixed, index: number): boolean => {
   if (index === 1) {
     if (!isDate(newValue) || !isDate(oldValue)) {
       return false;
@@ -138,14 +148,19 @@ const isEqual = (newValue: mixed, oldValue: mixed, index: number): boolean => {
   return newValue === oldValue;
 };
 
-// here is the main
 const getMemoizedWithIndex = (fn: Function) => {
   let argIndex: number = 0;
-  const withIndex = (newValue: mixed, oldValue: mixed) => isEqual(newValue, oldValue, argIndex++);
-  return memoizeOne(fn, withIndex);
+  const withIndex = (newValue: mixed, oldValue: mixed) => customIsEqual(newValue, oldValue, argIndex++);
+  const memoized = memoizeOne(fn, withIndex);
+
+  // every time this function is called it will reset our argIndex
+  return (...args: mixed[]) => {
+    argIndex = 0;
+    return memoized(...args);
+  };
 };
 
-const memoized = getMemoizedWithIndex(mock);
+const memoized = getMemoizedWithIndex(myFunc);
 ```
 
 #### Example: all `arguments`
@@ -160,48 +175,21 @@ const customIsEqual = (newValue: mixed, oldValue: mixed, index: number, args: mi
   }
   return newValue === oldValue;
 };
-
-// you are welcome to reuse this HOF!
-
 const getMemoizedFn = (fn: Function) => {
   let args: mixed[] = [];
   let argIndex: number = 0;
   const withIndex = (newValue: mixed, oldValue: mixed) => customIsEqual(newValue, oldValue, argIndex++, args);
   const memoized = memoizeOne(fn, withIndex);
 
+  // every time this function is called it will reset our args and argIndex
   return (...newArgs: mixed[]) => {
     args = newArgs;
+    argIndex = 0;
     return memoized(...newArgs);
   };
 };
 
-const memoized = getMemoizedFn(mock);
-```
-
-## Installation
-
-```bash
-# yarn
-yarn add memoize-one
-
-# npm
-npm install memoize-one --save
-```
-
-## Module usage
-
-### ES6 module
-
-```js
-import memoizeOne from 'memoize-one';
-```
-
-### CommonJS
-
-If you are in a CommonJS environment (eg [Node](https://nodejs.org)), then **you will need to add `.default` to your import**:
-
-```js
-const memoizeOne = require('memoize-one').default;
+const memoized = getMemoizedFn(myFunc);
 ```
 
 ## `this`
