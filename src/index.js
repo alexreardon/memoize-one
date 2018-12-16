@@ -1,7 +1,7 @@
 // @flow
-type EqualityFn = (newValue: mixed, oldValue: mixed, index: number) => boolean;
+type EqualityFn = (newValue: mixed, oldValue: mixed) => boolean;
 
-const simpleIsEqual: EqualityFn = (a: mixed, b: mixed): boolean => a === b;
+const simpleIsEqual: EqualityFn = (newValue: mixed, oldValue: mixed): boolean => newValue === oldValue;
 
 // <ResultFn: (...Array<any>) => mixed>
 // The purpose of this typing is to ensure that the returned memoized
@@ -15,7 +15,7 @@ export default function <ResultFn: (...Array<any>) => mixed>(resultFn: ResultFn,
   let lastResult: mixed;
   let calledOnce: boolean = false;
 
-  const isNewArgEqualToLast = (newArg: mixed, index: number): boolean => isEqual(newArg, lastArgs[index], index);
+  const isNewArgEqualToLast = (newArg: mixed, index: number): boolean => isEqual(newArg, lastArgs[index]);
 
   // breaking cache when context (this) or arguments change
   const result = function (...newArgs: Array<mixed>) {
