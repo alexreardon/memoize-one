@@ -79,9 +79,11 @@ An equality function should return `true` if the arguments are equal. If `true` 
 
 The default equality function is a shallow equal check of all arguments (each argument is compared with `===`). The default equality function is not used if the `length` of the arguments changes. It is up to you if you want to return `false` in your `isEqual` check if the `length` of the arrays is different.
 
+Your equality function needs to compare `Arrays`. The `newArgs` array will be a new reference every time so a simple `newArgs === lastArgs` will always return `false`.
+
 Equality functions are only called if the `this` context of the function has not changed (see below).
 
-Here is an example that uses a deep equal check
+Here is an example that uses a deep equal equality check
 
 ```js
 import memoizeOne from 'memoize-one';
@@ -89,21 +91,19 @@ import isDeepEqual from 'lodash.isequal';
 
 const identity = x => x;
 
-const defaultMemoization = memoizeOne(identity);
-const customMemoization = memoizeOne(identity, isDeepEqual);
+const shallowMemoized = memoizeOne(identity);
+const deepMemoized = memoizeOne(identity, isDeepEqual);
 
-const result1 = defaultMemoization({ foo: 'bar' });
-const result2 = defaultMemoization({ foo: 'bar' });
+const result1 = shallowMemoized({ foo: 'bar' });
+const result2 = shallowMemoized({ foo: 'bar' });
 
 result1 === result2; // false - difference reference
 
-const result3 = customMemoization({ foo: 'bar' });
-const result4 = customMemoization({ foo: 'bar' });
+const result3 = deepMemoized({ foo: 'bar' });
+const result4 = deepMemoized({ foo: 'bar' });
 
 result3 === result4; // true - arguments are deep equal
 ```
-
-Your equality function needs to compare `Arrays`. The `newArgs` array will be a new reference every time so a simple `newArgs === lastArgs` will always return `false`.
 
 ## `this`
 
