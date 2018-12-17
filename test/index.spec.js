@@ -1,5 +1,5 @@
 // @flow
-import memoizeOne, { type EqualityFn } from '../src/';
+import memoizeOne from '../src/';
 import isDeepEqual from 'lodash.isequal';
 
 describe('memoizeOne', () => {
