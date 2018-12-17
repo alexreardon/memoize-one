@@ -417,6 +417,44 @@ describe('memoizeOne', () => {
     });
   });
 
+  describe('skip equality check', () => {
+    it('should not run any equality checks if the arguments length changes', () => {
+      const mock = jest.fn();
+      const isEqual = jest.fn().mockReturnValue(true);
+      const memoized = memoizeOne(mock);
+
+      memoized(1, 2);
+      // not executed on original call
+      expect(isEqual).not.toHaveBeenCalled();
+
+      // not executed as argument length has changed
+      memoized(1, 2, 3);
+      expect(isEqual).not.toHaveBeenCalled();
+    });
+
+    it('should not run any equality checks if the "this" context changes', () => {
+      const isEqual = jest.fn().mockReturnValue(true);
+      const memoized = memoizeOne(getA);
+      const obj1 = {
+        a: 10,
+      };
+      const obj2 = {
+        a: 20,
+      };
+      const args: number[] = [1, 2, 3];
+
+      // using explicit binding change
+
+      // custom equality function not called on first call
+      expect(memoized.apply(obj1, args)).toBe(10);
+      expect(isEqual).not.toHaveBeenCalled();
+
+      // not executed as "this" context has changed
+      expect(memoized.apply(obj2, args)).toBe(20);
+      expect(isEqual).not.toHaveBeenCalled();
+    });
+  });
+
   describe('custom equality function', () => {
     let add;
     let memoizedAdd;
@@ -436,8 +474,8 @@ describe('memoizeOne', () => {
       // will trigger equality check
       memoizedAdd(1, 4);
 
-      expect(equalityStub).toHaveBeenCalledWith(1, 1, 0);
-      expect(equalityStub).toHaveBeenCalledWith(4, 2, 1);
+      expect(equalityStub).toHaveBeenCalledWith(1, 1);
+      expect(equalityStub).toHaveBeenCalledWith(4, 2);
     });
 
     it('should return the previous value without executing the result fn if the equality fn returns true', () => {
@@ -483,7 +521,6 @@ describe('memoizeOne', () => {
   });
 
   describe('throwing', () => {
-
     it('should throw when the memoized function throws', () => {
       const willThrow = (message: string) => {
         throw new Error(message);
@@ -613,6 +650,95 @@ describe('memoizeOne', () => {
     });
   });
 
+  describe('custom equality function higher order functions', () => {
+    it('should support a higher order function with index', () => {
+      const mock = jest.fn();
+
+      function isDate(value: mixed): boolean %checks {
+        return value instanceof Date;
+      }
+
+      // this function will do some special checking for the second argument
+      const customIsEqual = (newValue: mixed, oldValue: mixed, index: number): boolean => {
+        if (index !== 1) {
+          return newValue === oldValue;
+        }
+        if (!isDate(newValue) || !isDate(oldValue)) {
+          return false;
+        }
+        return newValue.getTime() === oldValue.getTime();
+
+      };
+
+      const getMemoizedWithIndex = (fn: Function) => {
+        let argIndex: number = 0;
+        const withIndex = (newValue: mixed, oldValue: mixed) => customIsEqual(newValue, oldValue, argIndex++);
+        const memoized = memoizeOne(fn, withIndex);
+
+        // every time this function is called it will reset our argIndex
+        return (...args: mixed[]) => {
+          argIndex = 0;
+          return memoized(...args);
+        };
+      };
+
+      const memoized = getMemoizedWithIndex(mock);
+
+      memoized(1, new Date(2019, 1));
+      memoized(1, new Date(2019, 1));
+
+      expect(mock).toHaveBeenCalledTimes(1);
+      expect(mock).toHaveBeenCalledWith(1, new Date(2019, 1));
+
+      // new date value - breaks memoization
+      mock.mockClear();
+      memoized(1, new Date(2019, 2));
+      expect(mock).toHaveBeenCalledTimes(1);
+      expect(mock).toHaveBeenCalledWith(1, new Date(2019, 2));
+    });
+
+    it('should support a higher order function with index and args', () => {
+      const mock = jest.fn();
+
+      // using this to only memoize calls with 3+ arguments
+      const customIsEqual = (newValue: mixed, oldValue: mixed, index: number, args: mixed[]): boolean => {
+        if (args.length < 3) {
+          return false;
+        }
+        return newValue === oldValue;
+      };
+      const getMemoizedFn = (fn: Function) => {
+        let args: mixed[] = [];
+        let argIndex: number = 0;
+        const withIndex = (newValue: mixed, oldValue: mixed) => customIsEqual(newValue, oldValue, argIndex++, args);
+        const memoized = memoizeOne(fn, withIndex);
+
+        // every time this function is called it will reset our args and argIndex
+        return (...newArgs: mixed[]) => {
+          args = newArgs;
+          argIndex = 0;
+          return memoized(...newArgs);
+        };
+      };
+
+      const memoized = getMemoizedFn(mock);
+
+      memoized(1, 2, 3);
+      memoized(1, 2, 3);
+
+      expect(mock).toHaveBeenCalledTimes(1);
+      expect(mock).toHaveBeenCalledWith(1, 2, 3);
+
+      mock.mockClear();
+
+      memoized(1, 2);
+      memoized(1, 2);
+
+      expect(mock).toHaveBeenCalledTimes(2);
+      expect(mock).toHaveBeenCalledWith(1, 2);
+    });
+  });
+
   describe('flow typing', () => {
     it('should maintain the type of the original function', () => {
       // this test will create a flow error if the typing is incorrect
@@ -628,21 +754,6 @@ describe('memoizeOne', () => {
 
       expect(result1).toBe(1);
       expect(result2).toBe(1);
-    });
-
-    it('should allow a custom equality fn with an index argument', () => {
-      const fn = (...args: mixed[]) => {
-        // eslint-disable-next-line no-console
-        console.log(...args);
-      };
-
-      const withIndex = (newValue: mixed, oldValue: mixed, index: number): boolean => {
-        return index > 0 ? newValue === oldValue : newValue !== oldValue;
-      };
-      memoizeOne(fn, withIndex);
-
-      const withoutIndex = (newValue: mixed, oldValue: mixed): boolean => newValue === oldValue;
-      memoizeOne(fn, withoutIndex);
     });
   });
 });

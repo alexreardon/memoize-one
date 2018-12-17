@@ -1,5 +1,5 @@
 // @flow
-type EqualityFn = (newValue: mixed, oldValue: mixed, index: number) => boolean;
+type EqualityFn = (newValue: mixed, oldValue: mixed) => boolean;
 
 const simpleIsEqual: EqualityFn = (newValue: mixed, oldValue: mixed): boolean => newValue === oldValue;
 
@@ -15,7 +15,7 @@ export default function <ResultFn: (...Array<any>) => mixed>(resultFn: ResultFn,
   let lastResult: mixed;
   let calledOnce: boolean = false;
 
-  const isNewArgEqualToLast = (newArg: mixed, index: number): boolean => isEqual(newArg, lastArgs[index], index);
+  const isNewArgEqualToLast = (newArg: mixed, index: number): boolean => isEqual(newArg, lastArgs[index]);
 
   // breaking cache when context (this) or arguments change
   const result = function (...newArgs: Array<mixed>) {
