@@ -1,8 +1,22 @@
 // @flow
-export type EqualityFn = (newValue: mixed, oldValue: mixed) => boolean;
+export type EqualityFn = (
+  newArgs: mixed[],
+  lastArgs: mixed[],
+  lastValue: mixed,
+) => boolean;
 
-const simpleIsEqual: EqualityFn = (newValue: mixed, oldValue: mixed): boolean =>
+const shallowEqual = (newValue: mixed, oldValue: mixed): boolean =>
   newValue === oldValue;
+
+const simpleIsEqual: EqualityFn = (
+  newArgs: mixed[],
+  lastArgs: mixed[],
+): boolean =>
+  newArgs.length === lastArgs.length &&
+  newArgs.every(
+    (newArg: mixed, index: number): boolean =>
+      shallowEqual(newArg, lastArgs[index]),
+  );
 
 // <ResultFn: (...Array<any>) => mixed>
 // The purpose of this typing is to ensure that the returned memoized
@@ -19,16 +33,12 @@ export default function<ResultFn: (...Array<any>) => mixed>(
   let lastResult: mixed;
   let calledOnce: boolean = false;
 
-  const isNewArgEqualToLast = (newArg: mixed, index: number): boolean =>
-    isEqual(newArg, lastArgs[index]);
-
   // breaking cache when context (this) or arguments change
   const result = function(...newArgs: Array<mixed>) {
     if (
       calledOnce &&
       lastThis === this &&
-      newArgs.length === lastArgs.length &&
-      newArgs.every(isNewArgEqualToLast)
+      isEqual(newArgs, lastArgs, lastResult)
     ) {
       return lastResult;
     }
