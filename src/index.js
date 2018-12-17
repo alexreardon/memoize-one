@@ -2,7 +2,7 @@
 export type EqualityFn = (
   newArgs: mixed[],
   lastArgs: mixed[],
-  lastValue: mixed,
+  lastResult: mixed,
 ) => boolean;
 
 const shallowEqual = (newValue: mixed, oldValue: mixed): boolean =>

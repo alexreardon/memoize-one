@@ -1,5 +1,6 @@
 // @flow
 import memoizeOne, { type EqualityFn } from '../src/';
+import isDeepEqual from 'lodash.isequal';
 
 describe('memoizeOne', () => {
   function getA() {
@@ -478,16 +479,95 @@ describe('memoizeOne', () => {
       memoizedAdd = memoizeOne(add, equalityStub);
     });
 
-    it('should call the equality function with the last arguments', () => {
+    it('should call the equality function with the newArgs, lastArgs and lastValue', () => {
       equalityStub.mockReturnValue(true);
 
       // first call does not trigger equality check
       memoizedAdd(1, 2);
-      // will trigger equality check
+      expect(equalityStub).not.toHaveBeenCalled();
       memoizedAdd(1, 4);
 
-      expect(equalityStub).toHaveBeenCalledWith(1, 1);
-      expect(equalityStub).toHaveBeenCalledWith(4, 2);
+      expect(equalityStub).toHaveBeenCalledWith([1, 4], [1, 2], 3);
+    });
+
+    it('should have a nice isDeepEqual consumption story', () => {
+      type Person = {
+        age: number,
+      };
+      {
+        const addAges = jest
+          .fn()
+          .mockImplementation(
+            (...people: Person[]): number =>
+              people.reduce(
+                (sum: number, person: Person) => sum + person.age,
+                0,
+              ),
+          );
+        const customIsEqual: EqualityFn = (
+          newArgs: mixed[],
+          lastArgs: mixed[],
+        ) => {
+          return isDeepEqual(newArgs, lastArgs);
+        };
+        const memoized = memoizeOne(addAges, customIsEqual);
+        const bob: Person = {
+          age: 10,
+        };
+        const jane: Person = {
+          age: 2,
+        };
+        const tim: Person = {
+          age: 1,
+        };
+
+        // addAges executed on first call
+        expect(memoized(bob, jane)).toBe(12);
+        expect(addAges).toHaveBeenCalled();
+        addAges.mockClear();
+
+        // memoized function not called
+        expect(memoized(bob, jane)).toBe(12);
+        expect(addAges).not.toHaveBeenCalled();
+
+        // memoized function called (we lodash happily handled argument change)
+        expect(memoized(bob, jane, tim)).toBe(13);
+        expect(addAges).toHaveBeenCalled();
+      }
+      {
+        const addAges = jest
+          .fn()
+          .mockImplementation(
+            (...people: Person[]): number =>
+              people.reduce(
+                (sum: number, person: Person) => sum + person.age,
+                0,
+              ),
+          );
+        const memoized = memoizeOne(addAges, isDeepEqual);
+        const bob: Person = {
+          age: 10,
+        };
+        const jane: Person = {
+          age: 2,
+        };
+        const tim: Person = {
+          age: 1,
+        };
+
+        // addAges executed on first call
+        expect(memoized(bob, jane)).toBe(12);
+        expect(addAges).toHaveBeenCalled();
+        addAges.mockClear();
+
+        // memoized function not called
+        expect(memoized(bob, jane)).toBe(12);
+        expect(addAges).not.toHaveBeenCalled();
+
+        // memoized function called (we lodash happily handled argument change)
+        expect(memoized(bob, jane, tim)).toBe(13);
+        expect(addAges).toHaveBeenCalled();
+      }
     });
 
     it('should return the previous value without executing the result fn if the equality fn returns true', () => {
@@ -668,150 +748,6 @@ describe('memoizeOne', () => {
         expect(throwValue).toHaveBeenCalledTimes(2);
         expect(firstError).toEqual(secondError);
       });
-    });
-  });
-
-  describe('custom equality function higher order functions', () => {
-    it('should support a higher order function with index', () => {
-      const mock = jest.fn();
-
-      function isDate(value: mixed): boolean %checks {
-        return value instanceof Date;
-      }
-
-      // this function will do some special checking for the second argument
-      const customIsEqual = (
-        newValue: mixed,
-        oldValue: mixed,
-        index: number,
-      ): boolean => {
-        if (index !== 1) {
-          return newValue === oldValue;
-        }
-        if (!isDate(newValue) || !isDate(oldValue)) {
-          return false;
-        }
-        return newValue.getTime() === oldValue.getTime();
-      };
-
-      const getMemoizedWithIndex = (fn: Function) => {
-        let argIndex: number = 0;
-        const withIndex = (newValue: mixed, oldValue: mixed) =>
-          customIsEqual(newValue, oldValue, argIndex++);
-        const memoized = memoizeOne(fn, withIndex);
-
-        // every time this function is called it will reset our argIndex
-        return (...args: mixed[]) => {
-          argIndex = 0;
-          return memoized(...args);
-        };
-      };
-
-      const memoized = getMemoizedWithIndex(mock);
-
-      memoized(1, new Date(2019, 1));
-      memoized(1, new Date(2019, 1));
-
-      expect(mock).toHaveBeenCalledTimes(1);
-      expect(mock).toHaveBeenCalledWith(1, new Date(2019, 1));
-
-      // new date value - breaks memoization
-      mock.mockClear();
-      memoized(1, new Date(2019, 2));
-      expect(mock).toHaveBeenCalledTimes(1);
-      expect(mock).toHaveBeenCalledWith(1, new Date(2019, 2));
-    });
-
-    it('should support a higher order function with index (alternate pattern)', () => {
-      const mock = jest.fn();
-
-      const getMemoized = (fn: Function, equalityChecks: EqualityFn[]) => {
-        const isEqual = (a: mixed, b: mixed, index: number) => {
-          return equalityChecks[index](a, b);
-        };
-
-        let argIndex: number = 0;
-        const withIndex = (newValue: mixed, oldValue: mixed) =>
-          isEqual(newValue, oldValue, argIndex++);
-        const memoized = memoizeOne(fn, withIndex);
-
-        // every time this function is called it will reset our argIndex
-        return (...args: mixed[]) => {
-          argIndex = 0;
-          return memoized(...args);
-        };
-      };
-
-      const custom1: EqualityFn = jest.fn().mockReturnValue(true);
-      const custom2: EqualityFn = jest.fn().mockReturnValue(true);
-      const custom3: EqualityFn = jest.fn().mockReturnValue(true);
-
-      const memoized = getMemoized(mock, [custom1, custom2, custom3]);
-
-      // nothing calling on first call
-      memoized(1, new Date(2019, 1), { foo: 'bar' });
-      expect(custom1).not.toHaveBeenCalled();
-      expect(custom2).not.toHaveBeenCalled();
-      expect(custom3).not.toHaveBeenCalled();
-
-      // custom checks run on second call
-      memoized(1, new Date(2019, 1), { foo: 'bar' });
-      expect(custom1).toHaveBeenCalledTimes(1);
-      expect(custom1).toHaveBeenCalledWith(1, 1);
-      expect(custom2).toHaveBeenCalledTimes(1);
-      expect(custom2).toHaveBeenCalledWith(
-        new Date(2019, 1),
-        new Date(2019, 1),
-      );
-      expect(custom3).toHaveBeenCalledTimes(1);
-      expect(custom3).toHaveBeenCalledWith({ foo: 'bar' }, { foo: 'bar' });
-    });
-
-    it('should support a higher order function with index and args', () => {
-      const mock = jest.fn();
-
-      // using this to only memoize calls with 3+ arguments
-      const customIsEqual = (
-        newValue: mixed,
-        oldValue: mixed,
-        index: number,
-        args: mixed[],
-      ): boolean => {
-        if (args.length < 3) {
-          return false;
-        }
-        return newValue === oldValue;
-      };
-      const getMemoizedFn = (fn: Function) => {
-        let args: mixed[] = [];
-        let argIndex: number = 0;
-        const withIndex = (newValue: mixed, oldValue: mixed) =>
-          customIsEqual(newValue, oldValue, argIndex++, args);
-        const memoized = memoizeOne(fn, withIndex);
-
-        // every time this function is called it will reset our args and argIndex
-        return (...newArgs: mixed[]) => {
-          args = newArgs;
-          argIndex = 0;
-          return memoized(...newArgs);
-        };
-      };
-
-      const memoized = getMemoizedFn(mock);
-
-      memoized(1, 2, 3);
-      memoized(1, 2, 3);
-
-      expect(mock).toHaveBeenCalledTimes(1);
-      expect(mock).toHaveBeenCalledWith(1, 2, 3);
-
-      mock.mockClear();
-
-      memoized(1, 2);
-      memoized(1, 2);
-
-      expect(mock).toHaveBeenCalledTimes(2);
-      expect(mock).toHaveBeenCalledWith(1, 2);
     });
   });
 

@@ -37,6 +37,7 @@
     "eslint-plugin-prettier": "^3.0.0",
     "flow-bin": "0.89.0",
     "jest": "^23.6.0",
+    "lodash.isequal": "^4.5.0",
     "prettier": "1.15.3",
     "rimraf": "2.6.2",
     "rollup": "^0.68.0",

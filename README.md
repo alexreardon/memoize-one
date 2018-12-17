@@ -68,30 +68,24 @@ const memoizeOne = require('memoize-one').default;
 
 ## Custom equality function
 
-The default equality function is a simple shallow equal check
+The default equality function is a simple shallow equal check of all arguments.
+
+You can also pass in a custom function for checking the equality of two sets of arguments
 
 ```js
-const simpleIsEqual: EqualityFn = (a: mixed, b: mixed): boolean => a === b;
+type EqualityFn = (newArgs: mixed[], oldArgs: mixed[], lastResult: mixed) => boolean;
 ```
-
-You can also pass in a custom function for checking the equality of two items.
-
-```js
-type EqualityFn = (newValue: mixed, oldValue: mixed) => boolean;
-```
-
-> I am considering changing the custom equality api to `(newArgs: mixed[], lastArgs: mixed[], lastResult: T)`
 
 Here is an example that uses a deep equal check
 
 ```js
 import memoizeOne from 'memoize-one';
-import deepEqual from 'lodash.isEqual';
+import isDeepEqual from 'lodash.isequal';
 
 const identity = x => x;
 
 const defaultMemoization = memoizeOne(identity);
-const customMemoization = memoizeOne(identity, deepEqual);
+const customMemoization = memoizeOne(identity, isDeepEqual);
 
 const result1 = defaultMemoization({ foo: 'bar' });
 const result2 = defaultMemoization({ foo: 'bar' });
@@ -106,127 +100,8 @@ result3 === result4; // true - arguments are deep equal
 
 ### Custom equality function behaviour
 
-- The equality function is only called if the `this` context of the function has not changed, and the `length` of the arguments has not changed.
-- The equality function is used to compare the value of every individual argument by index.
-
-Memoized function calls
-
-- First call: `memoized(0, 1)`
-- arguments: `0, 1`
-
-- Second call: `memoized(0, 2)`
-- arguments: `0, 2`
-
-Equality function calls:
-
-- First call: `isEqual(0, 0)` `(newArg, oldArg)`
-- Second call: `isEqual(1, 2)` `(newArg, oldArg)`
-
-### Custom equality function higher order functions
-
-> ⚠️ Generally you will not need to do this. There are some rare use cases where additional information in your custom equality function can be useful. We have optimised the custom equality function api for common use cases. There is some additional work you will need to do to unlock more advanced behaviours.
-
-We do not provide extra details to custom equality functions such as argument `index` for [compatibility reasons](https://github.com/alexreardon/memoize-one/issues/47). However, you can add extra information yourself to your custom equality functions with a higher order function (wrapping a function in another function).
-
-#### Example: `index`
-
-Here is an example of a higher order function that allow you to pass an `index` to your custom equality function.
-
-```js
-// this function will do some special checking for the second argument
-const customIsEqual = (
-  newValue: mixed,
-  oldValue: mixed,
-  index: number,
-): boolean => {
-  if (index === 1) {
-    if (!isDate(newValue) || !isDate(oldValue)) {
-      return false;
-    }
-    return newValue.getTime() === oldValue.getTime();
-  }
-
-  return newValue === oldValue;
-};
-
-const getMemoizedWithIndex = (fn: Function) => {
-  let argIndex: number = 0;
-  const withIndex = (newValue: mixed, oldValue: mixed) =>
-    customIsEqual(newValue, oldValue, argIndex++);
-  const memoized = memoizeOne(fn, withIndex);
-
-  // every time this function is called it will reset our argIndex
-  return (...args: mixed[]) => {
-    argIndex = 0;
-    return memoized(...args);
-  };
-};
-
-const memoized = getMemoizedWithIndex(myFunc);
-```
-
-#### Example: equality function per argument
-
-A nice pattern is to create a helper that applies different equality functions for the different arguments. Thanks [@Noviny!](https://github.com/Noviny)
-
-```js
-const getMemoized = (fn: Function, equalityChecks: EqualityFn[]) => {
-  const isEqual = (a: mixed, b: mixed, index: number) => {
-    return equalityChecks[index](a, b);
-  };
-
-  let argIndex: number = 0;
-  const withIndex = (newValue: mixed, oldValue: mixed) =>
-    isEqual(newValue, oldValue, argIndex++);
-  const memoized = memoizeOne(fn, withIndex);
-
-  // every time this function is called it will reset our argIndex
-  return (...args: mixed[]) => {
-    argIndex = 0;
-    return memoized(...args);
-  };
-};
-
-const memoized = getMemoized(myFunc, [isShallowEqual, isDateEqual, isDeepEqual]);
-
-memoized(1, new Date(2019, 1), {foo: 'bar' });
-memoized(1, new Date(2019, 1), {foo: 'bar' });
-```
-
-#### Example: all `arguments`
-
-Here is an example of a higher order function that allow you to pass a `index` and `arguments` to your custom equality function.
-
-```js
-// using this to only memoize calls with 3+ arguments
-const customIsEqual = (
-  newValue: mixed,
-  oldValue: mixed,
-  index: number,
-  args: mixed[],
-): boolean => {
-  if (args.length < 3) {
-    return false;
-  }
-  return newValue === oldValue;
-};
-const getMemoizedFn = (fn: Function) => {
-  let args: mixed[] = [];
-  let argIndex: number = 0;
-  const withIndex = (newValue: mixed, oldValue: mixed) =>
-    customIsEqual(newValue, oldValue, argIndex++, args);
-  const memoized = memoizeOne(fn, withIndex);
-
-  // every time this function is called it will reset our args and argIndex
-  return (...newArgs: mixed[]) => {
-    args = newArgs;
-    argIndex = 0;
-    return memoized(...newArgs);
-  };
-};
-
-const memoized = getMemoizedFn(myFunc);
-```
+- The equality function is only called if the `this` context of the function has not changed,
+- We pass the `previousResult` as the third argument. You need to make sure that this plays nicely with your custom equality function. Some libraries treat the third argument to an equality check differently. `lodash.isequal` ignores the third argument. While `lodash.isequalwith` uses the third argument as a customerizer function.
 
 ## `this`
 
