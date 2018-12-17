@@ -8,6 +8,7 @@ const simpleIsEqual: EqualityFn = (
   newArgs: mixed[],
   lastArgs: mixed[],
 ): boolean =>
+  newArgs.length === lastArgs.length &&
   newArgs.every(
     (newArg: mixed, index: number): boolean =>
       shallowEqual(newArg, lastArgs[index]),
@@ -30,12 +31,7 @@ export default function<ResultFn: (...Array<any>) => mixed>(
 
   // breaking cache when context (this) or arguments change
   const result = function(...newArgs: Array<mixed>) {
-    if (
-      calledOnce &&
-      lastThis === this &&
-      newArgs.length === lastArgs.length &&
-      isEqual(newArgs, lastArgs)
-    ) {
+    if (calledOnce && lastThis === this && isEqual(newArgs, lastArgs)) {
       return lastResult;
     }
 

@@ -77,16 +77,27 @@ type EqualityFn = (newArgs: mixed[], oldArgs: mixed[]) => boolean;
 
 An equality function should return `true` if the arguments are equal. If `true` is returned then the wrapped function will not be called.
 
-The default equality function is a shallow equal check of all arguments (each argument is compared with `===`).
+The default equality function is a shallow equal check of all arguments (each argument is compared with `===`). The default equality function also does not check anything if the length of the arguments changes. You are welcome to decide if you want to return `false` if the `length` of the arguments is not equal
 
-Your equality function needs to compare `Arrays`. The `newArgs` array will be a new reference every time so a simple `newArgs === lastArgs` will always return `false`.
+```js
+const simpleIsEqual: EqualityFn = (
+  newArgs: mixed[],
+  lastArgs: mixed[],
+): boolean =>
+  newArgs.length === lastArgs.length &&
+  newArgs.every(
+    (newArg: mixed, index: number): boolean =>
+      shallowEqual(newArg, lastArgs[index]),
+  );
+```
 
-Equality functions are not called if:
+A custom equality function needs to compare `Arrays`. The `newArgs` array will be a new reference every time so a simple `newArgs === lastArgs` will always return `false`.
 
-- this length of the arguments has changed OR
-- the `this` context of the function has changed (see below).
+Equality functions are not called if the `this` context of the function has changed (see below).
 
-Here is an example that uses a deep equal equality check
+Here is an example that uses a `lodash.isequal` deep equal equality check
+
+> `lodash.isequal` correctly handles deep comparing two arrays
 
 ```js
 import memoizeOne from 'memoize-one';

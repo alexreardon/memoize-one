@@ -449,7 +449,7 @@ describe('memoizeOne', () => {
       expect(isEqual).not.toHaveBeenCalled();
     });
 
-    it('should not run a custom equality check if the arguments length changes', () => {
+    it('should run a custom equality check if the arguments length changes', () => {
       const mock = jest.fn();
       const isEqual = jest.fn().mockReturnValue(true);
       const memoized = memoizeOne(mock, isEqual);
@@ -458,9 +458,9 @@ describe('memoizeOne', () => {
       // not executed on original call
       expect(isEqual).not.toHaveBeenCalled();
 
-      // not executed as argument length has changed
+      // executed even though argument length has changed
       memoized(1, 2, 3);
-      expect(isEqual).not.toHaveBeenCalled();
+      expect(isEqual).toHaveBeenCalled();
     });
   });
 
