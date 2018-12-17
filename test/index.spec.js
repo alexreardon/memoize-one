@@ -427,23 +427,9 @@ describe('memoizeOne', () => {
   });
 
   describe('skip equality check', () => {
-    it('should not run any equality checks if the arguments length changes', () => {
-      const mock = jest.fn();
-      const isEqual = jest.fn().mockReturnValue(true);
-      const memoized = memoizeOne(mock);
-
-      memoized(1, 2);
-      // not executed on original call
-      expect(isEqual).not.toHaveBeenCalled();
-
-      // not executed as argument length has changed
-      memoized(1, 2, 3);
-      expect(isEqual).not.toHaveBeenCalled();
-    });
-
     it('should not run any equality checks if the "this" context changes', () => {
       const isEqual = jest.fn().mockReturnValue(true);
-      const memoized = memoizeOne(getA);
+      const memoized = memoizeOne(getA, isEqual);
       const obj1 = {
         a: 10,
       };
@@ -460,6 +446,20 @@ describe('memoizeOne', () => {
 
       // not executed as "this" context has changed
       expect(memoized.apply(obj2, args)).toBe(20);
+      expect(isEqual).not.toHaveBeenCalled();
+    });
+
+    it('should not run a custom equality check if the arguments length changes', () => {
+      const mock = jest.fn();
+      const isEqual = jest.fn().mockReturnValue(true);
+      const memoized = memoizeOne(mock, isEqual);
+
+      memoized(1, 2);
+      // not executed on original call
+      expect(isEqual).not.toHaveBeenCalled();
+
+      // not executed as argument length has changed
+      memoized(1, 2, 3);
       expect(isEqual).not.toHaveBeenCalled();
     });
   });
