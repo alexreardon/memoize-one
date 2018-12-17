@@ -530,6 +530,33 @@ describe('memoizeOne', () => {
       // underlying function called
       expect(add).toHaveBeenCalledTimes(2);
     });
+
+    it('should apply an equality function for each argument if required', () => {
+      const mock = jest.fn();
+      const custom1: EqualityFn = jest.fn().mockReturnValue(true);
+      const custom2: EqualityFn = jest.fn().mockReturnValue(true);
+      const custom3: EqualityFn = jest.fn().mockReturnValue(true);
+
+      const memoized = memoizeOne(mock, [custom1, custom2, custom3]);
+
+      // nothing calling on first call
+      memoized(1, new Date(2019, 1), { foo: 'bar' });
+      expect(custom1).not.toHaveBeenCalled();
+      expect(custom2).not.toHaveBeenCalled();
+      expect(custom3).not.toHaveBeenCalled();
+
+      // custom checks run on second call
+      memoized(2, new Date(2019, 2), { foo: 'baz' });
+      expect(custom1).toHaveBeenCalledTimes(1);
+      expect(custom1).toHaveBeenCalledWith(2, 1);
+      expect(custom2).toHaveBeenCalledTimes(1);
+      expect(custom2).toHaveBeenCalledWith(
+        new Date(2019, 2),
+        new Date(2019, 1),
+      );
+      expect(custom3).toHaveBeenCalledTimes(1);
+      expect(custom3).toHaveBeenCalledWith({ foo: 'baz' }, { foo: 'bar' });
+    });
   });
 
   describe('throwing', () => {

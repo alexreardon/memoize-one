@@ -12,15 +12,20 @@ const simpleIsEqual: EqualityFn = (newValue: mixed, oldValue: mixed): boolean =>
 // mixed:           The result can be anything but needs to be checked before usage
 export default function<ResultFn: (...Array<any>) => mixed>(
   resultFn: ResultFn,
-  isEqual?: EqualityFn = simpleIsEqual,
+  isEqual?: EqualityFn | EqualityFn[] = simpleIsEqual,
 ): ResultFn {
   let lastThis: mixed;
   let lastArgs: Array<mixed> = [];
   let lastResult: mixed;
   let calledOnce: boolean = false;
 
-  const isNewArgEqualToLast = (newArg: mixed, index: number): boolean =>
-    isEqual(newArg, lastArgs[index]);
+  const isNewArgEqualToLast = (newArg: mixed, index: number): boolean => {
+    const oldArg: mixed = lastArgs[index];
+
+    return Array.isArray(isEqual)
+      ? isEqual[index](newArg, oldArg)
+      : isEqual(newArg, oldArg);
+  };
 
   // breaking cache when context (this) or arguments change
   const result = function(...newArgs: Array<mixed>) {
