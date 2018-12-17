@@ -1,5 +1,5 @@
 // @flow
-import memoizeOne from '../src/';
+import memoizeOne, { type EqualityFn } from '../src/';
 
 describe('memoizeOne', () => {
   function getA() {
@@ -720,6 +720,51 @@ describe('memoizeOne', () => {
       memoized(1, new Date(2019, 2));
       expect(mock).toHaveBeenCalledTimes(1);
       expect(mock).toHaveBeenCalledWith(1, new Date(2019, 2));
+    });
+
+    it('should support a higher order function with index (alternate pattern)', () => {
+      const mock = jest.fn();
+
+      const getMemoized = (fn: Function, equalityChecks: EqualityFn[]) => {
+        const isEqual = (a: mixed, b: mixed, index: number) => {
+          return equalityChecks[index](a, b);
+        };
+
+        let argIndex: number = 0;
+        const withIndex = (newValue: mixed, oldValue: mixed) =>
+          isEqual(newValue, oldValue, argIndex++);
+        const memoized = memoizeOne(fn, withIndex);
+
+        // every time this function is called it will reset our argIndex
+        return (...args: mixed[]) => {
+          argIndex = 0;
+          return memoized(...args);
+        };
+      };
+
+      const custom1: EqualityFn = jest.fn().mockReturnValue(true);
+      const custom2: EqualityFn = jest.fn().mockReturnValue(true);
+      const custom3: EqualityFn = jest.fn().mockReturnValue(true);
+
+      const memoized = getMemoized(mock, [custom1, custom2, custom3]);
+
+      // nothing calling on first call
+      memoized(1, new Date(2019, 1), { foo: 'bar' });
+      expect(custom1).not.toHaveBeenCalled();
+      expect(custom2).not.toHaveBeenCalled();
+      expect(custom3).not.toHaveBeenCalled();
+
+      // custom checks run on second call
+      memoized(1, new Date(2019, 1), { foo: 'bar' });
+      expect(custom1).toHaveBeenCalledTimes(1);
+      expect(custom1).toHaveBeenCalledWith(1, 1);
+      expect(custom2).toHaveBeenCalledTimes(1);
+      expect(custom2).toHaveBeenCalledWith(
+        new Date(2019, 1),
+        new Date(2019, 1),
+      );
+      expect(custom3).toHaveBeenCalledTimes(1);
+      expect(custom3).toHaveBeenCalledWith({ foo: 'bar' }, { foo: 'bar' });
     });
 
     it('should support a higher order function with index and args', () => {

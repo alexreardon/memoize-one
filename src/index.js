@@ -1,5 +1,5 @@
 // @flow
-type EqualityFn = (newValue: mixed, oldValue: mixed) => boolean;
+export type EqualityFn = (newValue: mixed, oldValue: mixed) => boolean;
 
 const simpleIsEqual: EqualityFn = (newValue: mixed, oldValue: mixed): boolean =>
   newValue === oldValue;
