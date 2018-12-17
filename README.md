@@ -70,10 +70,10 @@ const memoizeOne = require('memoize-one').default;
 
 The default equality function is a simple shallow equal check of all arguments.
 
-You can also pass in a custom function for checking the equality of two sets of arguments
+You can also pass in a custom function for checking the equality of two sets of arguments. The equality function is only called if the `this` context of the function has not changed (see below).
 
 ```js
-type EqualityFn = (newArgs: mixed[], oldArgs: mixed[], lastResult: mixed) => boolean;
+type EqualityFn = (newArgs: mixed[], oldArgs: mixed[]) => boolean;
 ```
 
 Here is an example that uses a deep equal check
@@ -97,11 +97,6 @@ const result4 = customMemoization({ foo: 'bar' });
 
 result3 === result4; // true - arguments are deep equal
 ```
-
-### Custom equality function behaviour
-
-- The equality function is only called if the `this` context of the function has not changed,
-- We pass the `previousResult` as the third argument. You need to make sure that this plays nicely with your custom equality function. Some libraries treat the third argument to an equality check differently. `lodash.isequal` ignores the third argument. While `lodash.isequalwith` uses the third argument as a customerizer function.
 
 ## `this`
 

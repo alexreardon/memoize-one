@@ -505,62 +505,27 @@ describe('memoizeOne', () => {
       const tim: Person = {
         age: 1,
       };
-      {
-        const addAges = jest
-          .fn()
-          .mockImplementation(
-            (...people: Person[]): number =>
-              people.reduce(
-                (sum: number, person: Person) => sum + person.age,
-                0,
-              ),
-          );
-        const customIsEqual: EqualityFn = (
-          newArgs: mixed[],
-          lastArgs: mixed[],
-        ) => {
-          return isDeepEqual(newArgs, lastArgs);
-        };
-        const memoized = memoizeOne(addAges, customIsEqual);
 
-        // addAges executed on first call
-        expect(memoized(clone(bob), clone(jane))).toBe(12);
-        expect(addAges).toHaveBeenCalled();
-        addAges.mockClear();
+      const addAges = jest
+        .fn()
+        .mockImplementation(
+          (...people: Person[]): number =>
+            people.reduce((sum: number, person: Person) => sum + person.age, 0),
+        );
+      const memoized = memoizeOne(addAges, isDeepEqual);
 
-        // memoized function not called
-        expect(memoized(clone(bob), clone(jane))).toBe(12);
-        expect(addAges).not.toHaveBeenCalled();
+      // addAges executed on first call
+      expect(memoized(clone(bob), clone(jane))).toBe(12);
+      expect(addAges).toHaveBeenCalled();
+      addAges.mockClear();
 
-        // memoized function called (we lodash happily handled argument change)
-        expect(memoized(clone(bob), clone(jane), clone(tim))).toBe(13);
-        expect(addAges).toHaveBeenCalled();
-      }
-      {
-        const addAges = jest
-          .fn()
-          .mockImplementation(
-            (...people: Person[]): number =>
-              people.reduce(
-                (sum: number, person: Person) => sum + person.age,
-                0,
-              ),
-          );
-        const memoized = memoizeOne(addAges, isDeepEqual);
+      // memoized function not called
+      expect(memoized(clone(bob), clone(jane))).toBe(12);
+      expect(addAges).not.toHaveBeenCalled();
 
-        // addAges executed on first call
-        expect(memoized(clone(bob), clone(jane))).toBe(12);
-        expect(addAges).toHaveBeenCalled();
-        addAges.mockClear();
-
-        // memoized function not called
-        expect(memoized(clone(bob), clone(jane))).toBe(12);
-        expect(addAges).not.toHaveBeenCalled();
-
-        // memoized function called (we lodash happily handled argument change)
-        expect(memoized(clone(bob), clone(jane), clone(tim))).toBe(13);
-        expect(addAges).toHaveBeenCalled();
-      }
+      // memoized function called (we lodash happily handled argument change)
+      expect(memoized(clone(bob), clone(jane), clone(tim))).toBe(13);
+      expect(addAges).toHaveBeenCalled();
     });
 
     it('should return the previous value without executing the result fn if the equality fn returns true', () => {
