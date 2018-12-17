@@ -91,15 +91,15 @@ const identity = x => x;
 const defaultMemoization = memoizeOne(identity);
 const customMemoization = memoizeOne(identity, deepEqual);
 
-const result1 = defaultMemoization({foo: 'bar'});
-const result2 = defaultMemoization({foo: 'bar'});
+const result1 = defaultMemoization({ foo: 'bar' });
+const result2 = defaultMemoization({ foo: 'bar' });
 
-result1 === result2 // false - difference reference
+result1 === result2; // false - difference reference
 
-const result3 = customMemoization({foo: 'bar'});
-const result4 = customMemoization({foo: 'bar'});
+const result3 = customMemoization({ foo: 'bar' });
+const result4 = customMemoization({ foo: 'bar' });
 
-result3 === result4 // true - arguments are deep equal
+result3 === result4; // true - arguments are deep equal
 ```
 
 ### Custom equality function behaviour
@@ -129,7 +129,11 @@ Here is an example of a higher order function that allow you to pass an `index` 
 
 ```js
 // this function will do some special checking for the second argument
-const customIsEqual = (newValue: mixed, oldValue: mixed, index: number): boolean => {
+const customIsEqual = (
+  newValue: mixed,
+  oldValue: mixed,
+  index: number,
+): boolean => {
   if (index === 1) {
     if (!isDate(newValue) || !isDate(oldValue)) {
       return false;
@@ -142,7 +146,8 @@ const customIsEqual = (newValue: mixed, oldValue: mixed, index: number): boolean
 
 const getMemoizedWithIndex = (fn: Function) => {
   let argIndex: number = 0;
-  const withIndex = (newValue: mixed, oldValue: mixed) => customIsEqual(newValue, oldValue, argIndex++);
+  const withIndex = (newValue: mixed, oldValue: mixed) =>
+    customIsEqual(newValue, oldValue, argIndex++);
   const memoized = memoizeOne(fn, withIndex);
 
   // every time this function is called it will reset our argIndex
@@ -161,7 +166,12 @@ Here is an example of a higher order function that allow you to pass a `index` a
 
 ```js
 // using this to only memoize calls with 3+ arguments
-const customIsEqual = (newValue: mixed, oldValue: mixed, index: number, args: mixed[]): boolean => {
+const customIsEqual = (
+  newValue: mixed,
+  oldValue: mixed,
+  index: number,
+  args: mixed[],
+): boolean => {
   if (args.length < 3) {
     return false;
   }
@@ -170,7 +180,8 @@ const customIsEqual = (newValue: mixed, oldValue: mixed, index: number, args: mi
 const getMemoizedFn = (fn: Function) => {
   let args: mixed[] = [];
   let argIndex: number = 0;
-  const withIndex = (newValue: mixed, oldValue: mixed) => customIsEqual(newValue, oldValue, argIndex++, args);
+  const withIndex = (newValue: mixed, oldValue: mixed) =>
+    customIsEqual(newValue, oldValue, argIndex++, args);
   const memoized = memoizeOne(fn, withIndex);
 
   // every time this function is called it will reset our args and argIndex
@@ -211,7 +222,7 @@ const temp1 = {
 };
 const temp2 = {
   a: 30,
-}
+};
 
 getA.call(temp1); // 20
 getA.call(temp2); // 30
@@ -219,7 +230,7 @@ getA.call(temp2); // 30
 
 Therefore, in order to prevent against unexpected results, `memoize-one` takes into account the current execution context (`this`) of the memoized function. If `this` is different to the previous invocation then it is considered a change in argument. [further discussion](https://github.com/alexreardon/memoize-one/issues/3).
 
-Generally this will be of no impact if you are not explicity controlling the `this` context of functions you want to memoize with [explicit binding](https://github.com/getify/You-Dont-Know-JS/blob/master/this%20%26%20object%20prototypes/ch2.md#explicit-binding)  or [implicit binding](https://github.com/getify/You-Dont-Know-JS/blob/master/this%20%26%20object%20prototypes/ch2.md#implicit-binding). `memoize-One` will detect when you are manipulating `this` and will then consider the `this` context as an argument. If `this` changes, it will re-execute the original function even if the arguments have not changed.
+Generally this will be of no impact if you are not explicity controlling the `this` context of functions you want to memoize with [explicit binding](https://github.com/getify/You-Dont-Know-JS/blob/master/this%20%26%20object%20prototypes/ch2.md#explicit-binding) or [implicit binding](https://github.com/getify/You-Dont-Know-JS/blob/master/this%20%26%20object%20prototypes/ch2.md#implicit-binding). `memoize-One` will detect when you are manipulating `this` and will then consider the `this` context as an argument. If `this` changes, it will re-execute the original function even if the arguments have not changed.
 
 ## When your result function `throw`s
 
@@ -230,11 +241,11 @@ If your result function `throw`s then the memoized function will also throw. The
 ```js
 const canThrow = (name: string) => {
   console.log('called');
-  if(name === 'throw') {
+  if (name === 'throw') {
     throw new Error(name);
   }
   return { name };
-}
+};
 
 const memoized = memoizeOne(canThrow);
 
@@ -249,7 +260,7 @@ console.log(value1 === value2);
 try {
   memoized('throw');
   // console.log => 'called'
-} catch(e) {
+} catch (e) {
   firstError = e;
 }
 
@@ -258,12 +269,11 @@ try {
   // console.log => 'called'
   // the result function was called again even though it was called twice
   // with the 'throw' string
-} catch(e) {
+} catch (e) {
   secondError = e;
 }
 
 console.log(firstError !== secondError);
-
 
 const value3 = memoized('Alex');
 // result function not called as the original memoization cache has not been busted

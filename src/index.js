@@ -1,7 +1,8 @@
 // @flow
 type EqualityFn = (newValue: mixed, oldValue: mixed) => boolean;
 
-const simpleIsEqual: EqualityFn = (newValue: mixed, oldValue: mixed): boolean => newValue === oldValue;
+const simpleIsEqual: EqualityFn = (newValue: mixed, oldValue: mixed): boolean =>
+  newValue === oldValue;
 
 // <ResultFn: (...Array<any>) => mixed>
 // The purpose of this typing is to ensure that the returned memoized
@@ -9,20 +10,26 @@ const simpleIsEqual: EqualityFn = (newValue: mixed, oldValue: mixed): boolean =>
 // ResultFn:        Generic type (which is the same as the resultFn).
 // (...Array<any>): Accepts any length of arguments - and they are not checked
 // mixed:           The result can be anything but needs to be checked before usage
-export default function <ResultFn: (...Array<any>) => mixed>(resultFn: ResultFn, isEqual?: EqualityFn = simpleIsEqual): ResultFn {
+export default function<ResultFn: (...Array<any>) => mixed>(
+  resultFn: ResultFn,
+  isEqual?: EqualityFn = simpleIsEqual,
+): ResultFn {
   let lastThis: mixed;
   let lastArgs: Array<mixed> = [];
   let lastResult: mixed;
   let calledOnce: boolean = false;
 
-  const isNewArgEqualToLast = (newArg: mixed, index: number): boolean => isEqual(newArg, lastArgs[index]);
+  const isNewArgEqualToLast = (newArg: mixed, index: number): boolean =>
+    isEqual(newArg, lastArgs[index]);
 
   // breaking cache when context (this) or arguments change
-  const result = function (...newArgs: Array<mixed>) {
-    if (calledOnce &&
+  const result = function(...newArgs: Array<mixed>) {
+    if (
+      calledOnce &&
       lastThis === this &&
       newArgs.length === lastArgs.length &&
-      newArgs.every(isNewArgEqualToLast)) {
+      newArgs.every(isNewArgEqualToLast)
+    ) {
       return lastResult;
     }
 
