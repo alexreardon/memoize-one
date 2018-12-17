@@ -160,6 +160,8 @@ const getMemoizedWithIndex = (fn: Function) => {
 const memoized = getMemoizedWithIndex(myFunc);
 ```
 
+#### Example: equality function per argument
+
 A nice pattern is to create a helper that applies different equality functions for the different arguments. Thanks [@Noviny!](https://github.com/Noviny)
 
 ```js
