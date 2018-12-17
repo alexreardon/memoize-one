@@ -294,7 +294,7 @@ console.log(value1 === value3);
 - [simple arguments](https://www.measurethat.net/Benchmarks/ShowResult/4452)
 - [complex arguments](https://www.measurethat.net/Benchmarks/ShowResult/4488)
 
-The comparisions are not exhaustive and are primiarly to show that `memoize-one` accomplishes remembering the latest invocation really fast. The benchmarks do not take into account the differences in feature sets, library sizes, parse time, and so on.
+The comparisons are not exhaustive and are primarily to show that `memoize-one` accomplishes remembering the latest invocation really fast. The benchmarks do not take into account the differences in feature sets, library sizes, parse time, and so on.
 
 ## Code health :thumbsup:
 
