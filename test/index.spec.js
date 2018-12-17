@@ -494,6 +494,17 @@ describe('memoizeOne', () => {
       type Person = {
         age: number,
       };
+      const clone = (person: Person): Person =>
+        JSON.parse(JSON.stringify(person));
+      const bob: Person = {
+        age: 10,
+      };
+      const jane: Person = {
+        age: 2,
+      };
+      const tim: Person = {
+        age: 1,
+      };
       {
         const addAges = jest
           .fn()
@@ -511,27 +522,18 @@ describe('memoizeOne', () => {
           return isDeepEqual(newArgs, lastArgs);
         };
         const memoized = memoizeOne(addAges, customIsEqual);
-        const bob: Person = {
-          age: 10,
-        };
-        const jane: Person = {
-          age: 2,
-        };
-        const tim: Person = {
-          age: 1,
-        };
 
         // addAges executed on first call
-        expect(memoized(bob, jane)).toBe(12);
+        expect(memoized(clone(bob), clone(jane))).toBe(12);
         expect(addAges).toHaveBeenCalled();
         addAges.mockClear();
 
         // memoized function not called
-        expect(memoized(bob, jane)).toBe(12);
+        expect(memoized(clone(bob), clone(jane))).toBe(12);
         expect(addAges).not.toHaveBeenCalled();
 
         // memoized function called (we lodash happily handled argument change)
-        expect(memoized(bob, jane, tim)).toBe(13);
+        expect(memoized(clone(bob), clone(jane), clone(tim))).toBe(13);
         expect(addAges).toHaveBeenCalled();
       }
       {
@@ -545,27 +547,18 @@ describe('memoizeOne', () => {
               ),
           );
         const memoized = memoizeOne(addAges, isDeepEqual);
-        const bob: Person = {
-          age: 10,
-        };
-        const jane: Person = {
-          age: 2,
-        };
-        const tim: Person = {
-          age: 1,
-        };
 
         // addAges executed on first call
-        expect(memoized(bob, jane)).toBe(12);
+        expect(memoized(clone(bob), clone(jane))).toBe(12);
         expect(addAges).toHaveBeenCalled();
         addAges.mockClear();
 
         // memoized function not called
-        expect(memoized(bob, jane)).toBe(12);
+        expect(memoized(clone(bob), clone(jane))).toBe(12);
         expect(addAges).not.toHaveBeenCalled();
 
         // memoized function called (we lodash happily handled argument change)
-        expect(memoized(bob, jane, tim)).toBe(13);
+        expect(memoized(clone(bob), clone(jane), clone(tim))).toBe(13);
         expect(addAges).toHaveBeenCalled();
       }
     });
