@@ -15,7 +15,11 @@ describe('memoizeOne', () => {
     let memoizedAdd;
 
     beforeEach(() => {
-      add = jest.fn().mockImplementation((value1: number, value2: number): number => value1 + value2);
+      add = jest
+        .fn()
+        .mockImplementation(
+          (value1: number, value2: number): number => value1 + value2,
+        );
       memoizedAdd = memoizeOne(add);
     });
 
@@ -54,13 +58,13 @@ describe('memoizeOne', () => {
   describe('standard behaviour - dynamic', () => {
     type Expectation = {|
       args: any[],
-      result: any
+      result: any,
     |};
 
     type Input = {|
       name: string,
       first: Expectation,
-      second: Expectation
+      second: Expectation,
     |};
 
     // [JavaScript defines seven built-in types:](https://github.com/getify/You-Dont-Know-JS/blob/master/types%20%26%20grammar/ch1.md)
@@ -163,18 +167,22 @@ describe('memoizeOne', () => {
       },
     ];
 
-    const isShallowEqual = (array1: Array<any>, array2: Array<any>): boolean => {
+    const isShallowEqual = (
+      array1: Array<any>,
+      array2: Array<any>,
+    ): boolean => {
       if (array1 === array2) {
         return true;
       }
 
-      return array1.length === array2.length &&
-                array1.every((item, i) => array2[i] === item);
+      return (
+        array1.length === array2.length &&
+        array1.every((item, i) => array2[i] === item)
+      );
     };
 
     inputs.forEach(({ name, first, second }) => {
       describe(`type: [${name}]`, () => {
-
         let mock;
         let memoized;
 
@@ -229,10 +237,10 @@ describe('memoizeOne', () => {
   describe('respecting "this" context', () => {
     describe('original function', () => {
       it('should respect new bindings', () => {
-        const Foo = function (bar) {
+        const Foo = function(bar) {
           this.bar = bar;
         };
-        const memoized = memoizeOne(function (bar) {
+        const memoized = memoizeOne(function(bar) {
           return new Foo(bar);
         });
 
@@ -247,7 +255,7 @@ describe('memoizeOne', () => {
           a: 10,
         };
 
-        const memoized = memoizeOne(function () {
+        const memoized = memoizeOne(function() {
           return getA.call(temp);
         });
 
@@ -270,7 +278,7 @@ describe('memoizeOne', () => {
           getA,
         };
 
-        const memoized = memoizeOne(function () {
+        const memoized = memoizeOne(function() {
           return temp.getA();
         });
 
@@ -305,7 +313,7 @@ describe('memoizeOne', () => {
     describe('memoized function', () => {
       it('should respect new bindings', () => {
         const memoizedGetA = memoizeOne(getA);
-        const Foo = function (a) {
+        const Foo = function(a) {
           this.a = a;
           this.result = memoizedGetA.call(this);
         };
@@ -391,7 +399,7 @@ describe('memoizeOne', () => {
       it('should respect ignored bindings', () => {
         const memoized = memoizeOne(getA);
 
-        const getResult = function () {
+        const getResult = function() {
           return memoized.call(null);
         };
 
@@ -461,7 +469,11 @@ describe('memoizeOne', () => {
     let equalityStub;
 
     beforeEach(() => {
-      add = jest.fn().mockImplementation((value1: number, value2: number): number => value1 + value2);
+      add = jest
+        .fn()
+        .mockImplementation(
+          (value1: number, value2: number): number => value1 + value2,
+        );
       equalityStub = jest.fn();
       memoizedAdd = memoizeOne(add, equalityStub);
     });
@@ -618,7 +630,16 @@ describe('memoizeOne', () => {
       //    - string
       //    - object
       //    - symbol
-      const values = [null, undefined, true, false, 10, 'hi', { name: 'Alex' }, Symbol('sup')];
+      const values = [
+        null,
+        undefined,
+        true,
+        false,
+        10,
+        'hi',
+        { name: 'Alex' },
+        Symbol('sup'),
+      ];
 
       values.forEach((value: mixed) => {
         const throwValue = jest.fn().mockImplementation(() => {
@@ -659,7 +680,11 @@ describe('memoizeOne', () => {
       }
 
       // this function will do some special checking for the second argument
-      const customIsEqual = (newValue: mixed, oldValue: mixed, index: number): boolean => {
+      const customIsEqual = (
+        newValue: mixed,
+        oldValue: mixed,
+        index: number,
+      ): boolean => {
         if (index !== 1) {
           return newValue === oldValue;
         }
@@ -667,12 +692,12 @@ describe('memoizeOne', () => {
           return false;
         }
         return newValue.getTime() === oldValue.getTime();
-
       };
 
       const getMemoizedWithIndex = (fn: Function) => {
         let argIndex: number = 0;
-        const withIndex = (newValue: mixed, oldValue: mixed) => customIsEqual(newValue, oldValue, argIndex++);
+        const withIndex = (newValue: mixed, oldValue: mixed) =>
+          customIsEqual(newValue, oldValue, argIndex++);
         const memoized = memoizeOne(fn, withIndex);
 
         // every time this function is called it will reset our argIndex
@@ -701,7 +726,12 @@ describe('memoizeOne', () => {
       const mock = jest.fn();
 
       // using this to only memoize calls with 3+ arguments
-      const customIsEqual = (newValue: mixed, oldValue: mixed, index: number, args: mixed[]): boolean => {
+      const customIsEqual = (
+        newValue: mixed,
+        oldValue: mixed,
+        index: number,
+        args: mixed[],
+      ): boolean => {
         if (args.length < 3) {
           return false;
         }
@@ -710,7 +740,8 @@ describe('memoizeOne', () => {
       const getMemoizedFn = (fn: Function) => {
         let args: mixed[] = [];
         let argIndex: number = 0;
-        const withIndex = (newValue: mixed, oldValue: mixed) => customIsEqual(newValue, oldValue, argIndex++, args);
+        const withIndex = (newValue: mixed, oldValue: mixed) =>
+          customIsEqual(newValue, oldValue, argIndex++, args);
         const memoized = memoizeOne(fn, withIndex);
 
         // every time this function is called it will reset our args and argIndex
@@ -757,4 +788,3 @@ describe('memoizeOne', () => {
     });
   });
 });
-
