@@ -160,6 +160,32 @@ const getMemoizedWithIndex = (fn: Function) => {
 const memoized = getMemoizedWithIndex(myFunc);
 ```
 
+A nice pattern is to create a helper that applies different equality functions for the different arguments. Thanks [@Noviny!](https://github.com/Noviny)
+
+```js
+const getMemoized = (fn: Function, equalityChecks: EqualityFn[]) => {
+  const isEqual = (a: mixed, b: mixed, index: number) => {
+    return equalityChecks[index](a, b);
+  };
+
+  let argIndex: number = 0;
+  const withIndex = (newValue: mixed, oldValue: mixed) =>
+    isEqual(newValue, oldValue, argIndex++);
+  const memoized = memoizeOne(fn, withIndex);
+
+  // every time this function is called it will reset our argIndex
+  return (...args: mixed[]) => {
+    argIndex = 0;
+    return memoized(...args);
+  };
+};
+
+const memoized = getMemoized(myFunc, [isShallowEqual, isDateEqual, isDeepEqual]);
+
+memoized(1, new Date(2019, 1), {foo: 'bar' });
+memoized(1, new Date(2019, 1), {foo: 'bar' });
+```
+
 #### Example: all `arguments`
 
 Here is an example of a higher order function that allow you to pass a `index` and `arguments` to your custom equality function.
