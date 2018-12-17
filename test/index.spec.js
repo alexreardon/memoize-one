@@ -487,7 +487,7 @@ describe('memoizeOne', () => {
       expect(equalityStub).not.toHaveBeenCalled();
       memoizedAdd(1, 4);
 
-      expect(equalityStub).toHaveBeenCalledWith([1, 4], [1, 2], 3);
+      expect(equalityStub).toHaveBeenCalledWith([1, 4], [1, 2]);
     });
 
     it('should have a nice isDeepEqual consumption story', () => {

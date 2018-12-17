@@ -1,9 +1,5 @@
 // @flow
-export type EqualityFn = (
-  newArgs: mixed[],
-  lastArgs: mixed[],
-  lastResult: mixed,
-) => boolean;
+export type EqualityFn = (newArgs: mixed[], lastArgs: mixed[]) => boolean;
 
 const shallowEqual = (newValue: mixed, oldValue: mixed): boolean =>
   newValue === oldValue;
@@ -35,11 +31,7 @@ export default function<ResultFn: (...Array<any>) => mixed>(
 
   // breaking cache when context (this) or arguments change
   const result = function(...newArgs: Array<mixed>) {
-    if (
-      calledOnce &&
-      lastThis === this &&
-      isEqual(newArgs, lastArgs, lastResult)
-    ) {
+    if (calledOnce && lastThis === this && isEqual(newArgs, lastArgs)) {
       return lastResult;
     }
 
