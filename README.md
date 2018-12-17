@@ -80,6 +80,8 @@ You can also pass in a custom function for checking the equality of two items.
 type EqualityFn = (newValue: mixed, oldValue: mixed) => boolean;
 ```
 
+> I am considering changing the custom equality api to `(newArgs: mixed[], lastArgs: mixed[], lastResult: T)`
+
 Here is an example that uses a deep equal check
 
 ```js
@@ -107,15 +109,18 @@ result3 === result4; // true - arguments are deep equal
 - The equality function is only called if the `this` context of the function has not changed, and the `length` of the arguments has not changed.
 - The equality function is used to compare the value of every individual argument by index.
 
-First call: `memoized(0, 1)`
-arguments: `0, 1`
+Memoized function calls
 
-Second call: `memoized(0, 2)`
-arguments: `0, 2`
+- First call: `memoized(0, 1)`
+- arguments: `0, 1`
 
-equality function calls:
-first call: `isEqual(0, 0)`
-second call: `isEqual(1, 2)`
+- Second call: `memoized(0, 2)`
+- arguments: `0, 2`
+
+Equality function calls:
+
+- First call: `isEqual(0, 0)` `(newArg, oldArg)`
+- Second call: `isEqual(1, 2)` `(newArg, oldArg)`
 
 ### Custom equality function higher order functions
 
