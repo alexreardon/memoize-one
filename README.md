@@ -77,11 +77,14 @@ type EqualityFn = (newArgs: mixed[], oldArgs: mixed[]) => boolean;
 
 An equality function should return `true` if the arguments are equal. If `true` is returned then the wrapped function will not be called.
 
-The default equality function is a shallow equal check of all arguments (each argument is compared with `===`). The default equality function is not used if the `length` of the arguments changes. It is up to you if you want to return `false` in your `isEqual` check if the `length` of the arrays is different.
+The default equality function is a shallow equal check of all arguments (each argument is compared with `===`).
 
 Your equality function needs to compare `Arrays`. The `newArgs` array will be a new reference every time so a simple `newArgs === lastArgs` will always return `false`.
 
-Equality functions are only called if the `this` context of the function has not changed (see below).
+Equality functions are not called if:
+
+- this length of the arguments has changed OR
+- the `this` context of the function has changed (see below).
 
 Here is an example that uses a deep equal equality check
 
