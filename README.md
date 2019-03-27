@@ -77,7 +77,7 @@ type EqualityFn = (newArgs: mixed[], oldArgs: mixed[]) => boolean;
 
 An equality function should return `true` if the arguments are equal. If `true` is returned then the wrapped function will not be called.
 
-The default equality function is a shallow equal check of all arguments (each argument is compared with `===`). The default equality function also does not check anything if the length of the arguments changes. You are welcome to decide if you want to return `false` if the `length` of the arguments is not equal
+The default equality function is a shallow equal check of all arguments (each argument is compared with `===`). If the `length` of arguments change, then the default equality function makes no shallow equality checks. You are welcome to decide if you want to return `false` if the `length` of the arguments is not equal
 
 ```js
 const simpleIsEqual: EqualityFn = (
