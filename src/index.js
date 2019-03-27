@@ -30,8 +30,7 @@ export default function<ResultFn: (...any[]) => mixed>(
   let calledOnce: boolean = false;
 
   // breaking cache when context (this) or arguments change
-  // $ExpectError - faking the type of ResultFn
-  const result: ResultFn = function(...newArgs: mixed[]) {
+  const result = function(...newArgs: mixed[]) {
     if (calledOnce && lastThis === this && isEqual(newArgs, lastArgs)) {
       return lastResult;
     }
@@ -46,5 +45,5 @@ export default function<ResultFn: (...any[]) => mixed>(
     return lastResult;
   };
 
-  return result;
+  return (result: any);
 }
