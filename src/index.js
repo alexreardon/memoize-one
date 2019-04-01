@@ -5,6 +5,7 @@ function simpleIsEqual(newArgs: mixed[], lastArgs: mixed[]): boolean {
   if (newArgs.length !== lastArgs.length) {
     return false;
   }
+  // Using a for loop rather than array.every for max speed
   for (let i = 0; i < newArgs.length; i++) {
     // shallow equality check
     if (newArgs[i] !== lastArgs[i]) {
