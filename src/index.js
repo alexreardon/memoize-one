@@ -1,18 +1,18 @@
 // @flow
 export type EqualityFn = (newArgs: mixed[], lastArgs: mixed[]) => boolean;
 
-const shallowEqual = (newValue: mixed, oldValue: mixed): boolean =>
-  newValue === oldValue;
-
-const simpleIsEqual: EqualityFn = (
-  newArgs: mixed[],
-  lastArgs: mixed[],
-): boolean =>
-  newArgs.length === lastArgs.length &&
-  newArgs.every(
-    (newArg: mixed, index: number): boolean =>
-      shallowEqual(newArg, lastArgs[index]),
-  );
+function simpleIsEqual(newArgs: mixed[], lastArgs: mixed[]): boolean {
+  if (newArgs.length !== lastArgs.length) {
+    return false;
+  }
+  for (let i = 0; i < newArgs.length; i++) {
+    // shallow equality check
+    if (newArgs[i] !== lastArgs[i]) {
+      return false;
+    }
+  }
+  return true;
+}
 
 // <ResultFn: (...any[]) => mixed>
 // The purpose of this typing is to ensure that the returned memoized
