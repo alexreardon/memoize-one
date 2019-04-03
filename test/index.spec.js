@@ -11,6 +11,27 @@ describe('memoizeOne', () => {
     return this.a;
   }
 
+  describe('name of the decorated function', () => {
+    it('should be named "memoize" with an undefined displayName if the input function is anonymous', () => {
+      expect(memoizeOne(() => {}).name).toBe('memoized');
+      expect(memoizeOne(() => {}).displayName).toBe(undefined);
+    });
+
+    it('should be named "memoize" with a displayName that reflects the input fn if the input function has a name but no displayName', () => {
+      function namedFn() {}
+      expect(memoizeOne(namedFn).name).toBe('memoized');
+      expect(memoizeOne(namedFn).displayName).toBe('memoized(namedFn)');
+    });
+
+    it('should be named "memoize" with a displayName that reflects the input fn if the input function has a displayName', () => {
+      function namedFn() {}
+      namedFn.displayName = 'someOtherName';
+
+      expect(memoizeOne(namedFn).name).toBe('memoized');
+      expect(memoizeOne(namedFn).displayName).toBe('memoized(someOtherName)');
+    });
+  });
+
   describe('standard behaviour - baseline', () => {
     let add;
     let memoizedAdd;

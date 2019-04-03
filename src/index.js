@@ -20,7 +20,7 @@ const simpleIsEqual: EqualityFn = (
 // ResultFn:        Generic type (which is the same as the resultFn).
 // (...any[]): Accepts any length of arguments - and they are not checked
 // mixed:           The result can be anything but needs to be checked before usage
-export default function<ResultFn: (...any[]) => mixed>(
+export default function memoizeOne<ResultFn: (...any[]) => mixed>(
   resultFn: ResultFn,
   isEqual?: EqualityFn = simpleIsEqual,
 ): ResultFn {
@@ -30,7 +30,7 @@ export default function<ResultFn: (...any[]) => mixed>(
   let calledOnce: boolean = false;
 
   // breaking cache when context (this) or arguments change
-  const result = function(...newArgs: mixed[]) {
+  const memoized = function(...newArgs: mixed[]) {
     if (calledOnce && lastThis === this && isEqual(newArgs, lastArgs)) {
       return lastResult;
     }
@@ -45,5 +45,12 @@ export default function<ResultFn: (...any[]) => mixed>(
     return lastResult;
   };
 
-  return (result: any);
+  // only reference the original name if it's present and not the empty string
+  if (resultFn.displayName) {
+    memoized.displayName = `memoized(${resultFn.displayName})`;
+  } else if (resultFn.name) {
+    memoized.displayName = `memoized(${resultFn.name})`;
+  }
+
+  return (memoized: any);
 }
