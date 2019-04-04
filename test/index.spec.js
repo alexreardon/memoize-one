@@ -17,18 +17,23 @@ describe('memoizeOne', () => {
       expect(memoizeOne(() => {}).displayName).toBe(undefined);
     });
 
-    it('should be named "memoize" with a displayName that reflects the input fn if the input function has a name but no displayName', () => {
+    it("should wrap the input function's name for its displayName if the input function doesn't have a displayName", () => {
       function namedFn() {}
-      expect(memoizeOne(namedFn).name).toBe('memoized');
       expect(memoizeOne(namedFn).displayName).toBe('memoized(namedFn)');
     });
 
-    it('should be named "memoize" with a displayName that reflects the input fn if the input function has a displayName', () => {
+    it("should wrap the input function's displayName for its own if the input function has a displayName", () => {
       function namedFn() {}
       namedFn.displayName = 'someOtherName';
 
-      expect(memoizeOne(namedFn).name).toBe('memoized');
       expect(memoizeOne(namedFn).displayName).toBe('memoized(someOtherName)');
+    });
+
+    it('should ignore displayNames that are empty strings', () => {
+      function namedFn() {}
+      namedFn.displayName = '';
+
+      expect(memoizeOne(namedFn).displayName).toBe('memoized(namedFn)');
     });
   });
 
