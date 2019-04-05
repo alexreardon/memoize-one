@@ -62,6 +62,7 @@
     "build:clean": "rimraf dist",
     "build:dist": "rollup -c",
     "build:flow": "echo \"// @flow\n\nexport * from '../src';\" > dist/memoize-one.cjs.js.flow",
+    "perf": "node ./benchmarks/shallowEqual.js",
     "prepublish": "yarn run build"
   }
 }
