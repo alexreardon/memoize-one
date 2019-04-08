@@ -1,18 +1,7 @@
 // @flow
+import areInputsEqual from './are-inputs-equal';
+
 export type EqualityFn = (newArgs: mixed[], lastArgs: mixed[]) => boolean;
-
-const shallowEqual = (newValue: mixed, oldValue: mixed): boolean =>
-  newValue === oldValue;
-
-const simpleIsEqual: EqualityFn = (
-  newArgs: mixed[],
-  lastArgs: mixed[],
-): boolean =>
-  newArgs.length === lastArgs.length &&
-  newArgs.every(
-    (newArg: mixed, index: number): boolean =>
-      shallowEqual(newArg, lastArgs[index]),
-  );
 
 // Type TArgs (arguments type) and TRet (return type) as generics to ensure that the
 // returned function (`memoized`) has the same type as the provided function (`inputFn`).
@@ -22,7 +11,7 @@ const simpleIsEqual: EqualityFn = (
 // See https://flow.org/en/docs/types/mixed/ for more.
 export default function memoizeOne<TArgs: mixed[], TRet: mixed>(
   inputFn: (...TArgs) => TRet,
-  isEqual?: EqualityFn = simpleIsEqual,
+  isEqual?: EqualityFn = areInputsEqual,
 ): (...TArgs) => TRet {
   let lastThis: mixed;
   let lastArgs: ?TArgs;
