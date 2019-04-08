@@ -12,7 +12,7 @@ export type EqualityFn = (newArgs: mixed[], lastArgs: mixed[]) => boolean;
 export default function memoizeOne<ResultFn: (...any[]) => mixed>(
   resultFn: ResultFn,
   isEqual?: EqualityFn = areInputsEqual,
-): ResultFn {
+): ResultFn & { reset: () => void } {
   let lastThis: mixed;
   let lastArgs: mixed[] = [];
   let lastResult: mixed;
@@ -33,6 +33,21 @@ export default function memoizeOne<ResultFn: (...any[]) => mixed>(
     lastArgs = newArgs;
     return lastResult;
   };
+
+  // We allow to reset cache, in cases we need computations to re-happen. It can happen in 2 cases:
+  // - In cases `memoizeOne` not used for "result", but for side-effects that should
+  //   happens only when some of the "params" change
+  // - When for some reason, `resultFn` needs "impure" elements that will change
+  const reset = function() {
+    // Reset memoization
+    calledOnce = false;
+    // Clean cache from memory
+    lastThis = undefined;
+    lastArgs = [];
+    lastResult = undefined;
+  };
+
+  result.reset = reset;
 
   return (result: any);
 }

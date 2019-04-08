@@ -204,6 +204,35 @@ console.log(value1 === value3);
 // console.log => true
 ```
 
+## Reset cache
+
+Sometimes you might need to reset the memoization cache so it will force computation on the next call.
+It can be useful in some cases:
+
+- for testing if the memoized function is depended on external constants
+- the memoization used for calling function only when arguments change
+- freeing memory
+
+It can be done by calling `reset()`.
+
+```js
+const submitForm = email => {
+  /* some code */
+};
+
+const memoized = memoizeOne(submitForm);
+
+// All three will be called once
+memoized('unicorns@example.com');
+memoized('unicorns@example.com');
+memoized('unicorns@example.com');
+
+// Some time later, if we want to force calling `submitForm` again
+memoized.reset();
+// Next line will be call again, even if it got the same param of last time
+memoized('unicorns@example.com');
+```
+
 ## Performance :rocket:
 
 ### Tiny

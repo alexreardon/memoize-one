@@ -725,4 +725,22 @@ describe('memoizeOne', () => {
       expect(result2).toBe(1);
     });
   });
+
+  describe('reset()', () => {
+    it('should reset cache and for calling resultFn for same values', () => {
+      const mock = jest.fn<[number], void>();
+      const memoized = memoizeOne<(_: number) => void>(mock);
+
+      memoized(1);
+      expect(mock).toBeCalledTimes(1);
+      memoized(1);
+      expect(mock).toBeCalledTimes(1);
+
+      memoized.reset();
+      memoized(1);
+      expect(mock).toBeCalledTimes(2);
+      memoized(1);
+      expect(mock).toBeCalledTimes(2);
+    });
+  });
 });
