@@ -1,19 +1,7 @@
 // @flow
-export type EqualityFn = (newArgs: mixed[], lastArgs: mixed[]) => boolean;
+import areInputsEqual from './are-inputs-equal';
 
-function simpleIsEqual(newArgs: mixed[], lastArgs: mixed[]): boolean {
-  if (newArgs.length !== lastArgs.length) {
-    return false;
-  }
-  // Using a for loop rather than array.every for max speed
-  for (let i = 0; i < newArgs.length; i++) {
-    // shallow equality check
-    if (newArgs[i] !== lastArgs[i]) {
-      return false;
-    }
-  }
-  return true;
-}
+export type EqualityFn = (newArgs: mixed[], lastArgs: mixed[]) => boolean;
 
 // Type TArgs (arguments type) and TRet (return type) as generics to ensure that the
 // returned function (`memoized`) has the same type as the provided function (`inputFn`).
@@ -23,7 +11,7 @@ function simpleIsEqual(newArgs: mixed[], lastArgs: mixed[]): boolean {
 // See https://flow.org/en/docs/types/mixed/ for more.
 export default function memoizeOne<TArgs: mixed[], TRet: mixed>(
   inputFn: (...TArgs) => TRet,
-  isEqual?: EqualityFn = simpleIsEqual,
+  isEqual?: EqualityFn = areInputsEqual,
 ): (...TArgs) => TRet {
   let lastThis: mixed;
   let lastArgs: ?TArgs;
