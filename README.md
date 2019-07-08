@@ -85,9 +85,8 @@ const simpleIsEqual: EqualityFn = (
   lastArgs: mixed[],
 ): boolean =>
   newArgs.length === lastArgs.length &&
-  newArgs.every(
-    (newArg: mixed, index: number): boolean =>
-      shallowEqual(newArg, lastArgs[index]),
+  newArgs.every((newArg: mixed, index: number): boolean =>
+    shallowEqual(newArg, lastArgs[index]),
   );
 ```
 

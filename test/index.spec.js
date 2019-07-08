@@ -508,9 +508,8 @@ describe('memoizeOne', () => {
 
       const addAges = jest
         .fn()
-        .mockImplementation(
-          (...people: Person[]): number =>
-            people.reduce((sum: number, person: Person) => sum + person.age, 0),
+        .mockImplementation((...people: Person[]): number =>
+          people.reduce((sum: number, person: Person) => sum + person.age, 0),
         );
       const memoized = memoizeOne(addAges, isDeepEqual);
 
