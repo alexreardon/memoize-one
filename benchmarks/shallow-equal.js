@@ -1,8 +1,10 @@
+// @ts-nocheck
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const Benchmark = require('benchmark');
 
 const suite = new Benchmark.Suite();
 
-function shallowEvery(a, b) {
+function shallowEvery(a, b): boolean {
   if (a.length !== b.length) {
     return false;
   }
@@ -10,7 +12,7 @@ function shallowEvery(a, b) {
   return a.every((e, i) => b[i] === e);
 }
 
-function shallowFor(a, b) {
+function shallowFor(a, b): boolean {
   if (a.length !== b.length) {
     return false;
   }
@@ -23,11 +25,11 @@ function shallowFor(a, b) {
   return true;
 }
 
-let a = {};
-let b = {};
+const a = {};
+const b = {};
 
-let listA = [a, b, {}, {}];
-let listB = [a, b, {}, {}];
+const listA = [a, b, {}, {}];
+const listB = [a, b, {}, {}];
 
 suite.add('shallowEvery with identical lists', () => {
   shallowEvery(listA, listA);
@@ -45,6 +47,7 @@ suite.add('shallowFor with half-identical lists', () => {
   shallowFor(listA, listB);
 });
 
-suite.on('cycle', e => console.log(String(e.target)));
+// eslint-disable-next-line no-console
+suite.on('cycle', (e: any) => console.log(String(e.target)));
 
 suite.run({ async: true });

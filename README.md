@@ -80,14 +80,9 @@ An equality function should return `true` if the arguments are equal. If `true` 
 The default equality function is a shallow equal check of all arguments (each argument is compared with `===`). If the `length` of arguments change, then the default equality function makes no shallow equality checks. You are welcome to decide if you want to return `false` if the `length` of the arguments is not equal
 
 ```js
-const simpleIsEqual: EqualityFn = (
-  newArgs: mixed[],
-  lastArgs: mixed[],
-): boolean =>
+const simpleIsEqual: EqualityFn = (newArgs: mixed[], lastArgs: mixed[]): boolean =>
   newArgs.length === lastArgs.length &&
-  newArgs.every((newArg: mixed, index: number): boolean =>
-    shallowEqual(newArg, lastArgs[index]),
-  );
+  newArgs.every((newArg: mixed, index: number): boolean => shallowEqual(newArg, lastArgs[index]));
 ```
 
 A custom equality function needs to compare `Arrays`. The `newArgs` array will be a new reference every time so a simple `newArgs === lastArgs` will always return `false`.

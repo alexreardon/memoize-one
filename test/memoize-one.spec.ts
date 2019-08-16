@@ -1,8 +1,11 @@
 import memoize from '../src/memoize-one';
 import isDeepEqual from 'lodash.isequal';
 
-function getA() {
-  // [appeasing flow](https://flowtype.org/docs/nullable-types.html)
+type HasA = {
+  a: number;
+};
+
+function getA(this: HasA | undefined): number {
   if (this == null) {
     throw new TypeError();
   }
@@ -14,11 +17,7 @@ describe('standard behaviour - baseline', () => {
   let memoizedAdd;
 
   beforeEach(() => {
-    add = jest
-      .fn()
-      .mockImplementation(
-        (value1: number, value2: number): number => value1 + value2,
-      );
+    add = jest.fn().mockImplementation((value1: number, value2: number): number => value1 + value2);
     memoizedAdd = memoize(add);
   });
 
@@ -57,13 +56,13 @@ describe('standard behaviour - baseline', () => {
 describe('standard behaviour - dynamic', () => {
   type Expectation = {
     args: unknown[];
-    result: unknown,
+    result: unknown;
   };
 
   type Input = {
-    name: string,
-    first: Expectation,
-    second: Expectation,
+    name: string;
+    first: Expectation;
+    second: Expectation;
   };
 
   // [JavaScript defines seven built-in types:](https://github.com/getify/You-Dont-Know-JS/blob/master/types%20%26%20grammar/ch1.md)
@@ -171,10 +170,7 @@ describe('standard behaviour - dynamic', () => {
       return true;
     }
 
-    return (
-      array1.length === array2.length &&
-      array1.every((item, i) => array2[i] === item)
-    );
+    return array1.length === array2.length && array1.every((item, i) => array2[i] === item);
   };
 
   inputs.forEach(({ name, first, second }) => {
@@ -233,7 +229,7 @@ describe('standard behaviour - dynamic', () => {
 describe('respecting "this" context', () => {
   describe('original function', () => {
     it('should respect new bindings', () => {
-      const Foo = function(bar) {
+      const Foo = function(bar): void {
         this.bar = bar;
       };
       const memoized = memoize(function(bar) {
@@ -309,7 +305,7 @@ describe('respecting "this" context', () => {
   describe('memoized function', () => {
     it('should respect new bindings', () => {
       const memoizedGetA = memoize(getA);
-      const Foo = function(a) {
+      const Foo = function(a): void {
         this.a = a;
         this.result = memoizedGetA.call(this);
       };
@@ -465,11 +461,7 @@ describe('custom equality function', () => {
   let equalityStub;
 
   beforeEach(() => {
-    add = jest
-      .fn()
-      .mockImplementation(
-        (value1: number, value2: number): number => value1 + value2,
-      );
+    add = jest.fn().mockImplementation((value1: number, value2: number): number => value1 + value2);
     equalityStub = jest.fn();
     memoizedAdd = memoize(add, equalityStub);
   });
@@ -487,10 +479,9 @@ describe('custom equality function', () => {
 
   it('should have a nice isDeepEqual consumption story', () => {
     type Person = {
-      age: number,
+      age: number;
     };
-    const clone = (person: Person): Person =>
-      JSON.parse(JSON.stringify(person));
+    const clone = (person: Person): Person => JSON.parse(JSON.stringify(person));
     const bob: Person = {
       age: 10,
     };
@@ -566,7 +557,7 @@ describe('custom equality function', () => {
 
 describe('throwing', () => {
   it('should throw when the memoized function throws', () => {
-    const willThrow = (message: string) => {
+    const willThrow = (message: string): never => {
       throw new Error(message);
     };
     const memoized = memoize(willThrow);
@@ -703,7 +694,7 @@ describe('throwing', () => {
   });
 });
 
-describe('flow typing', () => {
+describe('typing', () => {
   it('should maintain the type of the original function', () => {
     // this test will create a flow error if the typing is incorrect
     type SubtractFn = (a: number, b: number) => number;

@@ -1,9 +1,5 @@
 module.exports = {
-  extends: [
-    'prettier',
-    'plugin:@typescript-eslint/recommended',
-    'eslint:recommended',
-  ],
+  extends: ['prettier', 'plugin:@typescript-eslint/recommended', 'eslint:recommended'],
   parser: '@typescript-eslint/parser',
   plugins: ['prettier', 'jest', '@typescript-eslint'],
   env: {
@@ -37,5 +33,7 @@ module.exports = {
 
     // Allowing ++ on numbers
     'no-plusplus': 'off',
+
+    '@typescript-eslint/no-inferrable-types': 'off',
   },
 };
