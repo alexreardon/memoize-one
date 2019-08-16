@@ -24,6 +24,7 @@
   "dependencies": {},
   "devDependencies": {
     "@types/jest": "^24.0.17",
+    "@types/lodash.isequal": "^4.5.5",
     "@typescript-eslint/eslint-plugin": "^2.0.0",
     "@typescript-eslint/parser": "^2.0.0",
     "benchmark": "^2.1.4",
@@ -52,7 +53,7 @@
   },
   "scripts": {
     "validate": "yarn run lint && yarn run typecheck",
-    "test": "cross-env NODE_ENV=test jest",
+    "test": "yarn jest",
     "typecheck": "yarn tsc --noEmit",
     "prettier:check": "yarn prettier --debug-check $npm_package_config_prettier_target",
     "prettier:write": "yarn prettier --write $npm_package_config_prettier_target",

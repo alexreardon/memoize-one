@@ -10,5 +10,5 @@
     "removeComments": true,
     "esModuleInterop": true
   },
-  "include": ["src/"]
+  "include": ["src/", "test/"]
 }
