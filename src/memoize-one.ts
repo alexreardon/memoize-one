@@ -1,7 +1,6 @@
-// @flow
 import areInputsEqual from './are-inputs-equal';
 
-export type EqualityFn = (newArgs: mixed[], lastArgs: mixed[]) => boolean;
+export type EqualityFn = (newArgs: unknown[], lastArgs: unknown[]) => boolean;
 
 // <ResultFn: (...any[]) => mixed>
 // The purpose of this typing is to ensure that the returned memoized
@@ -9,17 +8,17 @@ export type EqualityFn = (newArgs: mixed[], lastArgs: mixed[]) => boolean;
 // ResultFn:        Generic type (which is the same as the resultFn).
 // (...any[]): Accepts any length of arguments - and they are not checked
 // mixed:           The result can be anything but needs to be checked before usage
-export default function memoizeOne<ResultFn: (...any[]) => mixed>(
+export function memoizeOne<ResultFn extends (this: unknown, ...newArgs: unknown[]) => ReturnType<ResultFn>>(
   resultFn: ResultFn,
-  isEqual?: EqualityFn = areInputsEqual,
+  isEqual: EqualityFn = areInputsEqual,
 ): ResultFn {
-  let lastThis: mixed;
-  let lastArgs: mixed[] = [];
-  let lastResult: mixed;
+  let lastThis: unknown;
+  let lastArgs: unknown[] = [];
+  let lastResult: ReturnType<ResultFn>;
   let calledOnce: boolean = false;
 
   // breaking cache when context (this) or arguments change
-  const result = function memoized(...newArgs: mixed[]) {
+  function memoized(this: unknown, ...newArgs: unknown[]): ReturnType<ResultFn> {
     if (calledOnce && lastThis === this && isEqual(newArgs, lastArgs)) {
       return lastResult;
     }
@@ -34,5 +33,7 @@ export default function memoizeOne<ResultFn: (...any[]) => mixed>(
     return lastResult;
   };
 
-  return (result: any);
+  return (memoized as ResultFn);
 }
+
+export default memoizeOne;

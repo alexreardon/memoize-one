@@ -1,5 +1,3 @@
-/* eslint-disable flowtype/require-valid-file-annotation */
-
 const Benchmark = require('benchmark');
 
 const suite = new Benchmark.Suite();

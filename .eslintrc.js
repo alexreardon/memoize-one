@@ -1,12 +1,11 @@
 module.exports = {
   extends: [
     'prettier',
+    'plugin:@typescript-eslint/recommended',
     'eslint:recommended',
-    'plugin:flowtype/recommended',
-    'prettier/flowtype',
   ],
-  parser: 'babel-eslint',
-  plugins: ['prettier', 'jest', 'flowtype'],
+  parser: '@typescript-eslint/parser',
+  plugins: ['prettier', 'jest', '@typescript-eslint'],
   env: {
     node: true,
     browser: true,
@@ -38,12 +37,5 @@ module.exports = {
 
     // Allowing ++ on numbers
     'no-plusplus': 'off',
-
-    // Require // @flow at the top of files
-    'flowtype/require-valid-file-annotation': [
-      'error',
-      'always',
-      { annotationStyle: 'line' },
-    ],
   },
 };
