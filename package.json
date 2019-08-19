@@ -49,7 +49,7 @@
     "typescript": "^3.5.3"
   },
   "config": {
-    "prettier_target": "*.{js,jsx,md,json} src/**/*.{js,jsx,md,json} test/**/*.{js,jsx,md,json}"
+    "prettier_target": "src/**/*.{ts,js,jsx,md,json} test/**/*.{ts,js,jsx,md,json}"
   },
   "scripts": {
     "validate": "yarn run lint && yarn run typecheck",
@@ -57,7 +57,7 @@
     "typecheck": "yarn tsc --noEmit",
     "prettier:check": "yarn prettier --debug-check $npm_package_config_prettier_target",
     "prettier:write": "yarn prettier --write $npm_package_config_prettier_target",
-    "lint:eslint": "eslint src/**/*.ts test/",
+    "lint:eslint": "eslint $npm_package_config_prettier_target",
     "lint": "yarn lint:eslint && yarn prettier:check",
     "build": "yarn run build:clean && yarn run build:dist && yarn run build:flow",
     "build:clean": "rimraf dist",

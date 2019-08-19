@@ -3,7 +3,10 @@ import areInputsEqual from './are-inputs-equal';
 export type EqualityFn = (newArgs: unknown[], lastArgs: unknown[]) => boolean;
 
 export function memoizeOne<
-  ResultFn extends (this: unknown, ...newArgs: unknown[]) => ReturnType<ResultFn>
+  // Need to use 'any' rather than 'unknown' here as it has
+  // The correct Generic narrowing behaviour.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ResultFn extends (this: any, ...newArgs: any[]) => ReturnType<ResultFn>
 >(resultFn: ResultFn, isEqual: EqualityFn = areInputsEqual): ResultFn {
   let lastThis: unknown;
   let lastArgs: unknown[] = [];

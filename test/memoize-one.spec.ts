@@ -1,20 +1,23 @@
-import memoize from '../src/memoize-one';
+import memoize, { EqualityFn } from '../src/memoize-one';
 import isDeepEqual from 'lodash.isequal';
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 type HasA = {
   a: number;
 };
 
-function getA(this: HasA | undefined): number {
+function getA(this: HasA | null | undefined): number {
   if (this == null) {
     throw new TypeError();
   }
   return this.a;
 }
 
+type AddFn = (value1: number, value2: number) => number;
+
 describe('standard behaviour - baseline', () => {
-  let add;
-  let memoizedAdd;
+  let add: AddFn;
+  let memoizedAdd: AddFn;
 
   beforeEach(() => {
     add = jest.fn().mockImplementation((value1: number, value2: number): number => value1 + value2);
@@ -175,8 +178,8 @@ describe('standard behaviour - dynamic', () => {
 
   inputs.forEach(({ name, first, second }) => {
     describe(`type: [${name}]`, () => {
-      let mock;
-      let memoized;
+      let mock: (...args: any[]) => unknown;
+      let memoized: (...args: any[]) => unknown;
 
       beforeEach(() => {
         mock = jest.fn().mockImplementation((...args) => {
@@ -229,10 +232,14 @@ describe('standard behaviour - dynamic', () => {
 describe('respecting "this" context', () => {
   describe('original function', () => {
     it('should respect new bindings', () => {
-      const Foo = function(bar): void {
+      type HasBar = {
+        bar: string;
+      };
+      const Foo = function(this: HasBar, bar: string): void {
         this.bar = bar;
       };
       const memoized = memoize(function(bar) {
+        // @ts-ignore
         return new Foo(bar);
       });
 
@@ -283,8 +290,9 @@ describe('respecting "this" context', () => {
       };
       function foo() {
         // return an arrow function
-        return () => {
+        return (): number => {
           // `this` here is lexically adopted from `foo()`
+          // @ts-ignore
           return getA.call(this);
         };
       }
@@ -305,12 +313,19 @@ describe('respecting "this" context', () => {
   describe('memoized function', () => {
     it('should respect new bindings', () => {
       const memoizedGetA = memoize(getA);
-      const Foo = function(a): void {
+      interface FooInterface {
+        a: number;
+        result: number;
+      }
+
+      const Foo = function(this: FooInterface, a: number): void {
         this.a = a;
         this.result = memoizedGetA.call(this);
       };
 
+      // @ts-ignore
       const foo1 = new Foo(10);
+      // @ts-ignore
       const foo2 = new Foo(20);
 
       expect(foo1.result).toBe(10);
@@ -371,14 +386,15 @@ describe('respecting "this" context', () => {
     });
 
     it('should respect fat arrow bindings', () => {
-      const temp = {
+      const temp: HasA = {
         a: 50,
       };
       const memoizedGetA = memoize(getA);
       function foo() {
         // return an arrow function
-        return () => {
+        return (): number => {
           // `this` here is lexically adopted from `foo()`
+          // @ts-ignore
           return memoizedGetA.call(this);
         };
       }
@@ -391,7 +407,7 @@ describe('respecting "this" context', () => {
     it('should respect ignored bindings', () => {
       const memoized = memoize(getA);
 
-      const getResult = function() {
+      const getResult = function(): number {
         return memoized.call(null);
       };
 
@@ -421,22 +437,21 @@ describe('skip equality check', () => {
   it('should not run any equality checks if the "this" context changes', () => {
     const isEqual = jest.fn().mockReturnValue(true);
     const memoized = memoize(getA, isEqual);
-    const obj1 = {
+    const obj1: HasA = {
       a: 10,
     };
-    const obj2 = {
+    const obj2: HasA = {
       a: 20,
     };
-    const args: number[] = [1, 2, 3];
 
     // using explicit binding change
 
     // custom equality function not called on first call
-    expect(memoized.apply(obj1, args)).toBe(10);
+    expect(memoized.apply(obj1)).toBe(10);
     expect(isEqual).not.toHaveBeenCalled();
 
     // not executed as "this" context has changed
-    expect(memoized.apply(obj2, args)).toBe(20);
+    expect(memoized.apply(obj2)).toBe(20);
     expect(isEqual).not.toHaveBeenCalled();
   });
 
@@ -456,9 +471,9 @@ describe('skip equality check', () => {
 });
 
 describe('custom equality function', () => {
-  let add;
-  let memoizedAdd;
-  let equalityStub;
+  let add: AddFn;
+  let memoizedAdd: AddFn;
+  let equalityStub: EqualityFn;
 
   beforeEach(() => {
     add = jest.fn().mockImplementation((value1: number, value2: number): number => value1 + value2);
@@ -467,7 +482,7 @@ describe('custom equality function', () => {
   });
 
   it('should call the equality function with the newArgs, lastArgs and lastValue', () => {
-    equalityStub.mockReturnValue(true);
+    (equalityStub as jest.Mock).mockReturnValue(true);
 
     // first call does not trigger equality check
     memoizedAdd(1, 2);
@@ -514,7 +529,7 @@ describe('custom equality function', () => {
   });
 
   it('should return the previous value without executing the result fn if the equality fn returns true', () => {
-    equalityStub.mockReturnValue(true);
+    (equalityStub as jest.Mock).mockReturnValue(true);
 
     // hydrate the first value
     const first: number = memoizedAdd(1, 2);
@@ -535,7 +550,7 @@ describe('custom equality function', () => {
   });
 
   it('should return execute and return the result of the result fn if the equality fn returns false', () => {
-    equalityStub.mockReturnValue(false);
+    (equalityStub as jest.Mock).mockReturnValue(false);
 
     // hydrate the first value
     const first: number = memoizedAdd(1, 2);
@@ -696,7 +711,7 @@ describe('throwing', () => {
 
 describe('typing', () => {
   it('should maintain the type of the original function', () => {
-    // this test will create a flow error if the typing is incorrect
+    // this test will create a type error if the typing is incorrect
     type SubtractFn = (a: number, b: number) => number;
     const subtract: SubtractFn = (a: number, b: number): number => a - b;
     const requiresASubtractFn = (fn: SubtractFn): number => fn(2, 1);
