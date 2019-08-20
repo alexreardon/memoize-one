@@ -50,7 +50,7 @@
     "typescript": "^3.5.3"
   },
   "config": {
-    "prettier_target": "*.{md} src/**/*.{ts,js,jsx,md,json} test/**/*.{ts,js,jsx,md,json}"
+    "prettier_target": "src/**/*.{ts,js,jsx,md,json} test/**/*.{ts,js,jsx,md,json}"
   },
   "scripts": {
     "validate": "yarn lint && yarn typecheck",
