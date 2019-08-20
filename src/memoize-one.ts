@@ -1,6 +1,6 @@
 import areInputsEqual from './are-inputs-equal';
 
-export type EqualityFn = (newArgs: unknown[], lastArgs: unknown[]) => boolean;
+export type EqualityFn = (newArgs: readonly unknown[], lastArgs: readonly unknown[]) => boolean;
 
 export default function memoizeOne<
   // Need to use 'any' rather than 'unknown' here as it has

@@ -1,4 +1,7 @@
-export default function areInputsEqual(newInputs: unknown[], lastInputs: unknown[]): boolean {
+export default function areInputsEqual(
+  newInputs: readonly unknown[],
+  lastInputs: readonly unknown[],
+): boolean {
   // no checks needed if the inputs length has changed
   if (newInputs.length !== lastInputs.length) {
     return false;

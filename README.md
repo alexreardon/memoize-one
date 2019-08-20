@@ -54,7 +54,20 @@ You can also pass in a custom function for checking the equality of two sets of 
 
 ```js
 const memoized = memoizeOne(fn, isEqual);
-type EqualityFn = (newArgs: mixed[], oldArgs: mixed[]) => boolean;
+```
+
+The quality function needs to conform to this `type`:
+
+```ts
+type EqualityFn = (newArgs: readonly unknown[], lastArgs: readonly unknown[]) => boolean;
+
+// You can import this type from memoize-one if you like
+
+// typescript
+import { EqualityFn } from 'memoize-one';
+
+// flow
+import type { EqualityFn } from 'memoize-one';
 ```
 
 An equality function should return `true` if the arguments are equal. If `true` is returned then the wrapped function will not be called.
