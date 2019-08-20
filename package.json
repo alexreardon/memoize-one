@@ -63,7 +63,7 @@
     "build": "yarn build:clean && yarn build:dist && yarn build:typescript && yarn build:flow",
     "build:clean": "rimraf dist",
     "build:dist": "rollup -c",
-    "build:typescript": "tsc --emitDeclarationOnly --declaration --outFile ./dist/memoize-one.d.ts ./src/memoize-one.ts",
+    "build:typescript": "tsc ./src/memoize-one.ts --emitDeclarationOnly --declaration --outDir ./dist",
     "build:flow": "cp src/memoize-one.js.flow dist/memoize-one.cjs.js.flow",
     "perf": "ts-node ./benchmarks/shallow-equal.ts",
     "prepublishOnly": "yarn build"
