@@ -5,17 +5,14 @@ A memoization library that only caches the result of the most recent arguments.
 [![Build Status](https://travis-ci.org/alexreardon/memoize-one.svg?branch=master)](https://travis-ci.org/alexreardon/memoize-one)
 [![npm](https://img.shields.io/npm/v/memoize-one.svg)](https://www.npmjs.com/package/memoize-one)
 [![dependencies](https://david-dm.org/alexreardon/memoize-one.svg)](https://david-dm.org/alexreardon/memoize-one)
-[![Downloads per month](https://img.shields.io/npm/dm/memoize-one.svg)](https://www.npmjs.com/package/memoize-one)
-[![min](https://img.shields.io/bundlephobia/min/memoize-one.svg)](https://www.npmjs.com/package/memoize-one)
 [![minzip](https://img.shields.io/bundlephobia/minzip/memoize-one.svg)](https://www.npmjs.com/package/memoize-one)
+[![Downloads per month](https://img.shields.io/npm/dm/memoize-one.svg)](https://www.npmjs.com/package/memoize-one)
 
 ## Rationale
 
 Unlike other memoization libraries, `memoize-one` only remembers the latest arguments and result. No need to worry about cache busting mechanisms such as `maxAge`, `maxSize`, `exclusions` and so on which can be prone to memory leaks. `memoize-one` simply remembers the last arguments, and if the function is next called with the same arguments then it returns the previous result.
 
 ## Usage
-
-### Standard usage
 
 ```js
 import memoizeOne from 'memoize-one';
@@ -40,6 +37,10 @@ memoizedAdd(1, 2); // 3
 // it is not the latest so the cached result is lost
 ```
 
+## Types for everyone 🤘
+
+`memoize-one` has full support for [`Typescript`](https://www.typescriptlang.org/) and [`flow`](https://flow.org/)
+
 ## Installation
 
 ```bash
@@ -48,22 +49,6 @@ yarn add memoize-one
 
 # npm
 npm install memoize-one --save
-```
-
-## Module usage
-
-### ES6 module
-
-```js
-import memoizeOne from 'memoize-one';
-```
-
-### CommonJS
-
-If you are in a CommonJS environment (eg [Node](https://nodejs.org)), then **you will need to add `.default` to your import**:
-
-```js
-const memoizeOne = require('memoize-one').default;
 ```
 
 ## Custom equality function
@@ -199,7 +184,7 @@ console.log(value1 === value3);
 // console.log => true
 ```
 
-## Performance :rocket:
+## Performance 🚀
 
 ### Tiny
 
@@ -216,11 +201,11 @@ console.log(value1 === value3);
 
 The comparisons are not exhaustive and are primarily to show that `memoize-one` accomplishes remembering the latest invocation really fast. The benchmarks do not take into account the differences in feature sets, library sizes, parse time, and so on.
 
-## Code health :thumbsup:
+## Code health 👍
 
 - Tested with all built in [JavaScript types](https://github.com/getify/You-Dont-Know-JS/blob/master/types%20%26%20grammar/ch1.md).
 - 100% code coverage
 - [Continuous integration](https://travis-ci.org/alexreardon/memoize-one) to run tests and type checks.
-- [`Flow` types](http://flowtype.org) for safer internal execution and external consumption. Also allows for editor autocompletion.
-- Follows [Semantic versioning (2.0)](http://semver.org/) for safer consumption.
+- Written in `Typescript`
+- Correct typing for `Typescript` and `flow` type systems
 - No dependencies
