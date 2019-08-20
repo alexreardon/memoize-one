@@ -1,7 +1,7 @@
 // @ts-check
 import typescript from 'rollup-plugin-typescript';
 import replace from 'rollup-plugin-replace';
-import { uglify } from 'rollup-plugin-uglify';
+import { terser } from 'rollup-plugin-terser';
 
 const input = 'src/memoize-one.ts';
 
@@ -32,7 +32,7 @@ export default [
       // Setting production env before running other steps
       replace({ 'process.env.NODE_ENV': JSON.stringify('production') }),
       typescript(),
-      uglify(),
+      terser(),
     ],
   },
   // ESM build
