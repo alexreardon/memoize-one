@@ -4,6 +4,7 @@ A memoization library that only caches the result of the most recent arguments.
 
 [![Build Status](https://travis-ci.org/alexreardon/memoize-one.svg?branch=master)](https://travis-ci.org/alexreardon/memoize-one)
 [![npm](https://img.shields.io/npm/v/memoize-one.svg)](https://www.npmjs.com/package/memoize-one)
+![types](https://img.shields.io/badge/types-typescript%20%7C%20flow-blueviolet)
 [![dependencies](https://david-dm.org/alexreardon/memoize-one.svg)](https://david-dm.org/alexreardon/memoize-one)
 [![minzip](https://img.shields.io/bundlephobia/minzip/memoize-one.svg)](https://www.npmjs.com/package/memoize-one)
 [![Downloads per month](https://img.shields.io/npm/dm/memoize-one.svg)](https://www.npmjs.com/package/memoize-one)
@@ -36,10 +37,6 @@ memoizedAdd(1, 2); // 3
 // While this was previously cached,
 // it is not the latest so the cached result is lost
 ```
-
-## Types for everyone 🤘
-
-`memoize-one` has full support for [`Typescript`](https://www.typescriptlang.org/) and [`flow`](https://flow.org/)
 
 ## Installation
 
