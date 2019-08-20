@@ -19,7 +19,6 @@ export default [
       // Setting development env before running other steps
       replace({ 'process.env.NODE_ENV': JSON.stringify('development') }),
       typescript(),
-      // commonjs({ include: 'node_modules/**' }),
     ],
   },
   // Universal module definition (UMD) build (production)
@@ -34,7 +33,6 @@ export default [
       // Setting production env before running other steps
       replace({ 'process.env.NODE_ENV': JSON.stringify('production') }),
       typescript(),
-      // commonjs({ include: 'node_modules/**' }),
       uglify(),
     ],
   },
