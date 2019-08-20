@@ -3,6 +3,7 @@
   "version": "5.0.5",
   "description": "A memoization library which only remembers the latest invocation",
   "main": "dist/memoize-one.cjs.js",
+  "types": "dist/memoize-one.d.ts",
   "module": "dist/memoize-one.esm.js",
   "sideEffects": false,
   "author": "Alex Reardon <alexreardon@gmail.com>",

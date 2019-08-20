@@ -16,7 +16,7 @@ export default [
       name: 'memoizeOne',
     },
     plugins: [
-      // Setting development env before running babel etc
+      // Setting development env before running other steps
       replace({ 'process.env.NODE_ENV': JSON.stringify('development') }),
       typescript(),
       // commonjs({ include: 'node_modules/**' }),
@@ -31,7 +31,7 @@ export default [
       name: 'memoizeOne',
     },
     plugins: [
-      // Setting production env before running babel etc
+      // Setting production env before running other steps
       replace({ 'process.env.NODE_ENV': JSON.stringify('production') }),
       typescript(),
       // commonjs({ include: 'node_modules/**' }),
