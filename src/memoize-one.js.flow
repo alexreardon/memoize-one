@@ -2,5 +2,8 @@
 declare module 'memoize-one' {
   declare export type EqualityFn = (newArgs: mixed[], lastArgs: mixed[]) => boolean;
 
-  declare export default function memoizeOne<T>(fn: T, isEqual?: EqualityFn): T;
+  declare export default function memoizeOne<ResultFn: (...any[]) => mixed>(
+    fn: ResultFn,
+    isEqual?: EqualityFn,
+  ): ResultFn;
 }
