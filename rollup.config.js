@@ -1,4 +1,3 @@
-// @flow
 // @ts-check
 import typescript from 'rollup-plugin-typescript';
 import replace from 'rollup-plugin-replace';

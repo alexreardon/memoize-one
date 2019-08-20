@@ -1,4 +1,3 @@
-// @flow
 export default function areInputsEqual(newInputs: unknown[], lastInputs: unknown[]): boolean {
   // no checks needed if the inputs length has changed
   if (newInputs.length !== lastInputs.length) {
