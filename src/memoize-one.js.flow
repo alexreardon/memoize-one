@@ -1,13 +1,7 @@
 // @flow
 export type EqualityFn = (newArgs: mixed[], lastArgs: mixed[]) => boolean;
 
-export default function memoizeOne<ResultFn: (...any[]) => mixed>(
+declare export default function memoizeOne<ResultFn: (...any[]) => mixed>(
   fn: ResultFn,
   isEqual?: EqualityFn,
-): ResultFn {
-  // **This file is only used for flow typing!**
-  // We are not doing any memoization here.
-  // We would use a module definition, but it looks as though
-  // those are made for specific consumption of module definitions `[lib]`
-  return fn;
-}
+): ResultFn;

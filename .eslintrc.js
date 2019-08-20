@@ -20,7 +20,7 @@ module.exports = {
     // use `invariant` and `warning`
     'no-console': ['error'],
 
-    // Opting out of prefer destructuring (nicer with flow in lots of cases)
+    // Opting out of prefer destructuring (nicer with types in lots of cases)
     'prefer-destructuring': 'off',
 
     // Disallowing the use of variables starting with `_` unless it called on `this`.
