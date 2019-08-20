@@ -53,18 +53,19 @@
     "prettier_target": "src/**/*.{ts,js,jsx,md,json} test/**/*.{ts,js,jsx,md,json}"
   },
   "scripts": {
-    "validate": "yarn run lint && yarn run typecheck",
+    "validate": "yarn lint && yarn typecheck",
     "test": "yarn jest",
     "typecheck": "yarn tsc --noEmit",
     "prettier:check": "yarn prettier --debug-check $npm_package_config_prettier_target",
     "prettier:write": "yarn prettier --write $npm_package_config_prettier_target",
     "lint:eslint": "eslint $npm_package_config_prettier_target",
     "lint": "yarn lint:eslint && yarn prettier:check",
-    "build": "yarn run build:clean && yarn run build:dist && yarn run build:flow",
+    "build": "yarn build:clean && yarn build:dist && yarn build:typescript && yarn build:flow",
     "build:clean": "rimraf dist",
     "build:dist": "rollup -c",
+    "build:typescript": "tsc --emitDeclarationOnly --declaration --outFile ./dist/memoize-one.d.ts ./src/memoize-one.ts",
     "build:flow": "cp src/memoize-one.js.flow dist/memoize-one.cjs.js.flow",
     "perf": "ts-node ./benchmarks/shallow-equal.ts",
-    "prepublish": "yarn run build"
+    "prepublishOnly": "yarn build"
   }
 }
