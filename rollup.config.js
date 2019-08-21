@@ -1,10 +1,9 @@
-// @flow
-import babel from 'rollup-plugin-babel';
-import commonjs from 'rollup-plugin-commonjs';
+// @ts-check
+import typescript from 'rollup-plugin-typescript';
 import replace from 'rollup-plugin-replace';
-import { uglify } from 'rollup-plugin-uglify';
+import { terser } from 'rollup-plugin-terser';
 
-const input = 'src/index.js';
+const input = 'src/memoize-one.ts';
 
 export default [
   // Universal module definition (UMD) build
@@ -16,10 +15,9 @@ export default [
       name: 'memoizeOne',
     },
     plugins: [
-      // Setting development env before running babel etc
+      // Setting development env before running other steps
       replace({ 'process.env.NODE_ENV': JSON.stringify('development') }),
-      babel(),
-      commonjs({ include: 'node_modules/**' }),
+      typescript(),
     ],
   },
   // Universal module definition (UMD) build (production)
@@ -31,11 +29,10 @@ export default [
       name: 'memoizeOne',
     },
     plugins: [
-      // Setting production env before running babel etc
+      // Setting production env before running other steps
       replace({ 'process.env.NODE_ENV': JSON.stringify('production') }),
-      babel(),
-      commonjs({ include: 'node_modules/**' }),
-      uglify(),
+      typescript(),
+      terser(),
     ],
   },
   // ESM build
@@ -45,7 +42,7 @@ export default [
       file: 'dist/memoize-one.esm.js',
       format: 'esm',
     },
-    plugins: [babel()],
+    plugins: [typescript()],
   },
   // CommonJS build
   {
@@ -54,6 +51,6 @@ export default [
       file: 'dist/memoize-one.cjs.js',
       format: 'cjs',
     },
-    plugins: [babel()],
+    plugins: [typescript()],
   },
 ];

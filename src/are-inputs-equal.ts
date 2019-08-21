@@ -1,8 +1,7 @@
-// @flow
 export default function areInputsEqual(
-  newInputs: mixed[],
-  lastInputs: mixed[],
-) {
+  newInputs: readonly unknown[],
+  lastInputs: readonly unknown[],
+): boolean {
   // no checks needed if the inputs length has changed
   if (newInputs.length !== lastInputs.length) {
     return false;

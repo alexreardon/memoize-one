@@ -1,12 +1,7 @@
 module.exports = {
-  extends: [
-    'prettier',
-    'eslint:recommended',
-    'plugin:flowtype/recommended',
-    'prettier/flowtype',
-  ],
-  parser: 'babel-eslint',
-  plugins: ['prettier', 'jest', 'flowtype'],
+  extends: ['prettier', 'plugin:@typescript-eslint/recommended', 'eslint:recommended'],
+  parser: '@typescript-eslint/parser',
+  plugins: ['prettier', 'jest', '@typescript-eslint'],
   env: {
     node: true,
     browser: true,
@@ -25,7 +20,7 @@ module.exports = {
     // use `invariant` and `warning`
     'no-console': ['error'],
 
-    // Opting out of prefer destructuring (nicer with flow in lots of cases)
+    // Opting out of prefer destructuring (nicer with types in lots of cases)
     'prefer-destructuring': 'off',
 
     // Disallowing the use of variables starting with `_` unless it called on `this`.
@@ -39,11 +34,8 @@ module.exports = {
     // Allowing ++ on numbers
     'no-plusplus': 'off',
 
-    // Require // @flow at the top of files
-    'flowtype/require-valid-file-annotation': [
-      'error',
-      'always',
-      { annotationStyle: 'line' },
-    ],
+    '@typescript-eslint/no-inferrable-types': 'off',
+
+    '@typescript-eslint/ban-ts-ignore': 'off',
   },
 };
