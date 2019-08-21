@@ -56,7 +56,7 @@ You can also pass in a custom function for checking the equality of two sets of 
 const memoized = memoizeOne(fn, isEqual);
 ```
 
-The quality function needs to conform to this `type`:
+The equality function needs to conform to this `type`:
 
 ```ts
 type EqualityFn = (newArgs: readonly unknown[], lastArgs: readonly unknown[]) => boolean;
