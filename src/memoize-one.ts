@@ -1,6 +1,10 @@
 import areInputsEqual from './are-inputs-equal';
 
-export type EqualityFn = (newArgs: readonly unknown[], lastArgs: readonly unknown[]) => boolean;
+// Using ReadonlyArray<T> rather than readonly T as it works with TS v3
+export type EqualityFn = (
+  newArgs: ReadonlyArray<unknown>,
+  lastArgs: ReadonlyArray<unknown>,
+) => boolean;
 
 export default function memoizeOne<
   // Need to use 'any' rather than 'unknown' here as it has
