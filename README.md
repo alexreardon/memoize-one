@@ -59,7 +59,7 @@ const memoized = memoizeOne(fn, isEqual);
 The equality function needs to conform to this `type`:
 
 ```ts
-type EqualityFn = (newArgs: readonly unknown[], lastArgs: readonly unknown[]) => boolean;
+type EqualityFn = (newArgs: any[], lastArgs: any[]) => boolean;
 
 // You can import this type from memoize-one if you like
 

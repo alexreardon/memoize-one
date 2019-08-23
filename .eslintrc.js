@@ -35,7 +35,7 @@ module.exports = {
     'no-plusplus': 'off',
 
     '@typescript-eslint/no-inferrable-types': 'off',
-
     '@typescript-eslint/ban-ts-ignore': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
   },
 };

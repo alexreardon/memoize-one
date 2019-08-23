@@ -724,4 +724,20 @@ describe('typing', () => {
     expect(result1).toBe(1);
     expect(result2).toBe(1);
   });
+
+  it('should support typed equality functions', () => {
+    const subtract = (a: number, b: number): number => a - b;
+
+    const valid: EqualityFn[] = [
+      (newArgs: readonly number[], lastArgs: readonly number[]): boolean =>
+        JSON.stringify(newArgs) === JSON.stringify(lastArgs),
+      (): boolean => true,
+      (value: unknown[]): boolean => value.length === 5,
+    ];
+
+    valid.forEach((isEqual: EqualityFn) => {
+      const memoized = memoize(subtract, isEqual);
+      expect(memoized(3, 1)).toBe(2);
+    });
+  });
 });
