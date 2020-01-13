@@ -6,15 +6,22 @@ export type EqualityFn = (newArgs: any[], lastArgs: any[]) => boolean;
 export default function memoizeOne<
   // Need to use 'any' rather than 'unknown' here as it has
   // The correct Generic narrowing behaviour.
-  ResultFn extends (this: any, ...newArgs: any[]) => ReturnType<ResultFn>
->(resultFn: ResultFn, isEqual: EqualityFn = areInputsEqual): ResultFn {
+  Args extends unknown[],
+  Result
+>(
+  resultFn: (this: any, ...newArgs: Args) => Result,
+  isEqual: EqualityFn = areInputsEqual,
+): (this: unknown, ...newArgs: Args) => Result {
   let lastThis: unknown;
   let lastArgs: unknown[] = [];
-  let lastResult: ReturnType<ResultFn>;
+  let lastResult: ReturnType<(this: any, ...newArgs: Args) => Result>;
   let calledOnce: boolean = false;
 
   // breaking cache when context (this) or arguments change
-  function memoized(this: unknown, ...newArgs: unknown[]): ReturnType<ResultFn> {
+  function memoized(
+    this: unknown,
+    ...newArgs: Args
+  ): ReturnType<(this: any, ...newArgs: Args) => Result> {
     if (calledOnce && lastThis === this && isEqual(newArgs, lastArgs)) {
       return lastResult;
     }
@@ -29,5 +36,5 @@ export default function memoizeOne<
     return lastResult;
   }
 
-  return memoized as ResultFn;
+  return memoized as (this: any, ...newArgs: Args) => Result;
 }
