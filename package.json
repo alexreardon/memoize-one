@@ -16,6 +16,24 @@
     "/dist",
     "/src"
   ],
+  "size-limit": [
+    {
+      "path": "dist/memoize-one.min.js",
+      "limit": "155B"
+    },
+    {
+      "path": "dist/memoize-one.js",
+      "limit": "155B"
+    },
+    {
+      "path": "dist/memoize-one.cjs.js",
+      "limit": "147B"
+    },
+    {
+      "path": "dist/memoize-one.esm.js",
+      "limit": "151B"
+    }
+  ],
   "keywords": [
     "memoize",
     "memoization",
@@ -24,6 +42,7 @@
   ],
   "dependencies": {},
   "devDependencies": {
+    "@size-limit/preset-small-lib": "^3.0.0",
     "@types/jest": "^24.0.18",
     "@types/lodash.isequal": "^4.5.5",
     "@typescript-eslint/eslint-plugin": "^2.0.0",
@@ -64,6 +83,7 @@
     "build:typescript": "tsc ./src/memoize-one.ts --emitDeclarationOnly --declaration --outDir ./dist",
     "build:flow": "cp src/memoize-one.js.flow dist/memoize-one.cjs.js.flow",
     "perf": "ts-node ./benchmarks/shallow-equal.ts",
-    "prepublishOnly": "yarn build"
+    "prepublishOnly": "yarn build",
+    "size": "yarn build && size-limit"
   }
 }
