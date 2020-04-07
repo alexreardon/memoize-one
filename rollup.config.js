@@ -1,9 +1,16 @@
 // @ts-check
 import typescript from 'rollup-plugin-typescript';
-import replace from 'rollup-plugin-replace';
-import { terser } from 'rollup-plugin-terser';
 
 const input = 'src/memoize-one.ts';
+
+function emitModulePackageFile() {
+  return {
+    name: 'emit-module-package-file',
+    generateBundle() {
+      this.emitFile({ type: 'asset', fileName: 'package.json', source: `{"type":"module"}` });
+    },
+  };
+}
 
 export default [
   // Universal module definition (UMD) build
@@ -14,43 +21,15 @@ export default [
       format: 'umd',
       name: 'memoizeOne',
     },
-    plugins: [
-      // Setting development env before running other steps
-      replace({ 'process.env.NODE_ENV': JSON.stringify('development') }),
-      typescript(),
-    ],
-  },
-  // Universal module definition (UMD) build (production)
-  {
-    input,
-    output: {
-      file: 'dist/memoize-one.min.js',
-      format: 'umd',
-      name: 'memoizeOne',
-    },
-    plugins: [
-      // Setting production env before running other steps
-      replace({ 'process.env.NODE_ENV': JSON.stringify('production') }),
-      typescript(),
-      terser(),
-    ],
+    plugins: [typescript()],
   },
   // ESM build
   {
     input,
     output: {
-      file: 'dist/memoize-one.esm.js',
+      file: 'dist/esm/memoize-one.js',
       format: 'esm',
     },
-    plugins: [typescript()],
-  },
-  // CommonJS build
-  {
-    input,
-    output: {
-      file: 'dist/memoize-one.cjs.js',
-      format: 'cjs',
-    },
-    plugins: [typescript()],
+    plugins: [typescript(), emitModulePackageFile()],
   },
 ];

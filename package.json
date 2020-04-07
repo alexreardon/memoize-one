@@ -2,9 +2,15 @@
   "name": "memoize-one",
   "version": "5.1.1",
   "description": "A memoization library which only remembers the latest invocation",
-  "main": "dist/memoize-one.cjs.js",
+  "main": "dist/memoize-one.js",
   "types": "dist/memoize-one.d.ts",
-  "module": "dist/memoize-one.esm.js",
+  "module": "dist/esm/memoize-one.js",
+  "exports": {
+    ".": {
+      "require": "./dist/memoize-one.js",
+      "import": "./dist/esm/memoize-one.js"
+    }
+  },
   "sideEffects": false,
   "author": "Alex Reardon <alexreardon@gmail.com>",
   "license": "MIT",
@@ -18,20 +24,12 @@
   ],
   "size-limit": [
     {
-      "path": "dist/memoize-one.min.js",
-      "limit": "155B"
-    },
-    {
       "path": "dist/memoize-one.js",
-      "limit": "155B"
+      "limit": "165B"
     },
     {
-      "path": "dist/memoize-one.cjs.js",
-      "limit": "147B"
-    },
-    {
-      "path": "dist/memoize-one.esm.js",
-      "limit": "151B"
+      "path": "dist/esm/memoize-one.js",
+      "limit": "169B"
     }
   ],
   "keywords": [
@@ -58,8 +56,6 @@
     "prettier": "1.18.2",
     "rimraf": "3.0.0",
     "rollup": "^1.19.4",
-    "rollup-plugin-replace": "^2.2.0",
-    "rollup-plugin-terser": "^5.1.1",
     "rollup-plugin-typescript": "^1.0.1",
     "ts-jest": "^24.0.2",
     "ts-node": "^8.3.0",
@@ -81,7 +77,7 @@
     "build:clean": "rimraf dist",
     "build:dist": "rollup -c",
     "build:typescript": "tsc ./src/memoize-one.ts --emitDeclarationOnly --declaration --outDir ./dist",
-    "build:flow": "cp src/memoize-one.js.flow dist/memoize-one.cjs.js.flow",
+    "build:flow": "cp src/memoize-one.js.flow dist/memoize-one.js.flow",
     "perf": "ts-node ./benchmarks/shallow-equal.ts",
     "prepublishOnly": "yarn build",
     "size": "yarn build && size-limit"
