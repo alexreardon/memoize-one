@@ -1,20 +1,25 @@
 import areInputsEqual from './are-inputs-equal';
 
 // Using ReadonlyArray<T> rather than readonly T as it works with TS v3
-export type EqualityFn = (newArgs: any[], lastArgs: any[]) => boolean;
+export type EqualityFn<Args extends any[] = any[]> = (newArgs: Args, lastArgs: Args) => boolean;
 
 export default function memoizeOne<
+  This,
   // Need to use 'any' rather than 'unknown' here as it has
   // The correct Generic narrowing behaviour.
-  ResultFn extends (this: any, ...newArgs: any[]) => ReturnType<ResultFn>
->(resultFn: ResultFn, isEqual: EqualityFn = areInputsEqual): ResultFn {
-  let lastThis: unknown;
-  let lastArgs: unknown[] = [];
-  let lastResult: ReturnType<ResultFn>;
+  Args extends any[],
+  R
+>(
+  resultFn: (this: This, ...newArgs: Args) => R,
+  isEqual: EqualityFn<Args> = areInputsEqual,
+): (this: This, ...newArgs: Args) => R {
+  let lastThis: This;
+  let lastArgs: any = [];
+  let lastResult: R;
   let calledOnce: boolean = false;
 
   // breaking cache when context (this) or arguments change
-  function memoized(this: unknown, ...newArgs: unknown[]): ReturnType<ResultFn> {
+  function memoized(this: This, ...newArgs: Args): R {
     if (calledOnce && lastThis === this && isEqual(newArgs, lastArgs)) {
       return lastResult;
     }
@@ -29,5 +34,5 @@ export default function memoizeOne<
     return lastResult;
   }
 
-  return memoized as ResultFn;
+  return memoized;
 }
