@@ -3,7 +3,8 @@ import areInputsEqual from './are-inputs-equal';
 // Using ReadonlyArray<T> rather than readonly T as it works with TS v3
 export type EqualityFn = (newArgs: any[], lastArgs: any[]) => boolean;
 
-export default function memoizeOne<
+// named export
+export function memoizeOne<
   // Need to use 'any' rather than 'unknown' here as it has
   // The correct Generic narrowing behaviour.
   ResultFn extends (this: any, ...newArgs: any[]) => ReturnType<ResultFn>
@@ -31,3 +32,6 @@ export default function memoizeOne<
 
   return memoized as ResultFn;
 }
+
+// default export
+export default memoizeOne;
