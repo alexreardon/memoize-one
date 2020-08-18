@@ -87,13 +87,13 @@ A custom equality function needs to compare `Arrays`. The `newArgs` array will b
 
 Equality functions are not called if the `this` context of the function has changed (see below).
 
-Here is an example that uses a `lodash.isequal` deep equal equality check
+Here is an example that uses a [dequal](https://github.com/lukeed/dequal) deep equal equality check
 
-> `lodash.isequal` correctly handles deep comparing two arrays
+> `dequal` correctly handles deep comparing two arrays
 
 ```js
 import memoizeOne from 'memoize-one';
-import isDeepEqual from 'lodash.isequal';
+import { dequal as isDeepEqual } from 'dequal';
 
 const identity = x => x;
 
