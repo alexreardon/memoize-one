@@ -85,5 +85,8 @@
     "perf": "ts-node ./benchmarks/shallow-equal.ts",
     "prepublishOnly": "yarn build",
     "size": "yarn build && size-limit"
+  },
+  "engines": {
+    "node": ">=10.15.3"
   }
 }
