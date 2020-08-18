@@ -1,4 +1,4 @@
-import memoize, { EqualityFn } from '../src/memoize-one';
+import { memoizeOne as memoize, EqualityFn } from '../src/memoize-one';
 import isDeepEqual from 'lodash.isequal';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -235,10 +235,10 @@ describe('respecting "this" context', () => {
       type HasBar = {
         bar: string;
       };
-      const Foo = function(this: HasBar, bar: string): void {
+      const Foo = function (this: HasBar, bar: string): void {
         this.bar = bar;
       };
-      const memoized = memoize(function(bar) {
+      const memoized = memoize(function (bar) {
         // @ts-ignore
         return new Foo(bar);
       });
@@ -254,7 +254,7 @@ describe('respecting "this" context', () => {
         a: 10,
       };
 
-      const memoized = memoize(function() {
+      const memoized = memoize(function () {
         return getA.call(temp);
       });
 
@@ -277,7 +277,7 @@ describe('respecting "this" context', () => {
         getA,
       };
 
-      const memoized = memoize(function() {
+      const memoized = memoize(function () {
         return temp.getA();
       });
 
@@ -318,7 +318,7 @@ describe('respecting "this" context', () => {
         result: number;
       }
 
-      const Foo = function(this: FooInterface, a: number): void {
+      const Foo = function (this: FooInterface, a: number): void {
         this.a = a;
         this.result = memoizedGetA.call(this);
       };
@@ -407,7 +407,7 @@ describe('respecting "this" context', () => {
     it('should respect ignored bindings', () => {
       const memoized = memoize(getA);
 
-      const getResult = function(): number {
+      const getResult = function (): number {
         return memoized.call(null);
       };
 
