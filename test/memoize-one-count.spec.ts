@@ -38,8 +38,8 @@ describe('standard behaviour - baseline', () => {
     memoizedAdd = memoize(add, 3);
     memoizedAdd(1, 2);
     memoizedAdd(1, 2);
-    memoizedAdd(1,4);
-    memoizedAdd(1,5);
+    memoizedAdd(1, 4);
+    memoizedAdd(1, 5);
     expect(add).toHaveBeenCalledTimes(3);
   });
 
@@ -47,8 +47,8 @@ describe('standard behaviour - baseline', () => {
     memoizedAdd = memoize(add, 3);
     memoizedAdd(1, 2);
     memoizedAdd(1, 3);
-    memoizedAdd(1,4);
-    memoizedAdd(1,5);
+    memoizedAdd(1, 4);
+    memoizedAdd(1, 5);
     expect(add).toHaveBeenCalledTimes(3);
   });
 
@@ -623,8 +623,8 @@ describe('throwing', () => {
   it('should throw when the memoize function is passed with zero number of', () => {
     add = jest.fn().mockImplementation((value1: number, value2: number): number => value1 + value2);
     expect(() => {
-        memoize(add, 0);
-      }).toThrow("Number of calls can't be less than one");
+      memoize(add, 0);
+    }).toThrow("Number of calls can't be less than one");
   });
 
   it('should not memoize a thrown result', () => {
