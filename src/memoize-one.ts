@@ -32,8 +32,11 @@ function memoizeOne<
   return memoized as ResultFn;
 }
 
-function memoizeOneCount<ResultFn extends (this: any, ...newArgs: any[]) => ReturnType<ResultFn>>
-  (resultFn: ResultFn, numberOfCalls: number, isEqual: EqualityFn = areInputsEqual): ResultFn {
+function memoizeOneCount<ResultFn extends (this: any, ...newArgs: any[]) => ReturnType<ResultFn>>(
+  resultFn: ResultFn,
+  numberOfCalls: number,
+  isEqual: EqualityFn = areInputsEqual,
+): ResultFn {
   if (numberOfCalls <= 0) {
     throw new Error("Number of calls can't be less than one");
   }
@@ -48,7 +51,7 @@ function memoizeOneCount<ResultFn extends (this: any, ...newArgs: any[]) => Retu
     if (calledOnce && lastThis === this && isEqual(newArgs, lastArgs)) {
       return lastResult;
     } else if (calledCount === numberOfCalls) {
-      return lastResult
+      return lastResult;
     } else {
       lastResult = resultFn.apply(this, newArgs);
       calledOnce = true;
