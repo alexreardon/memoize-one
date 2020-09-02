@@ -32,17 +32,10 @@ function memoizeOne<
   return memoized as ResultFn;
 }
 
-function memoizeOneCount<
-  ResultFn extends (this: any, ...newArgs: any[]) => ReturnType<ResultFn>
->(resultFn: ResultFn, numberOfCalls: number, isEqual: EqualityFn = areInputsEqual): ResultFn {
-  
-  if(numberOfCalls <= 0) {
-    try {
-      throw new Error("Number of calls can't be less than one");
-    }
-    catch(e) {
-      console.log(e);
-    }
+function memoizeOneCount<ResultFn extends (this: any, ...newArgs: any[]) => ReturnType<ResultFn>>
+  (resultFn: ResultFn, numberOfCalls: number, isEqual: EqualityFn = areInputsEqual): ResultFn {
+  if (numberOfCalls <= 0) {
+    throw new Error("Number of calls can't be less than one");
   }
 
   let lastThis: unknown;
@@ -54,19 +47,15 @@ function memoizeOneCount<
   function memoized(this: unknown, ...newArgs: unknown[]): ReturnType<ResultFn> {
     if (calledOnce && lastThis === this && isEqual(newArgs, lastArgs)) {
       return lastResult;
-    }
-
-    else if(calledCount === numberOfCalls) {
+    } else if (calledCount === numberOfCalls) {
       return lastResult
-    }
-
-    else {
+    } else {
       lastResult = resultFn.apply(this, newArgs);
       calledOnce = true;
       lastThis = this;
       lastArgs = newArgs;
       calledCount++;
-      return lastResult
+      return lastResult;
     }
   }
 
