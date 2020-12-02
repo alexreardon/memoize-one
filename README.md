@@ -1,6 +1,8 @@
 # memoize-one
 
-A memoization library that only caches the result of the most recent arguments.
+A memoization library that only caches the result of the most recent arguments. 
+
+> Also [async version](https://github.com/microlinkhq/async-memoize-one).
 
 [![Build Status](https://travis-ci.org/alexreardon/memoize-one.svg?branch=master)](https://travis-ci.org/alexreardon/memoize-one)
 [![npm](https://img.shields.io/npm/v/memoize-one.svg)](https://www.npmjs.com/package/memoize-one)
