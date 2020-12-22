@@ -216,7 +216,7 @@ The comparisons are not exhaustive and are primarily to show that `memoize-one` 
 
 ## Code health 👍
 
-- Tested with all built in [JavaScript types](https://github.com/getify/You-Dont-Know-JS/blob/master/types%20%26%20grammar/ch1.md).
+- Tested with all built in [JavaScript types](https://github.com/getify/You-Dont-Know-JS/blob/1st-ed/types%20%26%20grammar/ch1.md).
 - 100% code coverage
 - [Continuous integration](https://travis-ci.org/alexreardon/memoize-one) to run tests and type checks.
 - Written in `Typescript`
