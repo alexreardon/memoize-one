@@ -10,10 +10,14 @@ export default function areInputsEqual(
   // https://github.com/alexreardon/memoize-one/pull/59
 
   for (let i = 0; i < newInputs.length; i++) {
-    // using shallow equality check
-    if (newInputs[i] !== lastInputs[i]) {
+    if (hasChanged(newInputs[i], lastInputs[i])) {
       return false;
     }
   }
   return true;
+}
+
+// compare whether a value has changed, accounting for NaN
+function hasChanged(newValue: unknown, oldValue: unknown) {
+  return newValue !== oldValue && (newValue === newValue || oldValue === oldValue);
 }

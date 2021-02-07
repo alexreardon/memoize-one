@@ -72,7 +72,7 @@ describe('standard behaviour - dynamic', () => {
   //    - null
   //    - undefined
   //    - boolean
-  //    - number
+  //    - number (+ additional case for `NaN`)
   //    - string
   //    - object
   //    - symbol
@@ -118,6 +118,17 @@ describe('standard behaviour - dynamic', () => {
       },
       second: {
         args: [1, 5],
+        result: 6,
+      },
+    },
+    {
+      name: 'NaN',
+      first: {
+        args: [NaN, 2],
+        result: 3,
+      },
+      second: {
+        args: [NaN, 5],
         result: 6,
       },
     },
@@ -173,7 +184,12 @@ describe('standard behaviour - dynamic', () => {
       return true;
     }
 
-    return array1.length === array2.length && array1.every((item, i) => array2[i] === item);
+    return (
+      array1.length === array2.length &&
+      array1.every(
+        (item, i) => array2[i] === item || (Number.isNaN(array2[i]) && Number.isNaN(item)),
+      )
+    );
   };
 
   inputs.forEach(({ name, first, second }) => {
