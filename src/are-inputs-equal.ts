@@ -18,6 +18,20 @@ export default function areInputsEqual(
 }
 
 // compare whether a value has changed, accounting for NaN
-function hasChanged(newValue: unknown, oldValue: unknown) {
-  return newValue !== oldValue && (newValue === newValue || oldValue === oldValue);
+function hasChanged(newValue: unknown, oldValue: unknown): boolean {
+  if (newValue === oldValue) {
+    return false;
+  }
+
+  // Special case for NaN. NaN is not === to NaN
+  if (isNaN(newValue) && isNaN(oldValue)) {
+    return false;
+  }
+
+  return true;
+}
+
+function isNaN(value: unknown) {
+  // check for NaN, by comparing value to itself.
+  return value !== value;
 }
