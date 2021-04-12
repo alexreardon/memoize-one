@@ -1,5 +1,4 @@
-// Cannot use Number.isNumber
-
+// Cannot use Number.isNumber as it is not supported in IE11
 function ourIsNaN(value: unknown): boolean {
   return typeof value === 'number' && value !== value;
 }
@@ -9,7 +8,7 @@ function hasChanged(first: unknown, second: unknown): boolean {
     return false;
   }
 
-  // Special case for NaN
+  // Special case for NaN (NaN !== NaN)
   if (ourIsNaN(first) && ourIsNaN(second)) {
     return false;
   }
