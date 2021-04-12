@@ -26,7 +26,6 @@ export default function areInputsEqual(
   }
   // Using for loop for speed. It generally performs better than array.every
   // https://github.com/alexreardon/memoize-one/pull/59
-
   for (let i = 0; i < newInputs.length; i++) {
     if (hasChanged(newInputs[i], lastInputs[i])) {
       return false;
