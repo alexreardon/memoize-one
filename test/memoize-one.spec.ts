@@ -122,6 +122,17 @@ describe('standard behaviour - dynamic', () => {
       },
     },
     {
+      name: 'number (NaN special case)',
+      first: {
+        args: [NaN, 2],
+        result: 3,
+      },
+      second: {
+        args: [NaN, 5],
+        result: 6,
+      },
+    },
+    {
       name: 'string',
       first: {
         args: ['hi', 'there'],
@@ -173,7 +184,18 @@ describe('standard behaviour - dynamic', () => {
       return true;
     }
 
-    return array1.length === array2.length && array1.every((item, i) => array2[i] === item);
+    return (
+      array1.length === array2.length &&
+      array1.every((item, i) => {
+        if (array2[i] === item) {
+          return true;
+        }
+        if (Number.isNaN(array2[i]) && Number.isNaN(item)) {
+          return true;
+        }
+        return false;
+      })
+    );
   };
 
   inputs.forEach(({ name, first, second }) => {

@@ -1,3 +1,22 @@
+// Cannot use Number.isNumber
+
+function ourIsNaN(value: unknown): boolean {
+  return typeof value === 'number' && value !== value;
+}
+
+function hasChanged(first: unknown, second: unknown): boolean {
+  if (first === second) {
+    return false;
+  }
+
+  // Special case for NaN
+  if (ourIsNaN(first) && ourIsNaN(second)) {
+    return false;
+  }
+
+  return true;
+}
+
 export default function areInputsEqual(
   newInputs: readonly unknown[],
   lastInputs: readonly unknown[],
@@ -10,8 +29,7 @@ export default function areInputsEqual(
   // https://github.com/alexreardon/memoize-one/pull/59
 
   for (let i = 0; i < newInputs.length; i++) {
-    // using shallow equality check
-    if (newInputs[i] !== lastInputs[i]) {
+    if (hasChanged(newInputs[i], lastInputs[i])) {
       return false;
     }
   }
