@@ -1,4 +1,5 @@
-// Cannot use Number.isNaN as it is not supported in IE11
+// Number.isNaN as it is not supported in IE11 so conditionally using ponyfill
+// Using Number.isNaN where possible as it is ~10% faster
 
 const ourIsNaN =
   Number.isNaN ||
