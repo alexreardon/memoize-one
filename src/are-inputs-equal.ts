@@ -1,7 +1,10 @@
-// Cannot use Number.isNumber as it is not supported in IE11
-function ourIsNaN(value: unknown): boolean {
-  return typeof value === 'number' && value !== value;
-}
+// Cannot use Number.isNaN as it is not supported in IE11
+
+const ourIsNaN =
+  Number.isNaN ||
+  function ponyfill(value: unknown): boolean {
+    return typeof value === 'number' && value !== value;
+  };
 
 function isEqual(first: unknown, second: unknown): boolean {
   if (first === second) {
