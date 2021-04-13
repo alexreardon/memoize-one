@@ -34,6 +34,8 @@ module.exports = {
     // Allowing ++ on numbers
     'no-plusplus': 'off',
 
+    'no-unused-vars': 'off',
+
     '@typescript-eslint/no-inferrable-types': 'off',
     '@typescript-eslint/ban-ts-ignore': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
