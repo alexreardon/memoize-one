@@ -1,7 +1,7 @@
 // Number.isNaN as it is not supported in IE11 so conditionally using ponyfill
 // Using Number.isNaN where possible as it is ~10% faster
 
-const ourIsNaN =
+const safeIsNaN =
   Number.isNaN ||
   function ponyfill(value: unknown): boolean {
     return typeof value === 'number' && value !== value;
@@ -13,7 +13,7 @@ function isEqual(first: unknown, second: unknown): boolean {
   }
 
   // Special case for NaN (NaN !== NaN)
-  if (ourIsNaN(first) && ourIsNaN(second)) {
+  if (safeIsNaN(first) && safeIsNaN(second)) {
     return true;
   }
 
