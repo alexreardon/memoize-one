@@ -66,14 +66,15 @@ By default, we apply our own _fast_ and _naive_ equality function to determine w
 (By default) function arguments are considered equal if:
 
 1. there is same amount of arguments
-2. new arguments have strict equality (`===`) with the previous argument
+2. each new argument has strict equality (`===`) with the previous argument
 3. **[special case]** if the arguments are not `===` and they are both `NaN` then the argument is treated as equal
 
-What these look like in practice:
+What this looks like in practice:
 
 ```js
 import { memoizeOne } from 'memoize-one';
 
+// add all numbers provided to the function
 const add = (...args = []) =>
   args.reduce((current, value) => {
     return current + value;
