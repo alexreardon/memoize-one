@@ -3,5 +3,6 @@ cache: yarn
 node_js:
   - '14.16.1'
 script:
-  - yarn run validate
-  - yarn run test
+  - yarn validate
+  - yarn test
+  - yarn test:size
