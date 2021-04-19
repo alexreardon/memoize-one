@@ -13,7 +13,7 @@ A memoization library that only caches the result of the most recent arguments.
 
 ## Rationale
 
-Unlike other memoization libraries, `memoize-one` only remembers the latest arguments and result. No need to worry about cache busting mechanisms such as `maxAge`, `maxSize`, `exclusions` and so on which can be prone to memory leaks. `memoize-one` simply remembers the last arguments, and if the function is next called with the same arguments then it returns the previous result.
+Unlike other memoization libraries, `memoize-one` only remembers the latest arguments and result. No need to worry about cache busting mechanisms such as `maxAge`, `maxSize`, `exclusions` and so on, which can weigh down your page and can be prone to memory leaks. `memoize-one` simply remembers the last arguments, and if the function is next called with the same arguments then it returns the previous result.
 
 ## Usage
 
@@ -40,7 +40,7 @@ memoizedAdd(1, 2); // 3
 // it is not the latest so the cached result is lost
 ```
 
-You can use the default export or a named import
+You can use the default import or a named import
 
 ```js
 // Named import
@@ -67,7 +67,7 @@ By default, we apply our own _fast_ and _naive_ equality function to determine w
 
 1. there is same amount of arguments
 2. each new argument has strict equality (`===`) with the previous argument
-3. **[special case]** if the arguments are not `===` and they are both `NaN` then the argument is treated as equal
+3. **[special case]** if two arguments are not `===` and they are both `NaN` then the two arguments are treated as equal
 
 What this looks like in practice:
 
@@ -98,7 +98,8 @@ memoizedAdd(1, 2);
 memoizedAdd(1, 2);
 // second argument has changed, so add function is called again
 memoizedAdd(1, 3);
-// the first value is not `===` to the previous first value (1 !== 3), so add function is called again
+// the first value is not `===` to the previous first value (1 !== 3)
+// so add function is called again
 memoizedAdd(3, 1);
 ```
 
@@ -154,7 +155,7 @@ const deepMemoized = memoizeOne(identity, isDeepEqual);
 const result1 = shallowMemoized({ foo: 'bar' });
 const result2 = shallowMemoized({ foo: 'bar' });
 
-result1 === result2; // false - difference reference
+result1 === result2; // false - different object reference
 
 const result3 = deepMemoized({ foo: 'bar' });
 const result4 = deepMemoized({ foo: 'bar' });
