@@ -1,6 +1,6 @@
 # memoize-one
 
-A memoization library that only caches the result of the most recent arguments. 
+A memoization library that only caches the result of the most recent arguments.
 
 > Also [async version](https://github.com/microlinkhq/async-memoize-one).
 
@@ -59,6 +59,57 @@ yarn add memoize-one
 npm install memoize-one --save
 ```
 
+## Function argument equality
+
+By default, we apply our own _fast_ and _naive_ equality function to determine whether the arguments provided to your function are equal. You can see the full code here: [are-inputs-equal.ts](https://github.com/alexreardon/memoize-one/blob/master/src/are-inputs-equal.ts).
+
+(By default) function arguments are considered equal if:
+
+1. there is same amount of arguments
+2. each new argument has strict equality (`===`) with the previous argument
+3. **[special case]** if the arguments are not `===` and they are both `NaN` then the argument is treated as equal
+
+What this looks like in practice:
+
+```js
+import { memoizeOne } from 'memoize-one';
+
+// add all numbers provided to the function
+const add = (...args = []) =>
+  args.reduce((current, value) => {
+    return current + value;
+  }, 0);
+const memoizedAdd = memoizeOne(add);
+```
+
+> 1. there is same amount of arguments
+
+```js
+memoizedAdd(1, 2);
+// the amount of arguments has changed, so underlying add function is called
+memoizedAdd(1, 2, 3);
+```
+
+> 2. new arguments have strict equality (`===`) with the previous argument
+
+```js
+memoizedAdd(1, 2);
+// each argument is `===` to the last argument, so cache is used
+memoizedAdd(1, 2);
+// second argument has changed, so add function is called again
+memoizedAdd(1, 3);
+// the first value is not `===` to the previous first value (1 !== 3), so add function is called again
+memoizedAdd(3, 1);
+```
+
+> 3. **[special case]** if the arguments are not `===` and they are both `NaN` then the argument is treated as equal
+
+```js
+memoizedAdd(NaN);
+// Even though NaN !== NaN these arguments are treated as equal
+memoizedAdd(NaN);
+```
+
 ## Custom equality function
 
 You can also pass in a custom function for checking the equality of two sets of arguments
@@ -83,8 +134,6 @@ import type { EqualityFn } from 'memoize-one';
 
 An equality function should return `true` if the arguments are equal. If `true` is returned then the wrapped function will not be called.
 
-The default equality function is a shallow equal check of all arguments (each argument is compared with `===`). If the `length` of arguments change, then the default equality function makes no shallow equality checks. You are welcome to decide if you want to return `false` if the `length` of the arguments is not equal
-
 A custom equality function needs to compare `Arrays`. The `newArgs` array will be a new reference every time so a simple `newArgs === lastArgs` will always return `false`.
 
 Equality functions are not called if the `this` context of the function has changed (see below).
@@ -97,7 +146,7 @@ Here is an example that uses a [dequal](https://github.com/lukeed/dequal) deep e
 import memoizeOne from 'memoize-one';
 import { dequal as isDeepEqual } from 'dequal';
 
-const identity = x => x;
+const identity = (x) => x;
 
 const shallowMemoized = memoizeOne(identity);
 const deepMemoized = memoizeOne(identity, isDeepEqual);

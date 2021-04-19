@@ -4,6 +4,8 @@ const Benchmark = require('benchmark');
 
 const suite = new Benchmark.Suite();
 
+import areInputsEqual from '../src/are-inputs-equal';
+
 function shallowEvery(a, b): boolean {
   if (a.length !== b.length) {
     return false;
@@ -45,6 +47,14 @@ suite.add('shallowEvery with half-identical lists', () => {
 
 suite.add('shallowFor with half-identical lists', () => {
   shallowFor(listA, listB);
+});
+
+suite.add('our areInputsEqual with identical lists', () => {
+  areInputsEqual(listA, listA);
+});
+
+suite.add('our areInputsEqual with half-identical lists', () => {
+  areInputsEqual(listA, listB);
 });
 
 // eslint-disable-next-line no-console
