@@ -6,9 +6,3 @@ declare export default function memoizeOne<ResultFn: (...any[]) => mixed>(
   fn: ResultFn,
   isEqual?: EqualityFn,
 ): ResultFn;
-
-// named export
-declare export function memoizeOne<ResultFn: (...any[]) => mixed>(
-  fn: ResultFn,
-  isEqual?: EqualityFn,
-): ResultFn;

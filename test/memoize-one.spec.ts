@@ -1,4 +1,4 @@
-import { memoizeOne as memoize, EqualityFn } from '../src/memoize-one';
+import memoize, { EqualityFn } from '../src/memoize-one';
 import isDeepEqual from 'lodash.isequal';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 

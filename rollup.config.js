@@ -50,6 +50,7 @@ export default [
     output: {
       file: 'dist/memoize-one.cjs.js',
       format: 'cjs',
+      exports: 'default',
     },
     plugins: [typescript()],
   },
