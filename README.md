@@ -18,6 +18,7 @@ Unlike other memoization libraries, `memoize-one` only remembers the latest argu
 ## Usage
 
 ```js
+// memoize-one uses the default import
 import memoizeOne from 'memoize-one';
 
 const add = (a, b) => a + b;
@@ -38,12 +39,6 @@ memoizedAdd(1, 2); // 3
 // Add function is called to get new value.
 // While this was previously cached,
 // it is not the latest so the cached result is lost
-```
-
-You can use the default import of `'memoize-one'`
-
-```js
-import memoizeOne from 'memoize-one';
 ```
 
 ## Installation
