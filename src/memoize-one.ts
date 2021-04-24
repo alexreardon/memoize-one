@@ -34,7 +34,7 @@ function memoizeOne<
 
 // default export
 export default memoizeOne;
-// named export
+
 // disabled for now as mixing named and
 // default exports is problematic with CommonJS
 // export { memoizeOne };
