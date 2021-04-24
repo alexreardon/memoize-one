@@ -1,6 +1,6 @@
 {
   "name": "memoize-one",
-  "version": "5.2.0",
+  "version": "5.2.1",
   "description": "A memoization library which only remembers the latest invocation",
   "main": "dist/memoize-one.cjs.js",
   "types": "dist/memoize-one.d.ts",
