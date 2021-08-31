@@ -19,12 +19,11 @@ function memoizeOne<TFunc extends (this: any, ...newArgs: any[]) => any>(
   resultFn: TFunc,
   isEqual: EqualityFn = areInputsEqual,
 ): MemoizedFn<TFunc> {
-  let map = new WeakMap<Record<string, any>, Cache<ReturnType<TFunc>>>();
-  let key = {};
+  const map = new Map<'cache', Cache<ReturnType<TFunc>>>();
 
   // breaking cache when context (this) or arguments change
   function memoized(this: unknown, ...newArgs: unknown[]): ReturnType<TFunc> {
-    const cache = map.get(key);
+    const cache = map.get('cache');
     if (cache) {
       // Okay, we have something in the cache.
       // is this cache still valid?
@@ -37,7 +36,7 @@ function memoizeOne<TFunc extends (this: any, ...newArgs: any[]) => any>(
     // Or our parameters have changed.
 
     const lastResult = resultFn.apply(this, newArgs);
-    map.set(key, {
+    map.set('cache', {
       lastResult,
       lastArgs: newArgs,
       lastThis: this,
@@ -51,10 +50,7 @@ function memoizeOne<TFunc extends (this: any, ...newArgs: any[]) => any>(
 
   // Adding the ability to clear the cache of a memoized function
   memoized.clear = function clear() {
-    // standard way to clear a weakmap is to create another one
-    // as there is no 'clear' method for security reasons
-    key = {};
-    map = new WeakMap<Cache<ReturnType<TFunc>>>();
+    map.delete('cache');
   };
 
   return memoized;
