@@ -3,21 +3,11 @@ import areInputsEqual from './are-inputs-equal';
 // Using ReadonlyArray<T> rather than readonly T as it works with TS v3
 export type EqualityFn = (newArgs: any[], lastArgs: any[]) => boolean;
 
-type State<TResult> = {
+type Cache<TResult> = {
   lastThis: unknown;
   lastArgs: unknown[];
-  lastResult: TResult | undefined;
-  calledOnce: boolean;
+  lastResult: TResult;
 };
-
-function getInitialState<TResult>(): State<TResult> {
-  return {
-    lastThis: undefined,
-    lastArgs: [],
-    lastResult: undefined,
-    calledOnce: false,
-  };
-}
 
 type MemoizedFn<T extends (this: any, ...args: any[]) => any> = {
   name: string;
@@ -25,39 +15,46 @@ type MemoizedFn<T extends (this: any, ...args: any[]) => any> = {
   (...args: Parameters<T>): ReturnType<T>;
 };
 
-function memoizeOne<
-  // Need to use 'any' rather than 'unknown' here as it has
-  // The correct Generic narrowing behaviour.
-  TFunc extends (this: any, ...newArgs: any[]) => any
->(resultFn: TFunc, isEqual: EqualityFn = areInputsEqual): MemoizedFn<TFunc> {
-  let state: State<ReturnType<TFunc>> = getInitialState();
+function memoizeOne<TFunc extends (this: any, ...newArgs: any[]) => any>(
+  resultFn: TFunc,
+  isEqual: EqualityFn = areInputsEqual,
+): MemoizedFn<TFunc> {
+  let map = new WeakMap<Record<string, any>, Cache<ReturnType<TFunc>>>();
+  let key = {};
 
   // breaking cache when context (this) or arguments change
   function memoized(this: unknown, ...newArgs: unknown[]): ReturnType<TFunc> {
-    const { lastThis, lastArgs, lastResult, calledOnce } = state;
-    if (calledOnce && lastThis === this && isEqual(newArgs, lastArgs)) {
-      return lastResult as ReturnType<TFunc>;
+    const cache = map.get(key);
+    if (cache) {
+      // Okay, we have something in the cache.
+      // is this cache still valid?
+      if (cache.lastThis === this && isEqual(newArgs, cache.lastArgs)) {
+        return cache.lastResult;
+      }
     }
 
-    // Throwing during an assignment aborts the assignment: https://codepen.io/alexreardon/pen/RYKoaz
-    // Doing the lastResult assignment first so that if it throws
-    // nothing will be overwritten
-    state = {
-      lastResult: resultFn.apply(this, newArgs),
-      calledOnce: true,
-      lastThis: this,
-      lastArgs: newArgs,
-    };
+    // At this point, either we have nothing in the cache;
+    // Or our parameters have changed.
 
-    return state.lastResult as ReturnType<TFunc>;
+    const lastResult = resultFn.apply(this, newArgs);
+    map.set(key, {
+      lastResult,
+      lastArgs: newArgs,
+      lastThis: this,
+    });
+
+    return lastResult;
   }
 
   // Giving the function a better name for devtools
-  memoized.name = `memoized(${resultFn.name})`;
+  Object.defineProperty(memoized, 'name', { value: `memoized(${resultFn.name})`, writable: false });
 
   // Adding the ability to clear the cache of a memoized function
   memoized.clear = function clear() {
-    state = getInitialState();
+    // standard way to clear a weakmap is to create another one
+    // as there is no 'clear' method for security reasons
+    key = {};
+    map = new WeakMap<Cache<ReturnType<TFunc>>>();
   };
 
   return memoized;
