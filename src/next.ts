@@ -46,7 +46,14 @@ function memoizeOne<TFunc extends (this: any, ...newArgs: any[]) => any>(
   }
 
   // Giving the function a better name for devtools
-  Object.defineProperty(memoized, 'name', { value: `memoized(${resultFn.name})`, writable: true });
+  Object.defineProperty(memoized, 'name', {
+    value: `memoized(${resultFn.name})`,
+    // fn.name is configurable, so maintaining that.
+    configurable: true,
+    // Using the default values:
+    // enumerable: false,
+    // writable: false,
+  });
 
   // Adding the ability to clear the cache of a memoized function
   memoized.clear = function clear() {
