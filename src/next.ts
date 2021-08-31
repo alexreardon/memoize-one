@@ -19,11 +19,10 @@ function memoizeOne<TFunc extends (this: any, ...newArgs: any[]) => any>(
   resultFn: TFunc,
   isEqual: EqualityFn = areInputsEqual,
 ): MemoizedFn<TFunc> {
-  const map = new Map<'cache', Cache<ReturnType<TFunc>>>();
+  let cache: Cache<ReturnType<TFunc>> | null = null;
 
   // breaking cache when context (this) or arguments change
   function memoized(this: unknown, ...newArgs: unknown[]): ReturnType<TFunc> {
-    const cache = map.get('cache');
     if (cache && cache.lastThis === this && isEqual(newArgs, cache.lastArgs)) {
       return cache.lastResult;
     }
@@ -32,11 +31,11 @@ function memoizeOne<TFunc extends (this: any, ...newArgs: any[]) => any>(
     // Doing the lastResult assignment first so that if it throws
     // nothing will be overwritten
     const lastResult = resultFn.apply(this, newArgs);
-    map.set('cache', {
+    cache = {
       lastResult,
       lastArgs: newArgs,
       lastThis: this,
-    });
+    };
 
     return lastResult;
   }
@@ -53,7 +52,7 @@ function memoizeOne<TFunc extends (this: any, ...newArgs: any[]) => any>(
 
   // Adding the ability to clear the cache of a memoized function
   memoized.clear = function clear() {
-    map.delete('cache');
+    cache = null;
   };
 
   return memoized;
