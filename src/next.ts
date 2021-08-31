@@ -43,7 +43,7 @@ function memoizeOne<TFunc extends (this: any, ...newArgs: any[]) => any>(
 
   // Giving the function a better name for devtools
   Object.defineProperty(memoized, 'name', {
-    value: `memoized(${resultFn.name})`,
+    value: `memoized(${resultFn.name || 'anonymous'})`,
     // fn.name is configurable, so maintaining that.
     configurable: true,
     // Using the default values:
