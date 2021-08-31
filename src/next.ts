@@ -24,17 +24,13 @@ function memoizeOne<TFunc extends (this: any, ...newArgs: any[]) => any>(
   // breaking cache when context (this) or arguments change
   function memoized(this: unknown, ...newArgs: unknown[]): ReturnType<TFunc> {
     const cache = map.get('cache');
-    if (cache) {
-      // Okay, we have something in the cache.
-      // is this cache still valid?
-      if (cache.lastThis === this && isEqual(newArgs, cache.lastArgs)) {
-        return cache.lastResult;
-      }
+    if (cache && cache.lastThis === this && isEqual(newArgs, cache.lastArgs)) {
+      return cache.lastResult;
     }
 
-    // At this point, either we have nothing in the cache;
-    // Or our parameters have changed.
-
+    // Throwing during an assignment aborts the assignment: https://codepen.io/alexreardon/pen/RYKoaz
+    // Doing the lastResult assignment first so that if it throws
+    // nothing will be overwritten
     const lastResult = resultFn.apply(this, newArgs);
     map.set('cache', {
       lastResult,
