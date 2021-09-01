@@ -6,10 +6,10 @@ export type EqualityFn<TFunc extends (...args: any[]) => any> = (
   lastArgs: Parameters<TFunc>,
 ) => boolean;
 
-type Cache<TThis, TArgs, TResult> = {
-  lastThis: TThis;
-  lastArgs: TArgs;
-  lastResult: TResult;
+type Cache<TFunc extends (this: any, ...args: any[]) => any> = {
+  lastThis: ThisParameterType<TFunc>;
+  lastArgs: Parameters<TFunc>;
+  lastResult: ReturnType<TFunc>;
 };
 
 type MemoizedFn<TFunc extends (this: any, ...args: any[]) => any> = {
@@ -21,7 +21,7 @@ function memoizeOne<TFunc extends (this: any, ...newArgs: any[]) => any>(
   resultFn: TFunc,
   isEqual: EqualityFn<TFunc> = areInputsEqual,
 ): MemoizedFn<TFunc> {
-  let cache: Cache<ThisParameterType<TFunc>, Parameters<TFunc>, ReturnType<TFunc>> | null = null;
+  let cache: Cache<TFunc> | null = null;
 
   // breaking cache when context (this) or arguments change
   function memoized(
