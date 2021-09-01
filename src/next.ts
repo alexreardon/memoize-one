@@ -1,27 +1,30 @@
 import areInputsEqual from './are-inputs-equal';
 
 // Using ReadonlyArray<T> rather than readonly T as it works with TS v3
-export type EqualityFn = (newArgs: any[], lastArgs: any[]) => boolean;
+export type EqualityFn<TFunc extends (...args: any[]) => any> = (
+  newArgs: Parameters<TFunc>,
+  lastArgs: Parameters<TFunc>,
+) => boolean;
 
-type Cache<TResult> = {
+type Cache<TResult, TArgs> = {
   lastThis: unknown;
-  lastArgs: unknown[];
+  lastArgs: TArgs;
   lastResult: TResult;
 };
 
-type MemoizedFn<T extends (this: any, ...args: any[]) => any> = {
+type MemoizedFn<TFunc extends (this: any, ...args: any[]) => any> = {
   clear: () => void;
-  (...args: Parameters<T>): ReturnType<T>;
+  (...args: Parameters<TFunc>): ReturnType<TFunc>;
 };
 
 function memoizeOne<TFunc extends (this: any, ...newArgs: any[]) => any>(
   resultFn: TFunc,
-  isEqual: EqualityFn = areInputsEqual,
+  isEqual: EqualityFn<TFunc> = areInputsEqual,
 ): MemoizedFn<TFunc> {
-  let cache: Cache<ReturnType<TFunc>> | null = null;
+  let cache: Cache<ReturnType<TFunc>, Parameters<TFunc>> | null = null;
 
   // breaking cache when context (this) or arguments change
-  function memoized(this: unknown, ...newArgs: unknown[]): ReturnType<TFunc> {
+  function memoized(this: unknown, ...newArgs: Parameters<TFunc>): ReturnType<TFunc> {
     if (cache && cache.lastThis === this && isEqual(newArgs, cache.lastArgs)) {
       return cache.lastResult;
     }
