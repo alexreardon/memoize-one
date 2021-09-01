@@ -1,7 +1,5 @@
 // TODO: import and test both
-import memoize, { EqualityFn } from '../src/next';
-import isDeepEqual from 'lodash.isequal';
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import { memoizeOne as memoize } from '../src/next';
 
 it('should give the memoized function a helpful name (named fn)', () => {
   function add(...args: number[]) {

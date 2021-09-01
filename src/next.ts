@@ -14,7 +14,7 @@ type Cache<TThis, TArgs, TResult> = {
 
 type MemoizedFn<TFunc extends (this: any, ...args: any[]) => any> = {
   clear: () => void;
-  (...args: Parameters<TFunc>): ReturnType<TFunc>;
+  (this: ThisParameterType<TFunc>, ...args: Parameters<TFunc>): ReturnType<TFunc>;
 };
 
 function memoizeOne<TFunc extends (this: any, ...newArgs: any[]) => any>(
@@ -63,5 +63,4 @@ function memoizeOne<TFunc extends (this: any, ...newArgs: any[]) => any>(
   return memoized;
 }
 
-// default export
-export default memoizeOne;
+export { memoizeOne };
