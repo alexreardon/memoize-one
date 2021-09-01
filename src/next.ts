@@ -10,7 +10,6 @@ type Cache<TResult> = {
 };
 
 type MemoizedFn<T extends (this: any, ...args: any[]) => any> = {
-  name: string;
   clear: () => void;
   (...args: Parameters<T>): ReturnType<T>;
 };
