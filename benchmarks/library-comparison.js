@@ -1,17 +1,11 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable no-console */
 import benchmark from 'benchmark';
-import memoizeOne from '../src/memoize-one';
+import memoizeOne from '../dist/memoize-one.esm.js';
 import lodash from 'lodash.memoize';
 import fastMemoize from 'fast-memoize';
-// import mem from 'mem';
+import mem from 'mem';
 
-type Library = {
-  name: string;
-  memoize: (fn: (...args: any[]) => unknown) => (...args: any[]) => unknown;
-};
-
-const libraries: Library[] = [
+const libraries = [
   {
     name: 'no memoization',
     memoize: (fn) => fn,
@@ -28,13 +22,11 @@ const libraries: Library[] = [
     name: 'fast-memoize',
     memoize: fastMemoize,
   },
+  {
+    name: 'mem',
+    memoize: mem,
+  },
 ];
-
-type UseCase = {
-  name: string;
-  baseFn: (...args: any[]) => unknown;
-  args: unknown[];
-};
 
 function slowFn() {
   for (let i = 0; i < 2000; i++) {
@@ -42,7 +34,7 @@ function slowFn() {
   }
 }
 
-const cases: UseCase[] = [
+const cases = [
   {
     name: 'no arguments',
     baseFn: slowFn,
@@ -50,22 +42,34 @@ const cases: UseCase[] = [
   },
   {
     name: 'single primitive argument',
-    baseFn: slowFn,
+    baseFn: function add1(value) {
+      slowFn();
+      return value + 1;
+    },
     args: [2],
   },
   {
     name: 'single complex argument',
-    baseFn: slowFn,
+    baseFn: function identity(value) {
+      slowFn();
+      return value;
+    },
     args: [{ hello: 'world' }],
   },
   {
     name: 'multiple primitive arguments',
-    baseFn: slowFn,
+    baseFn: function asArray(...values) {
+      slowFn();
+      return values;
+    },
     args: [1, 'hello', true],
   },
   {
     name: 'multiple complex arguments',
-    baseFn: slowFn,
+    baseFn: function asArray(...values) {
+      slowFn();
+      return values;
+    },
     args: [() => {}, { hello: { there: 'world' } }, [1, 2, 3]],
   },
 ];
@@ -84,7 +88,7 @@ cases.forEach((useCase) => {
   });
 
   suite.on('start', () => console.log(`Use case: [${useCase.name}]`));
-  suite.on('cycle', (e: any) => console.log(String(e.target)));
+  suite.on('cycle', (e) => console.log(String(e.target)));
   // suite.on('finish', () => console.log('\n\r'));
   suite.run();
 });
