@@ -43,6 +43,7 @@
   "dependencies": {},
   "devDependencies": {
     "@size-limit/preset-small-lib": "^5.0.4",
+    "@types/benchmark": "^2.1.1",
     "@types/jest": "^27.0.2",
     "@types/lodash.isequal": "^4.5.5",
     "@types/node": "^16.10.1",
