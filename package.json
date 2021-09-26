@@ -63,6 +63,8 @@
     "lodash.isequal": "^4.5.0",
     "lodash.memoize": "^4.1.2",
     "mem": "^9.0.1",
+    "nanocolors": "^0.2.9",
+    "ora": "^6.0.1",
     "prettier": "2.4.1",
     "rimraf": "3.0.2",
     "rollup": "^2.57.0",
