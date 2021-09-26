@@ -1,12 +1,12 @@
 import { expectTypeOf } from 'expect-type';
-import { memoizeOne } from '../src/next';
+import memoize from '../src/memoize-one';
 
 it('should maintain the types of the original function', () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   function getLocation(this: Window, value: number) {
     return this.location;
   }
-  const memoized = memoizeOne(getLocation);
+  const memoized = memoize(getLocation);
 
   expectTypeOf<ThisParameterType<typeof getLocation>>().toEqualTypeOf<
     ThisParameterType<typeof memoized>
@@ -19,7 +19,7 @@ it('should add a .clear function', () => {
   function add(first: number, second: number) {
     return first + second;
   }
-  const memoized = memoizeOne(add);
+  const memoized = memoize(add);
   memoized.clear();
 
   // @ts-expect-error
