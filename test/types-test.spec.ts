@@ -15,7 +15,7 @@ it('should maintain the types of the original function', () => {
   expectTypeOf<ReturnType<typeof getLocation>>().toEqualTypeOf<ReturnType<typeof memoized>>();
 });
 
-it('should add a .clear function', () => {
+it('should add a .clear function property', () => {
   function add(first: number, second: number) {
     return first + second;
   }
