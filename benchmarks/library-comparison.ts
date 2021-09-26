@@ -1,20 +1,25 @@
 import benchmark from 'benchmark';
-import memoize from '../src/memoize-one';
+import memoizeOne from '../src/memoize-one';
+import lodash from 'lodash.memoize';
 
 const suite = new benchmark.Suite();
 
-function baseline() {
-  for (var i = 0; i < 2000; i++) {
+function slowFn() {
+  for (let i = 0; i < 2000; i++) {
     void undefined;
   }
 }
 
 suite.add('no memoization', {
-  fn: baseline,
+  fn: slowFn,
 });
 
 suite.add('memoize-one', {
-  fn: memoize(baseline),
+  fn: memoizeOne(slowFn),
+});
+
+suite.add('lodash.memoize', {
+  fn: lodash(slowFn),
 });
 
 suite.on('cycle', (e: any) => console.log(String(e.target)));
