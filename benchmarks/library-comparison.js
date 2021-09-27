@@ -43,7 +43,11 @@ const libraries = [
 ];
 
 function slowFn() {
-  for (let i = 0; i < 2000; i++) {}
+  // Burn CPU for 2ms
+  const start = Date.now();
+  while (Date.now() - start < 2) {
+    void undefined;
+  }
 }
 
 const scenarios = [
