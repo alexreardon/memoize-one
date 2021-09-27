@@ -5,6 +5,8 @@ import lodash from 'lodash.memoize';
 import fastMemoize from 'fast-memoize';
 import mem from 'mem';
 import ora from 'ora';
+import moize from 'moize';
+import memoizee from 'memoizee';
 import { green, bold } from 'nanocolors';
 import Table from 'cli-table';
 
@@ -26,28 +28,23 @@ const libraries = [
     memoize: fastMemoize,
   },
   {
-    name: 'mem',
-    memoize: mem,
+    name: 'moize',
+    memoize: moize,
+  },
+  {
+    name: 'memoizee',
+    memoize: memoizee,
+  },
+  {
+    name: 'mem (JSON.stringify strategy)',
+    // mem supports lots of strategies, choosing a 'fair' one for lots of operations
+    memoize: (fn) => mem(fn, { cacheKey: JSON.stringify }),
   },
 ];
 
 function slowFn() {
   for (let i = 0; i < 2000; i++) {}
 }
-
-// const first: Scenario<void> = {
-//   name: 'no arguments',
-//   baseFn: slowFn,
-//   args: [],
-// };
-// const second: Scenario<number> = {
-//   name: 'single primitive argument',
-//   baseFn: function add1(value) {
-//     slowFn();
-//     return value + 1;
-//   },
-//   args: [2],
-// };
 
 const scenarios = [
   {
@@ -73,17 +70,25 @@ const scenarios = [
   },
   {
     name: 'multiple primitive arguments',
-    baseFn: function asArray(...values) {
+    baseFn: function asArray(a, b, c) {
       slowFn();
-      return values;
+      return [a, b, c];
     },
     args: [1, 'hello', true],
   },
   {
     name: 'multiple complex arguments',
+    baseFn: function asArray(a, b, c) {
+      slowFn();
+      return [a, b, c];
+    },
+    args: [() => {}, { hello: { there: 'world' } }, [1, 2, 3]],
+  },
+  {
+    name: 'multiple complex arguments (spreading arguments)',
     baseFn: function asArray(...values) {
       slowFn();
-      return values;
+      return [...values];
     },
     args: [() => {}, { hello: { there: 'world' } }, [1, 2, 3]],
   },

@@ -64,6 +64,8 @@
     "lodash.isequal": "^4.5.0",
     "lodash.memoize": "^4.1.2",
     "mem": "^9.0.1",
+    "memoizee": "^0.4.15",
+    "moize": "^6.1.0",
     "nanocolors": "^0.2.9",
     "ora": "^6.0.1",
     "prettier": "2.4.1",
