@@ -84,21 +84,19 @@
     "prettier_target": "src/**/*.{ts,js,jsx,md,json} test/**/*.{ts,js,jsx,md,json}"
   },
   "scripts": {
-    "validate": "yarn lint && yarn typecheck",
+    "validate": "yarn prettier:check && yarn eslint:check && yarn typescript:check",
     "test": "yarn jest",
     "test:size": "yarn build && size-limit",
-    "typecheck": "yarn tsc --noEmit",
+    "typescript:check": "yarn tsc --noEmit",
     "prettier:check": "yarn prettier --debug-check $npm_package_config_prettier_target",
     "prettier:write": "yarn prettier --write $npm_package_config_prettier_target",
-    "lint:eslint": "eslint $npm_package_config_prettier_target",
-    "lint": "yarn lint:eslint && yarn prettier:check",
     "build": "yarn build:clean && yarn build:dist && yarn build:typescript && yarn build:flow",
     "build:clean": "rimraf dist",
     "build:dist": "rollup -c",
     "build:typescript": "tsc ./src/memoize-one.ts --emitDeclarationOnly --declaration --outDir ./dist",
     "build:flow": "cp src/memoize-one.js.flow dist/memoize-one.cjs.js.flow",
     "perf": "ts-node ./benchmarks/shallow-equal.ts",
-    "perf:library-comparison": "yarn tsc ./benchmarks/library-comparison.ts --esModuleInterop --module ESNext && node ./benchmarks/library-comparison.js",
+    "perf:library-comparison": "yarn build && node ./benchmarks/library-comparison.js",
     "prepublishOnly": "yarn build"
   }
 }
