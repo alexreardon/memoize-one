@@ -95,6 +95,7 @@
     "build:typescript": "tsc ./src/memoize-one.ts --emitDeclarationOnly --declaration --outDir ./dist",
     "build:flow": "cp src/memoize-one.js.flow dist/memoize-one.cjs.js.flow",
     "perf": "ts-node ./benchmarks/shallow-equal.ts",
+    "perf:library-comparison": "yarn tsc ./benchmarks/library-comparison.ts --esModuleInterop --module ESNext && node ./benchmarks/library-comparison.js",
     "prepublishOnly": "yarn build"
   }
 }
