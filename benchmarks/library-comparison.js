@@ -98,11 +98,11 @@ const scenarios = [
   },
 ];
 
-scenarios.forEach((useCase) => {
-  const suite = new Benchmark.Suite(useCase.name);
+scenarios.forEach((scenario) => {
+  const suite = new Benchmark.Suite(scenario.name);
 
   libraries.forEach(function callback(library) {
-    const memoized = library.memoize(useCase.baseFn);
+    const memoized = library.memoize(scenario.baseFn);
     const spinner = ora({
       text: library.name,
       spinner: {
@@ -113,14 +113,14 @@ scenarios.forEach((useCase) => {
     // Add a benchmark
     suite.add({
       name: library.name,
-      fn: () => memoized(...useCase.args),
+      fn: () => memoized(...scenario.args),
       onStart: () => spinner.start(),
       onComplete: () => spinner.succeed(),
     });
   });
 
   suite.on('start', () => {
-    console.log(`${bold('Scenario')}: ${green(useCase.name)}`);
+    console.log(`${bold('Scenario')}: ${green(scenario.name)}`);
   });
   // suite.on('cycle', (e) => console.log(String(e.target)));
   suite.on('complete', (event) => {
