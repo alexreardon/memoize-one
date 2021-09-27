@@ -1,17 +1,14 @@
 /* eslint-disable no-console */
-import benchmark from 'benchmark';
-import memoizeOne from '../dist/memoize-one.esm';
+import Benchmark from 'benchmark';
+import memoizeOne from '../dist/memoize-one.esm.js';
 import lodash from 'lodash.memoize';
 import fastMemoize from 'fast-memoize';
 import mem from 'mem';
 import ora from 'ora';
 import { green, bold } from 'nanocolors';
+import Table from 'cli-table';
 
-type Library = {
-  name: string;
-  memoize: (fn: (...args: any[]) => unknown) => (...args: any[]) => unknown;
-};
-const libraries: Library[] = [
+const libraries = [
   {
     name: 'no memoization',
     memoize: (fn) => fn,
@@ -34,15 +31,9 @@ const libraries: Library[] = [
   },
 ];
 
-function slowFn(): void {
+function slowFn() {
   for (let i = 0; i < 2000; i++) {}
 }
-
-type Scenario<TArgs> = {
-  name: string;
-  baseFn: (...args: TArgs[]) => unknown;
-  args: TArgs[];
-};
 
 // const first: Scenario<void> = {
 //   name: 'no arguments',
@@ -58,48 +49,48 @@ type Scenario<TArgs> = {
 //   args: [2],
 // };
 
-const scenarios: Scenario[] = [
+const scenarios = [
   {
     name: 'no arguments',
     baseFn: slowFn,
     args: [],
   },
-  // {
-  //   name: 'single primitive argument',
-  //   baseFn: function add1(value) {
-  //     slowFn();
-  //     return value + 1;
-  //   },
-  //   args: [2],
-  // },
-  // {
-  //   name: 'single complex argument',
-  //   baseFn: function identity(value) {
-  //     slowFn();
-  //     return value;
-  //   },
-  //   args: [{ hello: 'world' }],
-  // },
-  // {
-  //   name: 'multiple primitive arguments',
-  //   baseFn: function asArray(...values) {
-  //     slowFn();
-  //     return values;
-  //   },
-  //   args: [1, 'hello', true],
-  // },
-  // {
-  //   name: 'multiple complex arguments',
-  //   baseFn: function asArray(...values) {
-  //     slowFn();
-  //     return values;
-  //   },
-  //   args: [() => {}, { hello: { there: 'world' } }, [1, 2, 3]],
-  // },
+  {
+    name: 'single primitive argument',
+    baseFn: function add1(value) {
+      slowFn();
+      return value + 1;
+    },
+    args: [2],
+  },
+  {
+    name: 'single complex argument',
+    baseFn: function identity(value) {
+      slowFn();
+      return value;
+    },
+    args: [{ hello: 'world' }],
+  },
+  {
+    name: 'multiple primitive arguments',
+    baseFn: function asArray(...values) {
+      slowFn();
+      return values;
+    },
+    args: [1, 'hello', true],
+  },
+  {
+    name: 'multiple complex arguments',
+    baseFn: function asArray(...values) {
+      slowFn();
+      return values;
+    },
+    args: [() => {}, { hello: { there: 'world' } }, [1, 2, 3]],
+  },
 ];
 
 scenarios.forEach((useCase) => {
-  const suite = new benchmark.Suite(useCase.name);
+  const suite = new Benchmark.Suite(useCase.name);
 
   libraries.forEach(function callback(library) {
     const memoized = library.memoize(useCase.baseFn);
@@ -123,13 +114,24 @@ scenarios.forEach((useCase) => {
     console.log(`${bold('Scenario')}: ${green(useCase.name)}`);
   });
   // suite.on('cycle', (e) => console.log(String(e.target)));
-  suite.on('complete', (event: any) => {
-    const map = event.target;
-    const benchmarks = Object.values(map);
-    // benchmarks.sort((a, b) => {
-    //   return a.hz > b.hz;
-    // });
-    // console.log(benchmarks);
+  suite.on('complete', (event) => {
+    const benchmarks = Object.values(event.currentTarget).filter(
+      (item) => item instanceof Benchmark,
+    );
+    const rows = benchmarks
+      // bigger score goes first
+      .sort((a, b) => {
+        return b.hz - a.hz;
+      })
+      .map((benchmark, index) => {
+        return [index + 1, benchmark.name, Math.round(benchmark.hz).toLocaleString()];
+      });
+
+    const table = new Table({
+      head: ['Position', 'Library', 'Operations per second'],
+    });
+    table.push(...rows);
+    console.log(table.toString());
   });
   suite.run();
 });
