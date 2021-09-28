@@ -8,7 +8,6 @@
   "sideEffects": false,
   "author": "Alex Reardon <alexreardon@gmail.com>",
   "license": "MIT",
-  "type": "module",
   "repository": {
     "type": "git",
     "url": "https://github.com/alexreardon/memoize-one.git"
@@ -20,19 +19,19 @@
   "size-limit": [
     {
       "path": "dist/memoize-one.min.js",
-      "limit": "214B"
+      "limit": "234B"
     },
     {
       "path": "dist/memoize-one.js",
-      "limit": "216B"
+      "limit": "234B"
     },
     {
       "path": "dist/memoize-one.cjs.js",
-      "limit": "213B"
+      "limit": "230B"
     },
     {
       "path": "dist/memoize-one.esm.js",
-      "limit": "218B"
+      "limit": "246B"
     }
   ],
   "keywords": [
@@ -86,17 +85,17 @@
   "scripts": {
     "validate": "yarn prettier:check && yarn eslint:check && yarn typescript:check",
     "test": "yarn jest",
-    "test:size": "yarn build && size-limit",
-    "typescript:check": "tsc --noEmit",
-    "prettier:check": "prettier --debug-check $npm_package_config_prettier_target",
-    "prettier:write": "prettier --write $npm_package_config_prettier_target",
+    "test:size": "yarn build && yarn size-limit",
+    "typescript:check": "yarn tsc --noEmit",
+    "prettier:check": "yarn prettier --debug-check $npm_package_config_prettier_target",
+    "prettier:write": "yarn prettier --write $npm_package_config_prettier_target",
     "eslint:check": "eslint $npm_package_config_prettier_target",
-    "build": "build:clean && build:dist && build:typescript && build:flow",
-    "build:clean": "rimraf dist",
-    "build:dist": "rollup -c",
-    "build:typescript": "tsc ./src/memoize-one.ts --emitDeclarationOnly --declaration --outDir ./dist",
+    "build": "yarn build:clean && yarn build:dist && yarn build:typescript && yarn build:flow",
+    "build:clean": "yarn rimraf dist",
+    "build:dist": "yarn rollup -c",
+    "build:typescript": "yarn tsc ./src/memoize-one.ts --emitDeclarationOnly --declaration --outDir ./dist",
     "build:flow": "cp src/memoize-one.js.flow dist/memoize-one.cjs.js.flow",
-    "perf": "ts-node ./benchmarks/shallow-equal.ts",
+    "perf": "yarn ts-node ./benchmarks/shallow-equal.ts",
     "perf:library-comparison": "yarn build && node ./benchmarks/library-comparison.js",
     "prepublishOnly": "yarn build"
   }
