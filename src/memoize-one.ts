@@ -34,7 +34,7 @@ function memoizeOne<TFunc extends (this: any, ...newArgs: any[]) => any>(
 
     // Throwing during an assignment aborts the assignment: https://codepen.io/alexreardon/pen/RYKoaz
     // Doing the lastResult assignment first so that if it throws
-    // the cache will be overwritten
+    // the cache will not be overwritten
     const lastResult = resultFn.apply(this, newArgs);
     cache = {
       lastResult,
