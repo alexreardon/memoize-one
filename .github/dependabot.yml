@@ -12,7 +12,3 @@ updates:
       day: "monday"
       time: "08:00"
       timezone: "Australia/Sydney"
-    ignore:
-      # Ignoring parcel as we are on pre-release versions
-      - dependency-name: "@parcel/*"
-      - dependency-name: "parcel"
