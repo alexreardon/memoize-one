@@ -37,7 +37,6 @@ it('should type the equality function to based on the provided function', () => 
   expectTypeOf<EqualityFn<typeof add>>().toEqualTypeOf<
     (newArgs: Parameters<typeof add>, lastArgs: Parameters<typeof add>) => boolean
   >();
-
   expectTypeOf<EqualityFn<typeof add>>().toEqualTypeOf<
     (newArgs: [number, number], lastArgs: [number, number]) => boolean
   >();
