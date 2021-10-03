@@ -13,7 +13,7 @@ A memoization library that only caches the result of the most recent arguments.
 
 ## Rationale
 
-Unlike other memoization libraries, `memoize-one` only remembers the latest arguments and result. No need to worry about cache busting mechanisms such as `maxAge`, `maxSize`, `exclusions` and so on, which can be prone to memory leaks. `memoize-one` simply remembers the last arguments, and if the function is next called with the same arguments then it returns the previous result.
+Unlike other memoization libraries, `memoize-one` only remembers the latest arguments and result. No need to worry about cache busting mechanisms such as `maxAge`, `maxSize`, `exclusions` and so on, which can be prone to memory leaks. A function memoized with `memoize-one` simply remembers the last arguments, and if the memoized function is next called with the same arguments then it returns the previous result.
 
 ## Usage
 
@@ -21,24 +21,34 @@ Unlike other memoization libraries, `memoize-one` only remembers the latest argu
 // memoize-one uses the default import
 import memoizeOne from 'memoize-one';
 
-const add = (a, b) => a + b;
+function add (a, b) {
+  return a + b;
+}
 const memoizedAdd = memoizeOne(add);
 
-memoizedAdd(1, 2); // 3
+memoizedAdd(1, 2);
+// add function: is called
+// [new value returned: 3]
 
-memoizedAdd(1, 2); // 3
-// Add function is not executed: previous result is returned
+memoizedAdd(1, 2);
+// add function: not called
+// [cached result is returned: 3]
 
-memoizedAdd(2, 3); // 5
-// Add function is called to get new value
+memoizedAdd(2, 3);
+// add function: is called
+// [new value returned: 5]
 
-memoizedAdd(2, 3); // 5
-// Add function is not executed: previous result is returned
+memoizedAdd(2, 3);
+// add function: not called
+// [cached result is returned: 5]
 
-memoizedAdd(1, 2); // 3
-// Add function is called to get new value.
-// While this was previously cached,
-// it is not the latest so the cached result is lost
+memoizedAdd(1, 2);
+// add function: is called
+// [new value returned: 3]
+// 👇
+// While the result of `add(1, 2)` was previously cached
+// `(1, 2)` was not the *latest* arguments (the last call was `(2, 3)`)
+// so the previous cached result of `(1, 3)` was lost
 ```
 
 ## Installation
@@ -99,7 +109,8 @@ memoizedAdd(3, 1);
 
 ```js
 memoizedAdd(NaN);
-// Even though NaN !== NaN these arguments are treated as equal
+// Even though NaN !== NaN these arguments are
+// treated as equal as they are both `NaN`
 memoizedAdd(NaN);
 ```
 
@@ -111,23 +122,9 @@ You can also pass in a custom function for checking the equality of two sets of 
 const memoized = memoizeOne(fn, isEqual);
 ```
 
-The equality function needs to conform to this `type`:
-
-```ts
-type EqualityFn = (newArgs: any[], lastArgs: any[]) => boolean;
-
-// You can import this type from memoize-one if you like
-
-// typescript
-import { EqualityFn } from 'memoize-one';
-
-// flow
-import type { EqualityFn } from 'memoize-one';
-```
-
 An equality function should return `true` if the arguments are equal. If `true` is returned then the wrapped function will not be called.
 
-A custom equality function needs to compare `Arrays`. The `newArgs` array will be a new reference every time so a simple `newArgs === lastArgs` will always return `false`.
+**Tip**: A custom equality function needs to compare `Arrays`. The `newArgs` array will be a new reference every time so a simple `newArgs === lastArgs` will always return `false`.
 
 Equality functions are not called if the `this` context of the function has changed (see below).
 
@@ -153,6 +150,19 @@ const result3 = deepMemoized({ foo: 'bar' });
 const result4 = deepMemoized({ foo: 'bar' });
 
 result3 === result4; // true - arguments are deep equal
+```
+
+The equality function needs to conform to the `EqualityFn` `type`:
+
+```ts
+// TFunc is the function being memoized
+type EqualityFn<TFunc extends (...args: any[]) => any> = (
+  newArgs: Parameters<TFunc>,
+  lastArgs: Parameters<TFunc>,
+) => boolean;
+
+// You can import this type
+import type { EqualityFn } from 'memoize-one';
 ```
 
 ## `this`
