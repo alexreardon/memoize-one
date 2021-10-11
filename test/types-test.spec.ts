@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { EqualityFn } from './../src/memoize-one';
 import { expectTypeOf } from 'expect-type';
 import memoize from '../src/memoize-one';
@@ -42,77 +43,95 @@ it('should type the equality function to based on the provided function', () => 
   >();
 });
 
-it('should allow weak equality function types', () => {
+it('should allow weaker equality function types', () => {
   function add(first: number, second: number): number {
     return first + second;
   }
 
+  // ✅ parameters of `add`
   {
-    const isEqual = function isEqual(first: [number, number], second: [number, number]) {
-      return first === second;
+    const isEqual = function (first: Parameters<typeof add>, second: Parameters<typeof add>) {
+      return true;
     };
     expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
   }
 
+  // ✅ tuple of the correct types
   {
-    const isEqual = function strong(first: number[], second: number[]) {
-      return first === second;
+    const isEqual = function (first: [number, number], second: [number, number]) {
+      return true;
     };
     expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
   }
 
+  // ✅ array of the correct types
   {
-    const isEqual = function unknownStrong(first: [unknown, unknown], second: [unknown, unknown]) {
-      return first === second;
+    const isEqual = function (first: number[], second: number[]) {
+      return true;
     };
     expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
   }
 
+  // ✅ tuple of 'unknown'
   {
-    const isEqual = function unknownWeak(first: unknown[], second: unknown[]) {
-      return first === second;
+    const isEqual = function (first: [unknown, unknown], second: [unknown, unknown]) {
+      return true;
     };
     expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
   }
 
+  // ✅ array of 'unknown'
   {
-    const isEqual = function anyStrong(first: [any, any], second: [any, any]) {
-      return first === second;
+    const isEqual = function (first: unknown[], second: unknown[]) {
+      return true;
     };
     expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
   }
 
+  // ✅ tuple of 'unknown'
   {
-    const isEqual = function anyWeak(first: any[], second: any[]) {
-      return first === second;
-    };
-    expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
-  }
-
-  {
-    const isEqual = function anyWeakest(first: any, second: any) {
-      return first === second;
-    };
-    expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
-  }
-
-  {
-    const isEqual = function anyWeakest(first: any) {
+    const isEqual = function (...first: unknown[]) {
       return !!first;
     };
     expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
   }
 
+  // ✅ tuple of 'any'
   {
-    const isEqual = function anyWeakest(...first: any[]) {
-      return !!first;
+    const isEqual = function (first: [any, any], second: [any, any]) {
+      return true;
     };
     expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
   }
 
+  // ✅ array of 'any'
   {
-    const isEqual = function anyWeakest(...first: unknown[]) {
-      return !!first;
+    const isEqual = function (first: any[], second: any[]) {
+      return true;
+    };
+    expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+  }
+
+  // ✅ two arguments of type any
+  {
+    const isEqual = function (first: any, second: any) {
+      return true;
+    };
+    expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+  }
+
+  // ✅ a single argument of type any
+  {
+    const isEqual = function (first: any) {
+      return true;
+    };
+    expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+  }
+
+  // ✅ spread of any type
+  {
+    const isEqual = function (...first: any[]) {
+      return true;
     };
     expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
   }
