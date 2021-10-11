@@ -63,7 +63,7 @@ npm install memoize-one --save
 
 ## Function argument equality
 
-By default, we apply our own _fast_ and _naive_ equality function to determine whether the arguments provided to your function are equal. You can see the full code here: [are-inputs-equal.ts](https://github.com/alexreardon/memoize-one/blob/master/src/are-inputs-equal.ts).
+By default, we apply our own _fast_ and _relatively naive_ equality function to determine whether the arguments provided to your function are equal. You can see the full code here: [are-inputs-equal.ts](https://github.com/alexreardon/memoize-one/blob/master/src/are-inputs-equal.ts).
 
 (By default) function arguments are considered equal if:
 
@@ -343,6 +343,37 @@ getA.call(temp2); // 30
 Therefore, in order to prevent against unexpected results, `memoize-one` takes into account the current execution context (`this`) of the memoized function. If `this` is different to the previous invocation then it is considered a change in argument. [further discussion](https://github.com/alexreardon/memoize-one/issues/3).
 
 Generally this will be of no impact if you are not explicity controlling the `this` context of functions you want to memoize with [explicit binding](https://github.com/getify/You-Dont-Know-JS/blob/master/this%20%26%20object%20prototypes/ch2.md#explicit-binding) or [implicit binding](https://github.com/getify/You-Dont-Know-JS/blob/master/this%20%26%20object%20prototypes/ch2.md#implicit-binding). `memoize-One` will detect when you are manipulating `this` and will then consider the `this` context as an argument. If `this` changes, it will re-execute the original function even if the arguments have not changed.
+
+## Clearing the memoization cache
+
+A `.clear()` property is added to memoized functions to allow you to clear it's memoization cache.
+
+This is helpful if you want to:
+
+- Clear memory
+- Cause the underlying function to be called again without having to change arguments
+
+```ts
+import memoizeOne from 'memoize-one';
+
+function add(a: number, b: number): number {
+  return a + b;
+}
+
+const memoizedAdd = memoizeOne(add);
+
+// first call - not memoized
+const first = memoizedAdd(1, 2);
+
+// second call - cache hit (underlying function not called)
+const second = memoizedAdd(1, 2);
+
+// 👋 clearing memoization cache
+memoizedAdd.clear();
+
+// third call - not memoized (cache was cleared)
+const third = memoizedAdd(1, 2);
+```
 
 ## When your result function `throw`s
 
