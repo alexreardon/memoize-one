@@ -273,6 +273,8 @@ const memoized = memoizeOne(add);
 console.log(typeof memoized.hello); // undefined
 ```
 
+If you feel strongly that `memoize-one` _should_ preserve function properties, please raise an issue. This decision was made in order to keep `memoize-one` as light as possible.
+
 For _now_, the `.length` property of a function is not preserved on the memoized function
 
 ```ts
