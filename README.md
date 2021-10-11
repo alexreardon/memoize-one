@@ -251,6 +251,48 @@ console.log(value1 === value3);
 // console.log => true
 ```
 
+## Function properties
+
+Functions memoized with `memoize-one` do not preserve any properties on the function object.
+
+> This behaviour correctly reflected in the TypeScript types
+
+```ts
+import memoizeOne from 'memoize-one';
+
+function add(a, b) {
+  return a + b;
+}
+add.hello = 'hi';
+
+console.log(typeof add.hello); // string
+
+const memoized = memoizeOne(add);
+
+// hello property on the `add` was not preserved
+console.log(typeof memoized.hello); // undefined
+```
+
+For _now_, the `.length` property of a function is not preserved on the memoized function
+
+```ts
+import memoizeOne from 'memoize-one';
+
+function add(a, b) {
+  return a + b;
+}
+
+console.log(add.length); // 2
+
+const memoized = memoizeOne(add);
+
+console.log(memoized.length); // 0
+```
+
+There is no (great) way to correctly set the `.length` property of the memoized function while also supporting ie11. Once we [remove ie11 support](https://github.com/alexreardon/memoize-one/issues/125) then we will set the `.length` property of the memoized function to match the original function
+
+[→ discussion](https://github.com/alexreardon/memoize-one/pull/124).
+
 ## Performance 🚀
 
 ### Tiny
