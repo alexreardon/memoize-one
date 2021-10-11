@@ -41,3 +41,79 @@ it('should type the equality function to based on the provided function', () => 
     (newArgs: [number, number], lastArgs: [number, number]) => boolean
   >();
 });
+
+it('should allow weak equality function types', () => {
+  function add(first: number, second: number): number {
+    return first + second;
+  }
+
+  {
+    const isEqual = function isEqual(first: [number, number], second: [number, number]) {
+      return first === second;
+    };
+    expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+  }
+
+  {
+    const isEqual = function strong(first: number[], second: number[]) {
+      return first === second;
+    };
+    expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+  }
+
+  {
+    const isEqual = function unknownStrong(first: [unknown, unknown], second: [unknown, unknown]) {
+      return first === second;
+    };
+    expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+  }
+
+  {
+    const isEqual = function unknownWeak(first: unknown[], second: unknown[]) {
+      return first === second;
+    };
+    expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+  }
+
+  {
+    const isEqual = function anyStrong(first: [any, any], second: [any, any]) {
+      return first === second;
+    };
+    expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+  }
+
+  {
+    const isEqual = function anyWeak(first: any[], second: any[]) {
+      return first === second;
+    };
+    expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+  }
+
+  {
+    const isEqual = function anyWeakest(first: any, second: any) {
+      return first === second;
+    };
+    expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+  }
+
+  {
+    const isEqual = function anyWeakest(first: any) {
+      return !!first;
+    };
+    expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+  }
+
+  {
+    const isEqual = function anyWeakest(...first: any[]) {
+      return !!first;
+    };
+    expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+  }
+
+  {
+    const isEqual = function anyWeakest(...first: unknown[]) {
+      return !!first;
+    };
+    expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+  }
+});
