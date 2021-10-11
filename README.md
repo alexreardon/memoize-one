@@ -305,7 +305,7 @@ There is no (great) way to correctly set the `.length` property of the memoized 
 
 `memoize-one` performs better or on par with than other popular memoization libraries for the purpose of remembering the latest invocation.
 
-The comparisons are not exhaustive and are primarily to show that `memoize-one` accomplishes remembering the latest invocation really fast. The benchmarks do not take into account the differences in feature sets, library sizes, parse time, and so on.
+The comparisons are not exhaustive and are primarily to show that `memoize-one` accomplishes remembering the latest invocation really fast. There is variability between runs. The benchmarks do not take into account the differences in feature sets, library sizes, parse time, and so on.
 
 <details>
   <summary>Expand for results</summary>
