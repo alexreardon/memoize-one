@@ -130,7 +130,7 @@ Equality functions are not called if the `this` context of the function has chan
 
 Here is an example that uses a [dequal](https://github.com/lukeed/dequal) deep equal equality check
 
-> `dequal` correctly handles deep comparing two arrays
+> `lodash.isequal` correctly handles deep comparing two arrays
 
 ```js
 import memoizeOne from 'memoize-one';
@@ -164,6 +164,148 @@ type EqualityFn<TFunc extends (...args: any[]) => any> = (
 // You can import this type
 import type { EqualityFn } from 'memoize-one';
 ```
+
+The `EqualityFn` type allows you to create equality functions that are extremely typesafe. You are welcome to provide your own less type safe equality functions.
+
+Here are some examples of equality functions which are ordered by most type safe, to least type safe:
+
+<details>
+  <summary>Example equality function types</summary>
+  <p>
+
+```ts
+// the function we are going to memoize
+function add(first: number, second: number): number {
+  return first + second;
+}
+
+// Some options for our equality function
+// ↑ stronger types
+// ↓ weaker types
+
+// ✅ exact parameters of `add`
+{
+  const isEqual = function (first: Parameters<typeof add>, second: Parameters<typeof add>) {
+    return true;
+  };
+  expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+}
+
+// ✅ tuple of the correct types
+{
+  const isEqual = function (first: [number, number], second: [number, number]) {
+    return true;
+  };
+  expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+}
+
+// ❌ tuple of incorrect types
+{
+  const isEqual = function (first: [number, string], second: [number, number]) {
+    return true;
+  };
+  expectTypeOf<typeof isEqual>().not.toMatchTypeOf<EqualityFn<typeof add>>();
+}
+
+// ✅ array of the correct types
+{
+  const isEqual = function (first: number[], second: number[]) {
+    return true;
+  };
+  expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+}
+
+// ❌ array of incorrect types
+{
+  const isEqual = function (first: string[], second: number[]) {
+    return true;
+  };
+  expectTypeOf<typeof isEqual>().not.toMatchTypeOf<EqualityFn<typeof add>>();
+}
+
+// ✅ tuple of 'unknown'
+{
+  const isEqual = function (first: [unknown, unknown], second: [unknown, unknown]) {
+    return true;
+  };
+  expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+}
+
+// ❌ tuple of 'unknown' of incorrect length
+{
+  const isEqual = function (first: [unknown, unknown, unknown], second: [unknown, unknown]) {
+    return true;
+  };
+  expectTypeOf<typeof isEqual>().not.toMatchTypeOf<EqualityFn<typeof add>>();
+}
+
+// ✅ array of 'unknown'
+{
+  const isEqual = function (first: unknown[], second: unknown[]) {
+    return true;
+  };
+  expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+}
+
+// ✅ spread of 'unknown'
+{
+  const isEqual = function (...first: unknown[]) {
+    return !!first;
+  };
+  expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+}
+
+// ✅ tuple of 'any'
+{
+  const isEqual = function (first: [any, any], second: [any, any]) {
+    return true;
+  };
+  expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+}
+
+// ❌ tuple of 'any' or incorrect size
+{
+  const isEqual = function (first: [any, any, any], second: [any, any]) {
+    return true;
+  };
+  expectTypeOf<typeof isEqual>().not.toMatchTypeOf<EqualityFn<typeof add>>();
+}
+
+// ✅ array of 'any'
+{
+  const isEqual = function (first: any[], second: any[]) {
+    return true;
+  };
+  expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+}
+
+// ✅ two arguments of type any
+{
+  const isEqual = function (first: any, second: any) {
+    return true;
+  };
+  expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+}
+
+// ✅ a single argument of type any
+{
+  const isEqual = function (first: any) {
+    return true;
+  };
+  expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+}
+
+// ✅ spread of any type
+{
+  const isEqual = function (...first: any[]) {
+    return true;
+  };
+  expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+}
+```
+
+  </p>
+</details>
 
 ## `this`
 

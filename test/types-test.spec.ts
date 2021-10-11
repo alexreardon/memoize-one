@@ -48,7 +48,7 @@ it('should allow weaker equality function types', () => {
     return first + second;
   }
 
-  // ✅ parameters of `add`
+  // ✅ exact parameters of `add`
   {
     const isEqual = function (first: Parameters<typeof add>, second: Parameters<typeof add>) {
       return true;
@@ -64,12 +64,28 @@ it('should allow weaker equality function types', () => {
     expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
   }
 
+  // ❌ tuple of incorrect types
+  {
+    const isEqual = function (first: [number, string], second: [number, number]) {
+      return true;
+    };
+    expectTypeOf<typeof isEqual>().not.toMatchTypeOf<EqualityFn<typeof add>>();
+  }
+
   // ✅ array of the correct types
   {
     const isEqual = function (first: number[], second: number[]) {
       return true;
     };
     expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+  }
+
+  // ❌ array of incorrect types
+  {
+    const isEqual = function (first: string[], second: number[]) {
+      return true;
+    };
+    expectTypeOf<typeof isEqual>().not.toMatchTypeOf<EqualityFn<typeof add>>();
   }
 
   // ✅ tuple of 'unknown'
@@ -80,6 +96,14 @@ it('should allow weaker equality function types', () => {
     expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
   }
 
+  // ❌ tuple of 'unknown' of incorrect length
+  {
+    const isEqual = function (first: [unknown, unknown, unknown], second: [unknown, unknown]) {
+      return true;
+    };
+    expectTypeOf<typeof isEqual>().not.toMatchTypeOf<EqualityFn<typeof add>>();
+  }
+
   // ✅ array of 'unknown'
   {
     const isEqual = function (first: unknown[], second: unknown[]) {
@@ -88,7 +112,7 @@ it('should allow weaker equality function types', () => {
     expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
   }
 
-  // ✅ tuple of 'unknown'
+  // ✅ spread of 'unknown'
   {
     const isEqual = function (...first: unknown[]) {
       return !!first;
@@ -102,6 +126,14 @@ it('should allow weaker equality function types', () => {
       return true;
     };
     expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+  }
+
+  // ❌ tuple of 'any' or incorrect size
+  {
+    const isEqual = function (first: [any, any, any], second: [any, any]) {
+      return true;
+    };
+    expectTypeOf<typeof isEqual>().not.toMatchTypeOf<EqualityFn<typeof add>>();
   }
 
   // ✅ array of 'any'
