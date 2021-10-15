@@ -1,6 +1,5 @@
 import areInputsEqual from './are-inputs-equal';
 
-// Using ReadonlyArray<T> rather than readonly T as it works with TS v3
 export type EqualityFn<TFunc extends (...args: any[]) => any> = (
   newArgs: Parameters<TFunc>,
   lastArgs: Parameters<TFunc>,
