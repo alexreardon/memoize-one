@@ -488,6 +488,7 @@ You are welcome to use the `MemoizedFn` generic directly from `memoize-one` if y
 ```ts
 import memoize, { MemoizedFn } from 'memoize-one';
 import isDeepEqual from 'lodash.isequal';
+import { expectTypeOf } from 'expect-type';
 
 // Takes any function: TFunc, and returns a Memoized<TFunc>
 function withDeepEqual<TFunc extends (...args: any[]) => any>(fn: TFunc): MemoizedFn<TFunc> {
@@ -508,6 +509,7 @@ In this specific example, this type would have been correctly inferred too
 ```ts
 import memoize, { MemoizedFn } from 'memoize-one';
 import isDeepEqual from 'lodash.isequal';
+import { expectTypeOf } from 'expect-type';
 
 // return type of MemoizedFn<TFunc> is inferred
 function withDeepEqual<TFunc extends (...args: any[]) => any>(fn: TFunc) {
