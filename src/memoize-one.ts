@@ -10,6 +10,7 @@ export type MemoizedFn<TFunc extends (this: any, ...args: any[]) => any> = {
   (this: ThisParameterType<TFunc>, ...args: Parameters<TFunc>): ReturnType<TFunc>;
 };
 
+// internal type
 type Cache<TFunc extends (this: any, ...args: any[]) => any> = {
   lastThis: ThisParameterType<TFunc>;
   lastArgs: Parameters<TFunc>;

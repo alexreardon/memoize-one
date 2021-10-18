@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { EqualityFn } from './../src/memoize-one';
+import isDeepEqual from 'lodash.isequal';
+import type { EqualityFn, MemoizedFn } from './../src/memoize-one';
 import { expectTypeOf } from 'expect-type';
 import memoize from '../src/memoize-one';
 
@@ -28,6 +29,43 @@ it('should add a .clear function property', () => {
   expect(() => memoized.foo()).toThrow();
 
   expectTypeOf<typeof memoized.clear>().toEqualTypeOf<() => void>();
+});
+
+it('should return a `MemoizedFn<T>`', () => {
+  function add(first: number, second: number): number {
+    return first + second;
+  }
+
+  const memoized = memoize(add);
+
+  expectTypeOf<typeof memoized>().toEqualTypeOf<MemoizedFn<typeof add>>();
+});
+
+it('should allow you to leverage the MemoizedFn generic to allow many memoized functions', () => {
+  function withDeepEqual<TFunc extends (...args: any[]) => any>(fn: TFunc): MemoizedFn<TFunc> {
+    return memoize(fn, isDeepEqual);
+  }
+  function add(first: number, second: number): number {
+    return first + second;
+  }
+
+  const memoized = withDeepEqual(add);
+
+  expectTypeOf<typeof memoized>().toEqualTypeOf<MemoizedFn<typeof add>>();
+});
+
+it('should return a memoized function that satisies a typeof check for the original function', () => {
+  function add(first: number, second: number): number {
+    return first + second;
+  }
+  function caller(fn: typeof add) {
+    return fn(1, 2);
+  }
+  const memoized = memoize(add);
+
+  // this line is the actual type test
+  const result = caller(memoized);
+  expectTypeOf<typeof result>().toEqualTypeOf<number>();
 });
 
 it('should type the equality function to based on the provided function', () => {

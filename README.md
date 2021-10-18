@@ -128,7 +128,7 @@ An equality function should return `true` if the arguments are equal. If `true` 
 
 Equality functions are not called if the `this` context of the function has changed (see below).
 
-Here is an example that uses a [dequal](https://github.com/lukeed/dequal) deep equal equality check
+Here is an example that uses a [lodash.isEqual](https://lodash.com/docs/4.17.15#isEqual) deep equal equality check
 
 > `lodash.isequal` correctly handles deep comparing two arrays
 
@@ -467,6 +467,62 @@ console.log(memoized.length); // 0
 There is no (great) way to correctly set the `.length` property of the memoized function while also supporting ie11. Once we [remove ie11 support](https://github.com/alexreardon/memoize-one/issues/125) then we will set the `.length` property of the memoized function to match the original function
 
 [→ discussion](https://github.com/alexreardon/memoize-one/pull/124).
+
+## Memoized function `type`
+
+The resulting function you get back from `memoize-one` has *almost* the same `type` as the function that you are memoizing
+
+```ts
+declare type MemoizedFn<TFunc extends (this: any, ...args: any[]) => any> = {
+  clear: () => void;
+  (this: ThisParameterType<TFunc>, ...args: Parameters<TFunc>): ReturnType<TFunc>;
+};
+```
+
+- the same call signature as the function being memoized
+- a `.clear()` function property added
+- other function object properties on `TFunc` as not carried over
+
+You are welcome to use the `MemoizedFn` generic directly from `memoize-one` if you like:
+
+```ts
+import memoize, { MemoizedFn } from 'memoize-one';
+import isDeepEqual from 'lodash.isequal';
+
+// Takes any function: TFunc, and returns a Memoized<TFunc>
+function withDeepEqual<TFunc extends (...args: any[]) => any>(fn: TFunc): MemoizedFn<TFunc> {
+  return memoize(fn, isDeepEqual);
+}
+
+function add(first: number, second: number): number {
+  return first + second;
+}
+
+const memoized = withDeepEqual(add);
+
+expectTypeOf<typeof memoized>().toEqualTypeOf<MemoizedFn<typeof add>>();
+```
+
+In this specific example, this type would have been correctly inferred too
+
+```ts
+import memoize, { MemoizedFn } from 'memoize-one';
+import isDeepEqual from 'lodash.isequal';
+
+// return type of MemoizedFn<TFunc> is inferred
+function withDeepEqual<TFunc extends (...args: any[]) => any>(fn: TFunc) {
+  return memoize(fn, isDeepEqual);
+}
+
+function add(first: number, second: number): number {
+  return first + second;
+}
+
+const memoized = withDeepEqual(add);
+
+// type test still passes
+expectTypeOf<typeof memoized>().toEqualTypeOf<MemoizedFn<typeof add>>();
+```
 
 ## Performance 🚀
 
