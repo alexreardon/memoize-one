@@ -1,6 +1,7 @@
 {
   "name": "memoize-one",
   "version": "6.0.0-beta.1",
+  "type": "module",
   "description": "A memoization library which only remembers the latest invocation",
   "main": "dist/memoize-one.cjs.js",
   "types": "dist/memoize-one.d.ts",
@@ -51,7 +52,6 @@
     "@typescript-eslint/eslint-plugin": "^4.31.2",
     "@typescript-eslint/parser": "^4.31.2",
     "benchmark": "^2.1.4",
-    "cli-table": "^0.3.6",
     "cross-env": "^7.0.3",
     "eslint": "7.32.0",
     "eslint-config-prettier": "^8.3.0",
@@ -62,6 +62,7 @@
     "jest": "^27.2.2",
     "lodash.isequal": "^4.5.0",
     "lodash.memoize": "^4.1.2",
+    "markdown-table": "^3.0.1",
     "mem": "^9.0.1",
     "memoizee": "^0.4.15",
     "moize": "^6.1.0",

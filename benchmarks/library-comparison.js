@@ -8,38 +8,38 @@ import ora from 'ora';
 import moize from 'moize';
 import memoizee from 'memoizee';
 import { green, bold } from 'nanocolors';
-import Table from 'cli-table';
+import { markdownTable } from 'markdown-table';
 
 const libraries = [
   {
     name: 'no memoization',
     memoize: (fn) => fn,
   },
-  {
-    name: 'memoize-one',
-    memoize: memoizeOne,
-  },
-  {
-    name: 'lodash.memoize',
-    memoize: lodash,
-  },
-  {
-    name: 'fast-memoize',
-    memoize: fastMemoize,
-  },
-  {
-    name: 'moize',
-    memoize: moize,
-  },
-  {
-    name: 'memoizee',
-    memoize: memoizee,
-  },
-  {
-    name: 'mem (JSON.stringify strategy)',
-    // mem supports lots of strategies, choosing a 'fair' one for lots of operations
-    memoize: (fn) => mem(fn, { cacheKey: JSON.stringify }),
-  },
+  // {
+  //   name: 'memoize-one',
+  //   memoize: memoizeOne,
+  // },
+  // {
+  //   name: 'lodash.memoize',
+  //   memoize: lodash,
+  // },
+  // {
+  //   name: 'fast-memoize',
+  //   memoize: fastMemoize,
+  // },
+  // {
+  //   name: 'moize',
+  //   memoize: moize,
+  // },
+  // {
+  //   name: 'memoizee',
+  //   memoize: memoizee,
+  // },
+  // {
+  //   name: 'mem (JSON.stringify strategy)',
+  //   // mem supports lots of strategies, choosing a 'fair' one for lots of operations
+  //   memoize: (fn) => mem(fn, { cacheKey: JSON.stringify }),
+  // },
 ];
 
 function slowFn() {
@@ -136,11 +136,11 @@ scenarios.forEach((scenario) => {
         return [index + 1, benchmark.name, Math.round(benchmark.hz).toLocaleString()];
       });
 
-    const table = new Table({
-      head: ['Position', 'Library', 'Operations per second'],
-    });
-    table.push(...rows);
-    console.log(table.toString());
+    console.log('Markdown:\n');
+    console.log(`**${scenario.name}**\n`);
+    const table = markdownTable([['Position', 'Library', 'Operations per second'], ...rows]);
+
+    console.log(table);
   });
   suite.run();
 });
