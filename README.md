@@ -542,7 +542,7 @@ The comparisons are not exhaustive and are primarily to show that `memoize-one` 
   <summary>Expand for results</summary>
   <p>
 
-node version `14.15.0`
+node version `16.11.1`
 
 You can run this test in the repo by:
 
@@ -553,72 +553,72 @@ You can run this test in the repo by:
 
 | Position | Library                       | Operations per second |
 | -------- | ----------------------------- | --------------------- |
-| 1        | memoize-one                   | 80,657,220            |
-| 2        | moize                         | 64,951,103            |
-| 3        | memoizee                      | 32,066,963            |
-| 4        | lodash.memoize                | 30,387,390            |
-| 5        | mem (JSON.stringify strategy) | 3,894,072             |
-| 6        | no memoization                | 506                   |
+| 1        | memoize-one                   | 80,384,605            |
+| 2        | moize                         | 72,852,842            |
+| 3        | memoizee                      | 35,743,907            |
+| 4        | lodash.memoize                | 31,473,156            |
+| 5        | mem (JSON.stringify strategy) | 4,510,714             |
+| 6        | no memoization                | 505                   |
 | 7        | fast-memoize                  | 505                   |
 
 **single primitive argument**
 
 | Position | Library                       | Operations per second |
 | -------- | ----------------------------- | --------------------- |
-| 1        | fast-memoize                  | 43,922,254            |
-| 2        | lodash.memoize                | 26,652,387            |
-| 3        | moize                         | 25,654,686            |
-| 4        | memoize-one                   | 25,059,187            |
-| 5        | memoizee                      | 19,096,104            |
-| 6        | mem (JSON.stringify strategy) | 3,448,488             |
-| 7        | no memoization                | 503                   |
+| 1        | fast-memoize                  | 45,888,796            |
+| 2        | moize                         | 34,577,180            |
+| 3        | lodash.memoize                | 30,123,904            |
+| 4        | memoize-one                   | 28,516,529            |
+| 5        | memoizee                      | 20,230,305            |
+| 6        | mem (JSON.stringify strategy) | 3,874,762             |
+| 7        | no memoization                | 504                   |
 
 **single complex argument**
 
 | Position | Library                       | Operations per second |
 | -------- | ----------------------------- | --------------------- |
-| 1        | moize                         | 31,199,164            |
-| 2        | lodash.memoize                | 28,712,860            |
-| 3        | memoize-one                   | 23,896,851            |
-| 4        | memoizee                      | 19,010,167            |
-| 5        | mem (JSON.stringify strategy) | 2,045,973             |
-| 6        | fast-memoize                  | 1,519,294             |
+| 1        | lodash.memoize                | 28,862,391            |
+| 2        | moize                         | 27,275,762            |
+| 3        | memoize-one                   | 26,613,077            |
+| 4        | memoizee                      | 17,302,985            |
+| 5        | mem (JSON.stringify strategy) | 2,123,364             |
+| 6        | fast-memoize                  | 1,576,180             |
 | 7        | no memoization                | 504                   |
 
 **multiple primitive arguments**
 
 | Position | Library                       | Operations per second |
 | -------- | ----------------------------- | --------------------- |
-| 1        | moize                         | 21,039,928            |
-| 2        | lodash.memoize                | 20,248,759            |
-| 3        | memoize-one                   | 16,600,643            |
-| 4        | memoizee                      | 9,071,600             |
-| 5        | mem (JSON.stringify strategy) | 2,990,592             |
-| 6        | fast-memoize                  | 1,156,061             |
-| 7        | no memoization                | 506                   |
+| 1        | lodash.memoize                | 25,169,091            |
+| 2        | moize                         | 21,501,957            |
+| 3        | memoize-one                   | 17,269,441            |
+| 4        | memoizee                      | 9,728,831             |
+| 5        | mem (JSON.stringify strategy) | 3,037,060             |
+| 6        | fast-memoize                  | 1,209,636             |
+| 7        | no memoization                | 505                   |
 
 **multiple complex arguments**
 
 | Position | Library                       | Operations per second |
 | -------- | ----------------------------- | --------------------- |
-| 1        | lodash.memoize                | 22,803,155            |
-| 2        | moize                         | 19,773,333            |
-| 3        | memoize-one                   | 16,341,253            |
-| 4        | memoizee                      | 9,030,317             |
-| 5        | mem (JSON.stringify strategy) | 806,040               |
-| 6        | fast-memoize                  | 633,057               |
+| 1        | lodash.memoize                | 24,606,356            |
+| 2        | moize                         | 21,348,419            |
+| 3        | memoize-one                   | 17,633,659            |
+| 4        | memoizee                      | 9,455,600             |
+| 5        | mem (JSON.stringify strategy) | 797,349               |
+| 6        | fast-memoize                  | 676,376               |
 | 7        | no memoization                | 504                   |
 
 **multiple complex arguments (spreading arguments)**
 
 | Position | Library                       | Operations per second |
 | -------- | ----------------------------- | --------------------- |
-| 1        | lodash.memoize                | 24,089,032            |
-| 2        | moize                         | 21,574,025            |
-| 3        | memoizee                      | 19,810,230            |
-| 4        | memoize-one                   | 16,201,443            |
-| 5        | mem (JSON.stringify strategy) | 861,279               |
-| 6        | fast-memoize                  | 656,715               |
+| 1        | lodash.memoize                | 22,626,554            |
+| 2        | moize                         | 19,081,480            |
+| 3        | memoizee                      | 17,748,567            |
+| 4        | memoize-one                   | 16,108,391            |
+| 5        | mem (JSON.stringify strategy) | 786,317               |
+| 6        | fast-memoize                  | 557,983               |
 | 7        | no memoization                | 504                   |
 
   </p>
