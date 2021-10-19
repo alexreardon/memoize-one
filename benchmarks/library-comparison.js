@@ -20,8 +20,11 @@ const libraries = [
     memoize: memoizeOne,
   },
   {
-    name: 'lodash.memoize',
-    memoize: lodash,
+    name: 'lodash.memoize (JSON.stringify key resolver)',
+    memoize: (fn) => {
+      const resolver = (...args) => JSON.stringify(args);
+      return lodash(fn, resolver);
+    },
   },
   {
     name: 'fast-memoize',
