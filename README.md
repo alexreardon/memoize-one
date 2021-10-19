@@ -350,8 +350,8 @@ A `.clear()` property is added to memoized functions to allow you to clear it's 
 
 This is helpful if you want to:
 
-- Clear memory
-- Cause the underlying function to be called again without having to change arguments
+- Release memory
+- Allow the underlying function to be called again without having to change arguments
 
 ```ts
 import memoizeOne from 'memoize-one';
