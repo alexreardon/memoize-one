@@ -2,18 +2,16 @@
 
 A memoization library that only caches the result of the most recent arguments.
 
-> Also [async version](https://github.com/microlinkhq/async-memoize-one).
-
-[![Build Status](https://travis-ci.org/alexreardon/memoize-one.svg?branch=master)](https://travis-ci.org/alexreardon/memoize-one)
 [![npm](https://img.shields.io/npm/v/memoize-one.svg)](https://www.npmjs.com/package/memoize-one)
 ![types](https://img.shields.io/badge/types-typescript%20%7C%20flow-blueviolet)
-[![dependencies](https://david-dm.org/alexreardon/memoize-one.svg)](https://david-dm.org/alexreardon/memoize-one)
 [![minzip](https://img.shields.io/bundlephobia/minzip/memoize-one.svg)](https://www.npmjs.com/package/memoize-one)
 [![Downloads per month](https://img.shields.io/npm/dm/memoize-one.svg)](https://www.npmjs.com/package/memoize-one)
 
 ## Rationale
 
 Unlike other memoization libraries, `memoize-one` only remembers the latest arguments and result. No need to worry about cache busting mechanisms such as `maxAge`, `maxSize`, `exclusions` and so on, which can be prone to memory leaks. A function memoized with `memoize-one` simply remembers the last arguments, and if the memoized function is next called with the same arguments then it returns the previous result.
+
+> For working with promises, [@Kikobeats](https://github.com/Kikobeats) has built [async-memoize-one](https://github.com/microlinkhq/async-memoize-one).
 
 ## Usage
 
