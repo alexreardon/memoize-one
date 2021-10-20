@@ -86,7 +86,7 @@ const memoizedAdd = memoizeOne(add);
 
 ```js
 memoizedAdd(1, 2);
-// the amount of arguments has changed, so underlying add function is called
+// the amount of arguments has changed, so add function is called
 memoizedAdd(1, 2, 3);
 ```
 
@@ -349,7 +349,7 @@ A `.clear()` property is added to memoized functions to allow you to clear it's 
 This is helpful if you want to:
 
 - Release memory
-- Allow the underlying function to be called again without having to change arguments
+- Allow the result function to be called again without having to change arguments
 
 ```ts
 import memoizeOne from 'memoize-one';
@@ -363,7 +363,7 @@ const memoizedAdd = memoizeOne(add);
 // first call - not memoized
 const first = memoizedAdd(1, 2);
 
-// second call - cache hit (underlying function not called)
+// second call - cache hit (result function not called)
 const second = memoizedAdd(1, 2);
 
 // 👋 clearing memoization cache
@@ -391,9 +391,10 @@ const canThrow = (name: string) => {
 const memoized = memoizeOne(canThrow);
 
 const value1 = memoized('Alex');
-// console.log => 'called'
+// result function called: console.log => 'called'
+
 const value2 = memoized('Alex');
-// result function not called
+// result function not called (cache hit)
 
 console.log(value1 === value2);
 // console.log => true
@@ -415,9 +416,11 @@ try {
 }
 
 console.log(firstError !== secondError);
+// console.log => true
 
 const value3 = memoized('Alex');
 // result function not called as the original memoization cache has not been busted
+
 console.log(value1 === value3);
 // console.log => true
 ```
@@ -426,7 +429,7 @@ console.log(value1 === value3);
 
 Functions memoized with `memoize-one` do not preserve any properties on the function object.
 
-> This behaviour correctly reflected in the TypeScript types
+> This behaviour is correctly reflected in the TypeScript types
 
 ```ts
 import memoizeOne from 'memoize-one';
@@ -444,7 +447,7 @@ const memoized = memoizeOne(add);
 console.log(typeof memoized.hello); // undefined
 ```
 
-If you feel strongly that `memoize-one` _should_ preserve function properties, please raise an issue. This decision was made in order to keep `memoize-one` as light as possible.
+> If you feel strongly that `memoize-one` _should_ preserve function properties, please raise an issue. This decision was made in order to keep `memoize-one` as light as possible.
 
 For _now_, the `.length` property of a function is not preserved on the memoized function
 
@@ -462,13 +465,13 @@ const memoized = memoizeOne(add);
 console.log(memoized.length); // 0
 ```
 
-There is no (great) way to correctly set the `.length` property of the memoized function while also supporting ie11. Once we [remove ie11 support](https://github.com/alexreardon/memoize-one/issues/125) then we will set the `.length` property of the memoized function to match the original function
+There is no (great) way to correctly set the `.length` property of the memoized function while also supporting ie11. Once we [remove ie11 support](https://github.com/alexreardon/memoize-one/issues/125) then we plan on setting the `.length` property of the memoized function to match the original function
 
 [→ discussion](https://github.com/alexreardon/memoize-one/pull/124).
 
 ## Memoized function `type`
 
-The resulting function you get back from `memoize-one` has *almost* the same `type` as the function that you are memoizing
+The resulting function you get back from `memoize-one` has _almost_ the same `type` as the function that you are memoizing
 
 ```ts
 declare type MemoizedFn<TFunc extends (this: any, ...args: any[]) => any> = {
