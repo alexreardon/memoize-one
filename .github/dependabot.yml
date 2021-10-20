@@ -1,0 +1,14 @@
+version: 2
+updates:
+  # Enable version updates for npm
+  - package-ecosystem: "npm"
+    # Look for `package.json` and `lock` files in the `root` directory
+    directory: "/"
+    # Always increase the version requirement to match the new version.
+    versioning-strategy: increase
+    # Check the npm registry for updates at the start of every week
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "08:00"
+      timezone: "Australia/Sydney"

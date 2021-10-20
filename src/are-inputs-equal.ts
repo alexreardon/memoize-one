@@ -4,6 +4,8 @@
 const safeIsNaN =
   Number.isNaN ||
   function ponyfill(value: unknown): boolean {
+    // // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isNaN#polyfill
+    // NaN is the only value in JavaScript which is not equal to itself.
     return typeof value === 'number' && value !== value;
   };
 

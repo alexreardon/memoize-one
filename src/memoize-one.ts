@@ -1,40 +1,56 @@
 import areInputsEqual from './are-inputs-equal';
 
-// Using ReadonlyArray<T> rather than readonly T as it works with TS v3
-export type EqualityFn = (newArgs: any[], lastArgs: any[]) => boolean;
+export type EqualityFn<TFunc extends (...args: any[]) => any> = (
+  newArgs: Parameters<TFunc>,
+  lastArgs: Parameters<TFunc>,
+) => boolean;
 
-function memoizeOne<
-  // Need to use 'any' rather than 'unknown' here as it has
-  // The correct Generic narrowing behaviour.
-  ResultFn extends (this: any, ...newArgs: any[]) => ReturnType<ResultFn>
->(resultFn: ResultFn, isEqual: EqualityFn = areInputsEqual): ResultFn {
-  let lastThis: unknown;
-  let lastArgs: unknown[] = [];
-  let lastResult: ReturnType<ResultFn>;
-  let calledOnce: boolean = false;
+export type MemoizedFn<TFunc extends (this: any, ...args: any[]) => any> = {
+  clear: () => void;
+  (this: ThisParameterType<TFunc>, ...args: Parameters<TFunc>): ReturnType<TFunc>;
+};
+
+// internal type
+type Cache<TFunc extends (this: any, ...args: any[]) => any> = {
+  lastThis: ThisParameterType<TFunc>;
+  lastArgs: Parameters<TFunc>;
+  lastResult: ReturnType<TFunc>;
+};
+
+function memoizeOne<TFunc extends (this: any, ...newArgs: any[]) => any>(
+  resultFn: TFunc,
+  isEqual: EqualityFn<TFunc> = areInputsEqual,
+): MemoizedFn<TFunc> {
+  let cache: Cache<TFunc> | null = null;
 
   // breaking cache when context (this) or arguments change
-  function memoized(this: unknown, ...newArgs: unknown[]): ReturnType<ResultFn> {
-    if (calledOnce && lastThis === this && isEqual(newArgs, lastArgs)) {
-      return lastResult;
+  function memoized(
+    this: ThisParameterType<TFunc>,
+    ...newArgs: Parameters<TFunc>
+  ): ReturnType<TFunc> {
+    if (cache && cache.lastThis === this && isEqual(newArgs, cache.lastArgs)) {
+      return cache.lastResult;
     }
 
     // Throwing during an assignment aborts the assignment: https://codepen.io/alexreardon/pen/RYKoaz
     // Doing the lastResult assignment first so that if it throws
-    // nothing will be overwritten
-    lastResult = resultFn.apply(this, newArgs);
-    calledOnce = true;
-    lastThis = this;
-    lastArgs = newArgs;
+    // the cache will not be overwritten
+    const lastResult = resultFn.apply(this, newArgs);
+    cache = {
+      lastResult,
+      lastArgs: newArgs,
+      lastThis: this,
+    };
+
     return lastResult;
   }
 
-  return memoized as ResultFn;
+  // Adding the ability to clear the cache of a memoized function
+  memoized.clear = function clear() {
+    cache = null;
+  };
+
+  return memoized;
 }
 
-// default export
 export default memoizeOne;
-
-// disabled for now as mixing named and
-// default exports is problematic with CommonJS
-// export { memoizeOne };

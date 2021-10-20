@@ -1,12 +1,10 @@
-// @ts-nocheck
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const Benchmark = require('benchmark');
+import benchmark from 'benchmark';
 
-const suite = new Benchmark.Suite();
+const suite = new benchmark.Suite();
 
 import areInputsEqual from '../src/are-inputs-equal';
 
-function shallowEvery(a, b): boolean {
+function shallowEvery(a: unknown[], b: unknown[]): boolean {
   if (a.length !== b.length) {
     return false;
   }
@@ -14,7 +12,7 @@ function shallowEvery(a, b): boolean {
   return a.every((e, i) => b[i] === e);
 }
 
-function shallowFor(a, b): boolean {
+function shallowFor(a: unknown[], b: unknown[]): boolean {
   if (a.length !== b.length) {
     return false;
   }

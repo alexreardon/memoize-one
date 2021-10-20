@@ -495,7 +495,7 @@ describe('skip equality check', () => {
 describe('custom equality function', () => {
   let add: AddFn;
   let memoizedAdd: AddFn;
-  let equalityStub: EqualityFn;
+  let equalityStub: EqualityFn<AddFn>;
 
   beforeEach(() => {
     add = jest.fn().mockImplementation((value1: number, value2: number): number => value1 + value2);
@@ -750,14 +750,14 @@ describe('typing', () => {
   it('should support typed equality functions', () => {
     const subtract = (a: number, b: number): number => a - b;
 
-    const valid: EqualityFn[] = [
+    const valid = [
       (newArgs: readonly number[], lastArgs: readonly number[]): boolean =>
         JSON.stringify(newArgs) === JSON.stringify(lastArgs),
       (): boolean => true,
       (value: unknown[]): boolean => value.length === 5,
     ];
 
-    valid.forEach((isEqual: EqualityFn) => {
+    valid.forEach((isEqual) => {
       const memoized = memoize(subtract, isEqual);
       expect(memoized(3, 1)).toBe(2);
     });
