@@ -68,6 +68,46 @@ it('should return a memoized function that satisies a typeof check for the origi
   expectTypeOf<typeof result>().toEqualTypeOf<number>();
 });
 
+it('should allow casting back to the original function type', () => {
+  type AddFn = (first: number, second: number) => number;
+  function add(first: number, second: number): number {
+    return first + second;
+  }
+  // baseline
+  {
+    const memoized = memoize(add);
+    expectTypeOf<typeof memoized>().toEqualTypeOf<AddFn>();
+    expectTypeOf<typeof memoized>().toEqualTypeOf<MemoizedFn<typeof add>>();
+    expectTypeOf<typeof memoized>().toEqualTypeOf<MemoizedFn<AddFn>>();
+    expectTypeOf<typeof memoized>().toMatchTypeOf<MemoizedFn<typeof add>>();
+    expectTypeOf<typeof memoized>().toMatchTypeOf<MemoizedFn<AddFn>>();
+  }
+  {
+    const memoized: typeof add = memoize(add);
+    expectTypeOf<typeof memoized>().toEqualTypeOf<AddFn>();
+    expectTypeOf<typeof memoized>().not.toMatchTypeOf<MemoizedFn<typeof add>>();
+    expectTypeOf<typeof memoized>().not.toMatchTypeOf<MemoizedFn<AddFn>>();
+  }
+  {
+    const memoized: AddFn = memoize(add);
+    expectTypeOf<typeof memoized>().toEqualTypeOf<AddFn>();
+    expectTypeOf<typeof memoized>().not.toMatchTypeOf<MemoizedFn<typeof add>>();
+    expectTypeOf<typeof memoized>().not.toMatchTypeOf<MemoizedFn<AddFn>>();
+  }
+  {
+    const memoized = memoize(add) as typeof add;
+    expectTypeOf<typeof memoized>().toEqualTypeOf<AddFn>();
+    expectTypeOf<typeof memoized>().not.toMatchTypeOf<MemoizedFn<typeof add>>();
+    expectTypeOf<typeof memoized>().not.toMatchTypeOf<MemoizedFn<AddFn>>();
+  }
+  {
+    const memoized = memoize(add) as AddFn;
+    expectTypeOf<typeof memoized>().toEqualTypeOf<AddFn>();
+    expectTypeOf<typeof memoized>().not.toMatchTypeOf<MemoizedFn<typeof add>>();
+    expectTypeOf<typeof memoized>().not.toMatchTypeOf<MemoizedFn<AddFn>>();
+  }
+});
+
 it('should type the equality function to based on the provided function', () => {
   function add(first: number, second: number) {
     return first + second;
