@@ -59,7 +59,7 @@
     "cross-env": "^7.0.3",
     "eslint": "7.32.0",
     "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-jest": "^24.4.2",
+    "eslint-plugin-jest": "^26.1.4",
     "eslint-plugin-prettier": "^4.0.0",
     "expect-type": "^0.12.0",
     "fast-memoize": "^2.5.2",
