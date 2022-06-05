@@ -52,7 +52,7 @@
     "@types/jest": "^27.0.2",
     "@types/lodash.isequal": "^4.5.5",
     "@types/lodash.memoize": "^4.1.6",
-    "@types/node": "^16.10.1",
+    "@types/node": "^17.0.40",
     "@typescript-eslint/eslint-plugin": "^4.31.2",
     "@typescript-eslint/parser": "^4.31.2",
     "benchmark": "^2.1.4",
