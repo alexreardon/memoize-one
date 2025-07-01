@@ -25,6 +25,12 @@
     "/dist",
     "/src"
   ],
+  "exports": {
+    ".": {
+      "import": "./dist/memoize-one.esm.js",
+      "require": "./dist/memoize-one.cjs.js"
+    }
+  },
   "size-limit": [
     {
       "path": "dist/memoize-one.min.js",
