@@ -20,6 +20,18 @@
   "main": "dist/memoize-one.cjs.js",
   "types": "dist/memoize-one.d.ts",
   "module": "dist/memoize-one.esm.js",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/memoize-one.d.mts",
+        "default": "./dist/memoize-one.esm.js"
+      },
+      "require": {
+        "types": "./dist/memoize-one.d.ts",
+        "default": "./dist/memoize-one.cjs.js"
+      }
+    }
+  },
   "sideEffects": false,
   "files": [
     "/dist",
@@ -96,7 +108,7 @@
     "build": "yarn build:clean && yarn build:dist && yarn build:typescript && yarn build:flow",
     "build:clean": "yarn rimraf dist",
     "build:dist": "yarn rollup -c",
-    "build:typescript": "yarn tsc ./src/memoize-one.ts --emitDeclarationOnly --declaration --outDir ./dist",
+    "build:typescript": "yarn tsc ./src/memoize-one.ts --emitDeclarationOnly --declaration --outDir ./dist && cp ./dist/memoize-one.d.ts ./dist/memoize-one.d.mts",
     "build:flow": "cp src/memoize-one.js.flow dist/memoize-one.cjs.js.flow",
     "perf": "yarn ts-node ./benchmarks/shallow-equal.ts",
     "perf:library-comparison": "yarn build && node ./benchmarks/library-comparison.js",
