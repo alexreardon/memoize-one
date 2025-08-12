@@ -5,6 +5,24 @@ import { terser } from 'rollup-plugin-terser';
 
 const input = 'src/memoize-one.ts';
 
+// Plugin to convert module.exports to exports.default for CommonJS compatibility
+const fixCjsExports = () => ({
+  name: 'fix-cjs-exports',
+  generateBundle(options, bundle) {
+    if (options.format === 'cjs') {
+      Object.keys(bundle).forEach((fileName) => {
+        const chunk = bundle[fileName];
+        if (chunk.type === 'chunk') {
+          chunk.code = chunk.code.replace(
+            'module.exports = memoizeOne;',
+            'exports.default = memoizeOne;',
+          );
+        }
+      });
+    }
+  },
+});
+
 export default [
   // Universal module definition (UMD) build
   {
@@ -39,10 +57,10 @@ export default [
   {
     input,
     output: {
-      file: 'dist/memoize-one.esm.js',
-      format: 'esm',
+      file: 'dist/memoize-one.esm.mjs',
+      format: 'es',
     },
-    plugins: [typescript({ module: 'ESNext' })],
+    plugins: [typescript({ module: 'ESNext', target: 'ES2015' })],
   },
   // CommonJS build
   {
@@ -52,6 +70,6 @@ export default [
       format: 'cjs',
       exports: 'default',
     },
-    plugins: [typescript({ module: 'ESNext' })],
+    plugins: [typescript({ module: 'ESNext' }), fixCjsExports()],
   },
 ];
