@@ -596,7 +596,7 @@ expectTypeOf<typeof memoized>().toEqualTypeOf<MemoizedFn<typeof add>>();
 
 ### Extremely fast
 
-`memoize-one` performs similarly to other popular memoization libraries for remembering the latest invocation.
+`memoize-one` performs as fast as other popular memoization libraries for remembering the latest invocation.
 
 The comparisons are not exhaustive and are primarily to show that `memoize-one` accomplishes remembering the latest invocation really fast. There is variability between runs. The benchmarks do not take into account the differences in feature sets, library sizes, parse time, and so on.
 
