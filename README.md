@@ -72,22 +72,6 @@ const { memoizeOne } = require('memoize-one');
 
 If you need to support older environments, please use `memoize-one` v6.
 
-## Upgrading from v6
-
-1. **Named export.** There is no default export anymore:
-
-   ```diff
-   - import memoizeOne from 'memoize-one';
-   + import { memoizeOne } from 'memoize-one';
-   ```
-
-2. **Arguments are compared with `Object.is`.** `NaN` is still equal to `NaN`. The only change is that `+0` and `-0` are now treated as different arguments, so `memoized(0)` followed by `memoized(-0)` will call your function again. The `this` context is also compared with `Object.is`.
-3. **ES module only.** The CommonJS and UMD builds are gone. CommonJS users on Node.js 20.19+ and 22.12+ can still `require()` the package. TypeScript projects that compile to CommonJS need `"module": "nodenext"` (TypeScript 5.8+) or `"node20"` (TypeScript 5.9+). If you used the UMD build from a CDN, load the module instead: `<script type="module">import { memoizeOne } from 'https://cdn.jsdelivr.net/npm/memoize-one@7/+esm';</script>`
-4. **Only the package entry can be imported.** The `exports` map blocks deep imports such as `memoize-one/dist/memoize-one.esm.js`. Import from `memoize-one` instead.
-5. **ES2022 syntax.** Internet Explorer 11 is no longer supported (see [supported environments](#supported-environments)).
-6. **No Flow types.** The Flow type definitions are no longer included.
-7. **New: `areInputsEqual` is exported**, so you can build on the default equality check (see [custom equality function](#custom-equality-function)).
-
 ## Function argument equality
 
 By default, we apply our own _fast_ and _relatively naive_ equality function (`areInputsEqual`) to determine whether the arguments provided to your function are equal. You can see the full code here: [memoize-one.ts](https://github.com/alexreardon/memoize-one/blob/master/src/memoize-one.ts).
@@ -682,6 +666,22 @@ You can run this test in the repo with `npm run bench:library-comparison`
 
   </p>
 </details>
+
+## Upgrading from v6
+
+1. **Named export.** There is no default export anymore:
+
+   ```diff
+   - import memoizeOne from 'memoize-one';
+   + import { memoizeOne } from 'memoize-one';
+   ```
+
+2. **Arguments are compared with `Object.is`.** `NaN` is still equal to `NaN`. The only change is that `+0` and `-0` are now treated as different arguments, so `memoized(0)` followed by `memoized(-0)` will call your function again. The `this` context is also compared with `Object.is`.
+3. **ES module only.** The CommonJS and UMD builds are gone. CommonJS users on Node.js 20.19+ and 22.12+ can still `require()` the package. TypeScript projects that compile to CommonJS need `"module": "nodenext"` (TypeScript 5.8+) or `"node20"` (TypeScript 5.9+). If you used the UMD build from a CDN, load the module instead: `<script type="module">import { memoizeOne } from 'https://cdn.jsdelivr.net/npm/memoize-one@7/+esm';</script>`
+4. **Only the package entry can be imported.** The `exports` map blocks deep imports such as `memoize-one/dist/memoize-one.esm.js`. Import from `memoize-one` instead.
+5. **ES2022 syntax.** Internet Explorer 11 is no longer supported (see [supported environments](#supported-environments)).
+6. **No Flow types.** The Flow type definitions are no longer included.
+7. **New: `areInputsEqual` is exported**, so you can build on the default equality check (see [custom equality function](#custom-equality-function)).
 
 ## Code health 👍
 
