@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
 import { areInputsEqual, memoizeOne, type EqualityFn } from '../src/memoize-one.js';
-import isDeepEqual from 'lodash.isequal';
+import { isEqual as isDeepEqual } from 'es-toolkit';
 
 type HasA = {
   a: number;
@@ -631,7 +631,7 @@ describe('custom equality function', () => {
     expect(memoized(clone(bob), clone(jane))).toBe(12);
     expect(addAges).not.toHaveBeenCalled();
 
-    // memoized function called (we lodash happily handled argument change)
+    // memoized function called (isDeepEqual handled the argument change)
     expect(memoized(clone(bob), clone(jane), clone(tim))).toBe(13);
     expect(addAges).toHaveBeenCalled();
   });

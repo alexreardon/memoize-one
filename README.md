@@ -154,13 +154,13 @@ An equality function should return `true` if the arguments are equal. If `true` 
 
 Equality functions are not called if the `this` context of the function has changed (see below).
 
-Here is an example that uses a [lodash.isEqual](https://lodash.com/docs/4.17.15#isEqual) deep equal equality check
+Here is an example that uses [`isEqual` from es-toolkit](https://es-toolkit.dev/reference/predicate/isEqual.html) as a deep equal equality check
 
-> `lodash.isequal` correctly handles deep comparing two arrays
+> `isEqual` from `es-toolkit` correctly handles deep comparing two arrays
 
 ```js
 import { memoizeOne } from 'memoize-one';
-import isDeepEqual from 'lodash.isequal';
+import { isEqual as isDeepEqual } from 'es-toolkit';
 
 const identity = (x) => x;
 
@@ -533,7 +533,7 @@ You are welcome to use the `MemoizedFn` generic directly from `memoize-one` if y
 
 ```ts
 import { memoizeOne, type MemoizedFn } from 'memoize-one';
-import isDeepEqual from 'lodash.isequal';
+import { isEqual as isDeepEqual } from 'es-toolkit';
 import { expectTypeOf } from 'expect-type';
 
 // Takes any function: TFunc, and returns a Memoized<TFunc>
@@ -554,7 +554,7 @@ In this specific example, this type would have been correctly inferred too
 
 ```ts
 import { memoizeOne, type MemoizedFn } from 'memoize-one';
-import isDeepEqual from 'lodash.isequal';
+import { isEqual as isDeepEqual } from 'es-toolkit';
 import { expectTypeOf } from 'expect-type';
 
 // return type of MemoizedFn<TFunc> is inferred
