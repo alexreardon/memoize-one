@@ -46,7 +46,7 @@ memoizedAdd(1, 2);
 // 👇
 // While the result of `add(1, 2)` was previously cached
 // `(1, 2)` was not the *latest* arguments (the last call was `(2, 3)`)
-// so the previous cached result of `(1, 3)` was lost
+// so the previous cached result of `(1, 2)` was lost
 ```
 
 ## Installation
