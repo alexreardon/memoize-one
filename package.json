@@ -76,7 +76,6 @@
     "test:size": "npm run build && size-limit",
     "build": "npm run build:clean && tsc -p tsconfig.build.json",
     "build:clean": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\"",
-    "prepublishOnly": "npm run build",
     "bench": "node benchmarks/comparison/run.ts",
     "bench:library-comparison": "npm run build && cd benchmarks/library-comparison && npm ci && npm start",
     "check:package": "publint --strict && attw --pack . --profile esm-only",

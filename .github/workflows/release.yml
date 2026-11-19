@@ -1,0 +1,42 @@
+name: Release
+
+# Publishes to npm when a GitHub Release is published.
+# Uses npm trusted publishing (OIDC), so there is no npm token.
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    # The `npm` environment requires a maintainer to approve each release
+    environment: npm
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          registry-url: https://registry.npmjs.org
+      - name: Check the release tag matches package.json
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          VERSION="v$(node -p "require('./package.json').version")"
+          if [ "$TAG" != "$VERSION" ]; then
+            echo "Release tag $TAG does not match package.json version $VERSION"
+            exit 1
+          fi
+      - run: npm ci
+      - run: npm test
+      # Run explicitly: `ignore-scripts=true` in .npmrc skips prepublishOnly
+      - run: npm run build
+      - run: npm run check:package
+      - run: npm publish

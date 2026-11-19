@@ -1,14 +1,44 @@
 version: 2
 updates:
-  # Enable version updates for npm
-  - package-ecosystem: 'npm'
-    # Look for `package.json` and `lock` files in the `root` directory
-    directory: '/'
+  - package-ecosystem: npm
+    directory: /
     # Always increase the version requirement to match the new version.
     versioning-strategy: increase
-    # Check the npm registry for updates at the start of every week
     schedule:
-      interval: 'weekly'
-      day: 'monday'
+      interval: weekly
+      day: monday
       time: '08:00'
-      timezone: 'Australia/Sydney'
+      timezone: Australia/Sydney
+    # Matches min-release-age in .npmrc
+    cooldown:
+      default-days: 7
+    groups:
+      dev-dependencies:
+        dependency-type: development
+
+  - package-ecosystem: npm
+    directory: /benchmarks/library-comparison
+    versioning-strategy: increase
+    schedule:
+      interval: weekly
+      day: monday
+      time: '08:00'
+      timezone: Australia/Sydney
+    cooldown:
+      default-days: 7
+    groups:
+      library-comparison:
+        patterns: ['*']
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '08:00'
+      timezone: Australia/Sydney
+    cooldown:
+      default-days: 7
+    groups:
+      github-actions:
+        patterns: ['*']
