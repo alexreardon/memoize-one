@@ -60,7 +60,11 @@ function slowFn() {
 const scenarios = [
   {
     name: 'no arguments',
-    baseFn: slowFn,
+    // Returning a value: some libraries (such as fast-memoize) do not cache `undefined`
+    baseFn: function getValue() {
+      slowFn();
+      return 'value';
+    },
     args: [],
   },
   {
