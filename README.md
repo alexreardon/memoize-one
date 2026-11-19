@@ -596,7 +596,7 @@ expectTypeOf<typeof memoized>().toEqualTypeOf<MemoizedFn<typeof add>>();
 
 ### Extremely fast
 
-`memoize-one` is one of the fastest options for remembering the latest invocation. In these benchmarks `micro-memoize` is a little faster in most scenarios, and `fast-memoize` is faster for a single primitive argument (but much slower in the other scenarios).
+`memoize-one` performs similarly to other popular memoization libraries for remembering the latest invocation.
 
 The comparisons are not exhaustive and are primarily to show that `memoize-one` accomplishes remembering the latest invocation really fast. There is variability between runs. The benchmarks do not take into account the differences in feature sets, library sizes, parse time, and so on.
 
