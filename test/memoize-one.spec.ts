@@ -1,3 +1,5 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Mock } from 'vitest';
 import memoize, { EqualityFn } from '../src/memoize-one';
 import isDeepEqual from 'lodash.isequal';
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -20,7 +22,7 @@ describe('standard behaviour - baseline', () => {
   let memoizedAdd: AddFn;
 
   beforeEach(() => {
-    add = jest.fn().mockImplementation((value1: number, value2: number): number => value1 + value2);
+    add = vi.fn().mockImplementation((value1: number, value2: number): number => value1 + value2);
     memoizedAdd = memoize(add);
   });
 
@@ -204,7 +206,7 @@ describe('standard behaviour - dynamic', () => {
       let memoized: (...args: any[]) => unknown;
 
       beforeEach(() => {
-        mock = jest.fn().mockImplementation((...args) => {
+        mock = vi.fn().mockImplementation((...args) => {
           if (isShallowEqual(args, first.args)) {
             return first.result;
           }
@@ -388,7 +390,7 @@ describe('respecting "this" context', () => {
       const temp = {
         a: 40,
       };
-      const spy = jest.fn().mockImplementation(getA);
+      const spy = vi.fn().mockImplementation(getA);
 
       const getAMemoized = memoize(spy).bind(temp);
 
@@ -457,7 +459,7 @@ describe('context change', () => {
 
 describe('skip equality check', () => {
   it('should not run any equality checks if the "this" context changes', () => {
-    const isEqual = jest.fn().mockReturnValue(true);
+    const isEqual = vi.fn().mockReturnValue(true);
     const memoized = memoize(getA, isEqual);
     const obj1: HasA = {
       a: 10,
@@ -478,8 +480,8 @@ describe('skip equality check', () => {
   });
 
   it('should run a custom equality check if the arguments length changes', () => {
-    const mock = jest.fn();
-    const isEqual = jest.fn().mockReturnValue(true);
+    const mock = vi.fn();
+    const isEqual = vi.fn().mockReturnValue(true);
     const memoized = memoize(mock, isEqual);
 
     memoized(1, 2);
@@ -498,13 +500,13 @@ describe('custom equality function', () => {
   let equalityStub: EqualityFn<AddFn>;
 
   beforeEach(() => {
-    add = jest.fn().mockImplementation((value1: number, value2: number): number => value1 + value2);
-    equalityStub = jest.fn();
+    add = vi.fn().mockImplementation((value1: number, value2: number): number => value1 + value2);
+    equalityStub = vi.fn();
     memoizedAdd = memoize(add, equalityStub);
   });
 
   it('should call the equality function with the newArgs, lastArgs and lastValue', () => {
-    (equalityStub as jest.Mock).mockReturnValue(true);
+    (equalityStub as Mock).mockReturnValue(true);
 
     // first call does not trigger equality check
     memoizedAdd(1, 2);
@@ -529,7 +531,7 @@ describe('custom equality function', () => {
       age: 1,
     };
 
-    const addAges = jest
+    const addAges = vi
       .fn()
       .mockImplementation((...people: Person[]): number =>
         people.reduce((sum: number, person: Person) => sum + person.age, 0),
@@ -551,7 +553,7 @@ describe('custom equality function', () => {
   });
 
   it('should return the previous value without executing the result fn if the equality fn returns true', () => {
-    (equalityStub as jest.Mock).mockReturnValue(true);
+    (equalityStub as Mock).mockReturnValue(true);
 
     // hydrate the first value
     const first: number = memoizedAdd(1, 2);
@@ -572,7 +574,7 @@ describe('custom equality function', () => {
   });
 
   it('should return execute and return the result of the result fn if the equality fn returns false', () => {
-    (equalityStub as jest.Mock).mockReturnValue(false);
+    (equalityStub as Mock).mockReturnValue(false);
 
     // hydrate the first value
     const first: number = memoizedAdd(1, 2);
@@ -603,7 +605,7 @@ describe('throwing', () => {
   });
 
   it('should not memoize a thrown result', () => {
-    const willThrow = jest.fn().mockImplementation((message: string) => {
+    const willThrow = vi.fn().mockImplementation((message: string) => {
       throw new Error(message);
     });
     const memoized = memoize(willThrow);
@@ -628,7 +630,7 @@ describe('throwing', () => {
   });
 
   it('should not break the memoization cache of a successful call', () => {
-    const canThrow = jest.fn().mockImplementation((shouldThrow: boolean) => {
+    const canThrow = vi.fn().mockImplementation((shouldThrow: boolean) => {
       if (shouldThrow) {
         throw new Error('hey friend');
       }
@@ -702,7 +704,7 @@ describe('throwing', () => {
     ];
 
     values.forEach((value: unknown) => {
-      const throwValue = jest.fn().mockImplementation(() => {
+      const throwValue = vi.fn().mockImplementation(() => {
         throw value;
       });
       const memoized = memoize(throwValue);

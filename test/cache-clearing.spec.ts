@@ -1,7 +1,8 @@
+import { expect, it, vi } from 'vitest';
 import memoize from '../src/memoize-one';
 
 it('should enable cache clearing', () => {
-  const underlyingFn = jest.fn(function add(a: number, b: number) {
+  const underlyingFn = vi.fn(function add(a: number, b: number) {
     return a + b;
   });
 

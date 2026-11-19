@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import isDeepEqual from 'lodash.isequal';
 import type { EqualityFn, MemoizedFn } from './../src/memoize-one';
-import { expectTypeOf } from 'expect-type';
+import { expect, expectTypeOf, it } from 'vitest';
 import memoize from '../src/memoize-one';
 
 it('should maintain the types of the original function', () => {
@@ -76,7 +76,10 @@ it('should allow casting back to the original function type', () => {
   // baseline
   {
     const memoized = memoize(add);
-    expectTypeOf<typeof memoized>().toEqualTypeOf<AddFn>();
+    // a memoized function is assignable to the original function type,
+    // but is not equal to it (it has an extra `.clear()` property)
+    expectTypeOf<typeof memoized>().not.toEqualTypeOf<AddFn>();
+    expectTypeOf<typeof memoized>().toMatchTypeOf<AddFn>();
     expectTypeOf<typeof memoized>().toEqualTypeOf<MemoizedFn<typeof add>>();
     expectTypeOf<typeof memoized>().toEqualTypeOf<MemoizedFn<AddFn>>();
     expectTypeOf<typeof memoized>().toMatchTypeOf<MemoizedFn<typeof add>>();
