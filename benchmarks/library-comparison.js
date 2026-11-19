@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import Benchmark from 'benchmark';
-import memoizeOne from '../dist/memoize-one.js';
+import { memoizeOne } from '../dist/memoize-one.js';
 import lodash from 'lodash.memoize';
 import fastMemoize from 'fast-memoize';
 import mem from 'mem';

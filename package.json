@@ -33,8 +33,15 @@
   ],
   "size-limit": [
     {
+      "name": "import { memoizeOne }",
       "path": "dist/memoize-one.js",
-      "limit": "250 B"
+      "import": "{ memoizeOne }",
+      "limit": "185 B"
+    },
+    {
+      "name": "whole module",
+      "path": "dist/memoize-one.js",
+      "limit": "225 B"
     }
   ],
   "devDependencies": {

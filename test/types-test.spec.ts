@@ -1,15 +1,14 @@
 // Type tests declare functions and values only to check their types
 /* oxlint-disable no-unused-vars */
 import isDeepEqual from 'lodash.isequal';
-import type { EqualityFn, MemoizedFn } from '../src/memoize-one.js';
 import { expect, expectTypeOf, it } from 'vitest';
-import memoize from '../src/memoize-one.js';
+import { memoizeOne, type EqualityFn, type MemoizedFn } from '../src/memoize-one.js';
 
 it('should maintain the types of the original function', () => {
   function getLocation(this: Window, value: number) {
     return this.location;
   }
-  const memoized = memoize(getLocation);
+  const memoized = memoizeOne(getLocation);
 
   expectTypeOf<ThisParameterType<typeof getLocation>>().toEqualTypeOf<
     ThisParameterType<typeof memoized>
@@ -22,7 +21,7 @@ it('should add a .clear function property', () => {
   function add(first: number, second: number) {
     return first + second;
   }
-  const memoized = memoize(add);
+  const memoized = memoizeOne(add);
   memoized.clear();
 
   // @ts-expect-error
@@ -36,14 +35,14 @@ it('should return a `MemoizedFn<T>`', () => {
     return first + second;
   }
 
-  const memoized = memoize(add);
+  const memoized = memoizeOne(add);
 
   expectTypeOf<typeof memoized>().toEqualTypeOf<MemoizedFn<typeof add>>();
 });
 
 it('should allow you to leverage the MemoizedFn generic to allow many memoized functions', () => {
   function withDeepEqual<TFunc extends (...args: any[]) => any>(fn: TFunc): MemoizedFn<TFunc> {
-    return memoize(fn, isDeepEqual);
+    return memoizeOne(fn, isDeepEqual);
   }
   function add(first: number, second: number): number {
     return first + second;
@@ -61,7 +60,7 @@ it('should return a memoized function that satisies a typeof check for the origi
   function caller(fn: typeof add) {
     return fn(1, 2);
   }
-  const memoized = memoize(add);
+  const memoized = memoizeOne(add);
 
   // this line is the actual type test
   const result = caller(memoized);
@@ -75,7 +74,7 @@ it('should allow casting back to the original function type', () => {
   }
   // baseline
   {
-    const memoized = memoize(add);
+    const memoized = memoizeOne(add);
     // a memoized function is assignable to the original function type,
     // but is not equal to it (it has an extra `.clear()` property)
     expectTypeOf<typeof memoized>().not.toEqualTypeOf<AddFn>();
@@ -86,25 +85,25 @@ it('should allow casting back to the original function type', () => {
     expectTypeOf<typeof memoized>().toMatchTypeOf<MemoizedFn<AddFn>>();
   }
   {
-    const memoized: typeof add = memoize(add);
+    const memoized: typeof add = memoizeOne(add);
     expectTypeOf<typeof memoized>().toEqualTypeOf<AddFn>();
     expectTypeOf<typeof memoized>().not.toMatchTypeOf<MemoizedFn<typeof add>>();
     expectTypeOf<typeof memoized>().not.toMatchTypeOf<MemoizedFn<AddFn>>();
   }
   {
-    const memoized: AddFn = memoize(add);
+    const memoized: AddFn = memoizeOne(add);
     expectTypeOf<typeof memoized>().toEqualTypeOf<AddFn>();
     expectTypeOf<typeof memoized>().not.toMatchTypeOf<MemoizedFn<typeof add>>();
     expectTypeOf<typeof memoized>().not.toMatchTypeOf<MemoizedFn<AddFn>>();
   }
   {
-    const memoized = memoize(add) as typeof add;
+    const memoized = memoizeOne(add) as typeof add;
     expectTypeOf<typeof memoized>().toEqualTypeOf<AddFn>();
     expectTypeOf<typeof memoized>().not.toMatchTypeOf<MemoizedFn<typeof add>>();
     expectTypeOf<typeof memoized>().not.toMatchTypeOf<MemoizedFn<AddFn>>();
   }
   {
-    const memoized = memoize(add) as AddFn;
+    const memoized = memoizeOne(add) as AddFn;
     expectTypeOf<typeof memoized>().toEqualTypeOf<AddFn>();
     expectTypeOf<typeof memoized>().not.toMatchTypeOf<MemoizedFn<typeof add>>();
     expectTypeOf<typeof memoized>().not.toMatchTypeOf<MemoizedFn<AddFn>>();

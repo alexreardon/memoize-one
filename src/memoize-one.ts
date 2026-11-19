@@ -1,11 +1,18 @@
-import areInputsEqual from './are-inputs-equal.js';
-
+/**
+ * A function that decides if the new arguments are equal to the last arguments.
+ * Return `true` to use the cached result, or `false` to call the result function again.
+ */
 export type EqualityFn<TFunc extends (...args: any[]) => any> = (
   newArgs: Parameters<TFunc>,
   lastArgs: Parameters<TFunc>,
 ) => boolean;
 
+/**
+ * A memoized version of `TFunc`. It has the same call signature as `TFunc`,
+ * plus a `.clear()` function to clear the cache.
+ */
 export type MemoizedFn<TFunc extends (this: any, ...args: any[]) => any> = {
+  /** Clear the cache, so that the next call will call the result function again */
   clear: () => void;
   (this: ThisParameterType<TFunc>, ...args: Parameters<TFunc>): ReturnType<TFunc>;
 };
@@ -17,7 +24,40 @@ type Cache<TFunc extends (this: any, ...args: any[]) => any> = {
   lastResult: ReturnType<TFunc>;
 };
 
-function memoizeOne<TFunc extends (this: any, ...newArgs: any[]) => any>(
+/**
+ * The default equality check used by `memoizeOne`.
+ *
+ * Returns `true` when both lists have the same length,
+ * and each item is the same value according to `Object.is`.
+ */
+export function areInputsEqual(
+  newInputs: readonly unknown[],
+  lastInputs: readonly unknown[],
+): boolean {
+  // no checks needed if the inputs length has changed
+  if (newInputs.length !== lastInputs.length) {
+    return false;
+  }
+  // Using for loop for speed. It generally performs better than array.every
+  // https://github.com/alexreardon/memoize-one/pull/59
+  for (let i = 0; i < newInputs.length; i++) {
+    if (!Object.is(newInputs[i], lastInputs[i])) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
+ * Memoize a function so that it only remembers the latest arguments and result.
+ *
+ * The result function is called again when `this` or the arguments change.
+ * By default, arguments are compared with `areInputsEqual` (`Object.is` on each argument).
+ *
+ * @param resultFn The function to memoize
+ * @param isEqual An optional custom equality function for the arguments
+ */
+export function memoizeOne<TFunc extends (this: any, ...newArgs: any[]) => any>(
   resultFn: TFunc,
   isEqual: EqualityFn<TFunc> = areInputsEqual,
 ): MemoizedFn<TFunc> {
@@ -28,7 +68,7 @@ function memoizeOne<TFunc extends (this: any, ...newArgs: any[]) => any>(
     this: ThisParameterType<TFunc>,
     ...newArgs: Parameters<TFunc>
   ): ReturnType<TFunc> {
-    if (cache && cache.lastThis === this && isEqual(newArgs, cache.lastArgs)) {
+    if (cache && Object.is(cache.lastThis, this) && isEqual(newArgs, cache.lastArgs)) {
       return cache.lastResult;
     }
 
@@ -52,5 +92,3 @@ function memoizeOne<TFunc extends (this: any, ...newArgs: any[]) => any>(
 
   return memoized;
 }
-
-export default memoizeOne;
