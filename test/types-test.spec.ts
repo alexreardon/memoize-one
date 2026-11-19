@@ -1,11 +1,11 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+// Type tests declare functions and values only to check their types
+/* oxlint-disable no-unused-vars */
 import isDeepEqual from 'lodash.isequal';
 import type { EqualityFn, MemoizedFn } from './../src/memoize-one';
 import { expect, expectTypeOf, it } from 'vitest';
 import memoize from '../src/memoize-one';
 
 it('should maintain the types of the original function', () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   function getLocation(this: Window, value: number) {
     return this.location;
   }

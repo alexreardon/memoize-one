@@ -2,7 +2,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
 import memoize, { EqualityFn } from '../src/memoize-one';
 import isDeepEqual from 'lodash.isequal';
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 type HasA = {
   a: number;
