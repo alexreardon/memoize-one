@@ -18,14 +18,7 @@
     "url": "https://github.com/alexreardon/memoize-one/issues"
   },
   "type": "module",
-  "exports": {
-    ".": {
-      "types": "./dist/memoize-one.d.ts",
-      "default": "./dist/memoize-one.js"
-    },
-    "./package.json": "./package.json"
-  },
-  "types": "./dist/memoize-one.d.ts",
+  "exports": "./dist/memoize-one.js",
   "sideEffects": false,
   "files": [
     "dist",
