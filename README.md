@@ -3,7 +3,7 @@
 A memoization library that only caches the result of the most recent arguments.
 
 [![npm](https://img.shields.io/npm/v/memoize-one.svg)](https://www.npmjs.com/package/memoize-one)
-![types](https://img.shields.io/badge/types-typescript%20%7C%20flow-blueviolet)
+![types](https://img.shields.io/badge/types-typescript-blueviolet)
 [![minzip](https://img.shields.io/bundlephobia/minzip/memoize-one.svg)](https://www.npmjs.com/package/memoize-one)
 [![Downloads per month](https://img.shields.io/npm/dm/memoize-one.svg)](https://www.npmjs.com/package/memoize-one)
 
@@ -16,8 +16,7 @@ Unlike other memoization libraries, `memoize-one` only remembers the latest argu
 ## Usage
 
 ```js
-// memoize-one uses the default import
-import memoizeOne from 'memoize-one';
+import { memoizeOne } from 'memoize-one';
 
 function add(a, b) {
   return a + b;
@@ -52,27 +51,61 @@ memoizedAdd(1, 2);
 ## Installation
 
 ```bash
-# yarn
-yarn add memoize-one
-
-# npm
-npm install memoize-one --save
+npm install memoize-one
 ```
+
+## Supported environments
+
+`memoize-one` v7 is an [ES module](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules) only package, written in ES2022 syntax.
+
+- **Browsers**: browsers that are [Baseline widely available](https://web.dev/baseline) (Chrome, Edge and Firefox 111+, Safari 16.4+), with any modern bundler
+- **Node.js**: `import` works in all supported versions. `require()` works in Node.js 20.19+ and 22.12+ (through [`require(esm)`](https://nodejs.org/api/modules.html#loading-ecmascript-modules-using-require))
+
+```js
+// ES modules
+import { memoizeOne } from 'memoize-one';
+
+// CommonJS (Node.js 20.19+ and 22.12+)
+const { memoizeOne } = require('memoize-one');
+```
+
+If you need to support older environments, please use `memoize-one` v6.
+
+## Upgrading from v6
+
+1. **Named export.** There is no default export anymore:
+
+   ```diff
+   - import memoizeOne from 'memoize-one';
+   + import { memoizeOne } from 'memoize-one';
+   ```
+
+2. **Arguments are compared with `Object.is`.** `NaN` is still equal to `NaN`. The only change is that `+0` and `-0` are now treated as different arguments, so `memoized(0)` followed by `memoized(-0)` will call your function again. The `this` context is also compared with `Object.is`.
+3. **ES module only.** The CommonJS and UMD builds are gone. CommonJS users on Node.js 20.19+ and 22.12+ can still `require()` the package. If you used the UMD build from a CDN, load the module instead: `<script type="module">import { memoizeOne } from 'https://cdn.jsdelivr.net/npm/memoize-one@7/+esm';</script>`
+4. **ES2022 syntax.** Internet Explorer 11 is no longer supported (see [supported environments](#supported-environments)).
+5. **No Flow types.** The Flow type definitions are no longer included.
+6. **New: `areInputsEqual` is exported**, so you can build on the default equality check (see [custom equality function](#custom-equality-function)).
 
 ## Function argument equality
 
-By default, we apply our own _fast_ and _relatively naive_ equality function to determine whether the arguments provided to your function are equal. You can see the full code here: [are-inputs-equal.ts](https://github.com/alexreardon/memoize-one/blob/master/src/are-inputs-equal.ts).
+By default, we apply our own _fast_ and _relatively naive_ equality function (`areInputsEqual`) to determine whether the arguments provided to your function are equal. You can see the full code here: [memoize-one.ts](https://github.com/alexreardon/memoize-one/blob/master/src/memoize-one.ts).
 
 (By default) function arguments are considered equal if:
 
 1. there is same amount of arguments
-2. each new argument has strict equality (`===`) with the previous argument
-3. **[special case]** if two arguments are not `===` and they are both `NaN` then the two arguments are treated as equal
+2. each new argument is the same value as the previous argument, according to [`Object.is`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is)
+
+`Object.is` is the same as strict equality (`===`), except for two special cases:
+
+- `NaN` is equal to `NaN`
+- `+0` and `-0` are not equal
+
+This is the same comparison that React uses for hook dependencies (such as in `useMemo`).
 
 What this looks like in practice:
 
 ```js
-import memoizeOne from 'memoize-one';
+import { memoizeOne } from 'memoize-one';
 
 // add all numbers provided to the function
 const add = (...args = []) =>
@@ -90,26 +123,35 @@ memoizedAdd(1, 2);
 memoizedAdd(1, 2, 3);
 ```
 
-> 2. new arguments have strict equality (`===`) with the previous argument
+> 2. each new argument is the same value as the previous argument, according to `Object.is`
 
 ```js
 memoizedAdd(1, 2);
-// each argument is `===` to the last argument, so cache is used
+// each argument is the same value as the last argument, so cache is used
 memoizedAdd(1, 2);
 // second argument has changed, so add function is called again
 memoizedAdd(1, 3);
-// the first value is not `===` to the previous first value (1 !== 3)
+// the first value is not the same value as the previous first value (1 !== 3)
 // so add function is called again
 memoizedAdd(3, 1);
 ```
 
-> 3. **[special case]** if the arguments are not `===` and they are both `NaN` then the argument is treated as equal
+> **[special case]** `NaN` is equal to `NaN`
 
 ```js
 memoizedAdd(NaN);
-// Even though NaN !== NaN these arguments are
-// treated as equal as they are both `NaN`
+// Even though NaN !== NaN, Object.is(NaN, NaN) is true
+// so the cache is used
 memoizedAdd(NaN);
+```
+
+> **[special case]** `+0` and `-0` are not equal
+
+```js
+memoizedAdd(0);
+// Even though 0 === -0, Object.is(0, -0) is false
+// so add function is called again
+memoizedAdd(-0);
 ```
 
 ## Custom equality function
@@ -131,7 +173,7 @@ Here is an example that uses a [lodash.isEqual](https://lodash.com/docs/4.17.15#
 > `lodash.isequal` correctly handles deep comparing two arrays
 
 ```js
-import memoizeOne from 'memoize-one';
+import { memoizeOne } from 'memoize-one';
 import isDeepEqual from 'lodash.isequal';
 
 const identity = (x) => x;
@@ -148,6 +190,16 @@ const result3 = deepMemoized({ foo: 'bar' });
 const result4 = deepMemoized({ foo: 'bar' });
 
 result3 === result4; // true - arguments are deep equal
+```
+
+You can build on the default equality check with `areInputsEqual`. For example, to ignore the last argument:
+
+```js
+import { memoizeOne, areInputsEqual } from 'memoize-one';
+
+const memoized = memoizeOne(format, (newArgs, lastArgs) =>
+  areInputsEqual(newArgs.slice(0, -1), lastArgs.slice(0, -1)),
+);
 ```
 
 The equality function needs to conform to the `EqualityFn` `type`:
@@ -338,7 +390,7 @@ getA.call(temp1); // 20
 getA.call(temp2); // 30
 ```
 
-Therefore, in order to prevent against unexpected results, `memoize-one` takes into account the current execution context (`this`) of the memoized function. If `this` is different to the previous invocation then it is considered a change in argument. [further discussion](https://github.com/alexreardon/memoize-one/issues/3).
+Therefore, in order to prevent against unexpected results, `memoize-one` takes into account the current execution context (`this`) of the memoized function. If `this` is different to the previous invocation (according to `Object.is`) then it is considered a change in argument. [further discussion](https://github.com/alexreardon/memoize-one/issues/3).
 
 Generally this will be of no impact if you are not explicity controlling the `this` context of functions you want to memoize with [explicit binding](https://github.com/getify/You-Dont-Know-JS/blob/master/this%20%26%20object%20prototypes/ch2.md#explicit-binding) or [implicit binding](https://github.com/getify/You-Dont-Know-JS/blob/master/this%20%26%20object%20prototypes/ch2.md#implicit-binding). `memoize-One` will detect when you are manipulating `this` and will then consider the `this` context as an argument. If `this` changes, it will re-execute the original function even if the arguments have not changed.
 
@@ -352,7 +404,7 @@ This is helpful if you want to:
 - Allow the result function to be called again without having to change arguments
 
 ```ts
-import memoizeOne from 'memoize-one';
+import { memoizeOne } from 'memoize-one';
 
 function add(a: number, b: number): number {
   return a + b;
@@ -432,7 +484,7 @@ Functions memoized with `memoize-one` do not preserve any properties on the func
 > This behaviour is correctly reflected in the TypeScript types
 
 ```ts
-import memoizeOne from 'memoize-one';
+import { memoizeOne } from 'memoize-one';
 
 function add(a, b) {
   return a + b;
@@ -449,10 +501,10 @@ console.log(typeof memoized.hello); // undefined
 
 > If you feel strongly that `memoize-one` _should_ preserve function properties, please raise an issue. This decision was made in order to keep `memoize-one` as light as possible.
 
-For _now_, the `.length` property of a function is not preserved on the memoized function
+The `.length` property of a function is not preserved on the memoized function
 
 ```ts
-import memoizeOne from 'memoize-one';
+import { memoizeOne } from 'memoize-one';
 
 function add(a, b) {
   return a + b;
@@ -465,9 +517,16 @@ const memoized = memoizeOne(add);
 console.log(memoized.length); // 0
 ```
 
-There is no (great) way to correctly set the `.length` property of the memoized function while also supporting ie11. Once we [remove ie11 support](https://github.com/alexreardon/memoize-one/issues/125) then we plan on setting the `.length` property of the memoized function to match the original function
+If you need it, you can set the `.length` property yourself:
 
-[→ discussion](https://github.com/alexreardon/memoize-one/pull/124).
+```ts
+const memoized = memoizeOne(add);
+Object.defineProperty(memoized, 'length', { value: add.length });
+
+console.log(memoized.length); // 2
+```
+
+[→ discussion](https://github.com/alexreardon/memoize-one/issues/38).
 
 ## Memoized function `type`
 
@@ -487,13 +546,13 @@ declare type MemoizedFn<TFunc extends (this: any, ...args: any[]) => any> = {
 You are welcome to use the `MemoizedFn` generic directly from `memoize-one` if you like:
 
 ```ts
-import memoize, { MemoizedFn } from 'memoize-one';
+import { memoizeOne, type MemoizedFn } from 'memoize-one';
 import isDeepEqual from 'lodash.isequal';
 import { expectTypeOf } from 'expect-type';
 
 // Takes any function: TFunc, and returns a Memoized<TFunc>
 function withDeepEqual<TFunc extends (...args: any[]) => any>(fn: TFunc): MemoizedFn<TFunc> {
-  return memoize(fn, isDeepEqual);
+  return memoizeOne(fn, isDeepEqual);
 }
 
 function add(first: number, second: number): number {
@@ -508,13 +567,13 @@ expectTypeOf<typeof memoized>().toEqualTypeOf<MemoizedFn<typeof add>>();
 In this specific example, this type would have been correctly inferred too
 
 ```ts
-import memoize, { MemoizedFn } from 'memoize-one';
+import { memoizeOne, type MemoizedFn } from 'memoize-one';
 import isDeepEqual from 'lodash.isequal';
 import { expectTypeOf } from 'expect-type';
 
 // return type of MemoizedFn<TFunc> is inferred
 function withDeepEqual<TFunc extends (...args: any[]) => any>(fn: TFunc) {
-  return memoize(fn, isDeepEqual);
+  return memoizeOne(fn, isDeepEqual);
 }
 
 function add(first: number, second: number): number {
@@ -632,5 +691,6 @@ You can run this test in the repo with `npm run bench:library-comparison`
 
 - Tested with all built in [JavaScript types](https://github.com/getify/You-Dont-Know-JS/blob/1st-ed/types%20%26%20grammar/ch1.md)
 - Written in `Typescript`
-- Correct typing for `Typescript` and `flow` type systems
+- Correct typing for `Typescript`, checked with [`publint`](https://publint.dev) and [`arethetypeswrong`](https://arethetypeswrong.github.io)
+- ES module only
 - No dependencies
