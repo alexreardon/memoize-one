@@ -146,6 +146,17 @@ describe('standard behaviour - dynamic', () => {
       },
     },
     {
+      name: 'bigint',
+      first: {
+        args: [1n, 2n],
+        result: 3n,
+      },
+      second: {
+        args: [1n, 5n],
+        result: 6n,
+      },
+    },
+    {
       name: 'string',
       first: {
         args: ['hi', 'there'],
@@ -479,6 +490,26 @@ describe('areInputsEqual', () => {
     const obj = {};
     expect(areInputsEqual([1, 'a', obj, NaN, undefined], [1, 'a', obj, NaN, undefined])).toBe(true);
     expect(areInputsEqual([], [])).toBe(true);
+  });
+
+  it('should compare bigint inputs by value', () => {
+    // separately created bigints with the same value are the same value
+    expect(areInputsEqual([10n], [BigInt(10)])).toBe(true);
+    expect(areInputsEqual([10n], [11n])).toBe(false);
+    // a bigint is never the same value as a number
+    expect(areInputsEqual([1n], [1])).toBe(false);
+  });
+
+  it('should use the cache for bigint arguments with the same value', () => {
+    const double = vi.fn((value: bigint) => value * 2n);
+    const memoized = memoizeOne(double);
+
+    expect(memoized(10n)).toBe(20n);
+    expect(memoized(BigInt(10))).toBe(20n);
+    expect(double).toHaveBeenCalledTimes(1);
+
+    expect(memoized(11n)).toBe(22n);
+    expect(double).toHaveBeenCalledTimes(2);
   });
 
   it('should return false when the inputs have different lengths', () => {
