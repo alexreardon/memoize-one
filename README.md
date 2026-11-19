@@ -613,13 +613,12 @@ You can run this test in the repo with `npm run bench:library-comparison`
 | Position | Library                                      | Operations per second |
 | -------- | -------------------------------------------- | --------------------- |
 | 1        | micro-memoize                                | 141,030,495           |
-| 2        | memoize-one (v6)                             | 110,207,965           |
-| 3        | memoize-one (v7)                             | 106,945,637           |
-| 4        | memoizee                                     | 41,745,115            |
-| 5        | lodash memoize (JSON.stringify key resolver) | 10,825,368            |
-| 6        | memoize (JSON.stringify cache key)           | 10,210,920            |
-| 7        | fast-memoize                                 | 5,026,269             |
-| 8        | no memoization                               | 500                   |
+| 2        | memoize-one                                  | 106,945,637           |
+| 3        | memoizee                                     | 41,745,115            |
+| 4        | lodash memoize (JSON.stringify key resolver) | 10,825,368            |
+| 5        | memoize (JSON.stringify cache key)           | 10,210,920            |
+| 6        | fast-memoize                                 | 5,026,269             |
+| 7        | no memoization                               | 500                   |
 
 **single primitive argument**
 
@@ -627,64 +626,59 @@ You can run this test in the repo with `npm run bench:library-comparison`
 | -------- | -------------------------------------------- | --------------------- |
 | 1        | fast-memoize                                 | 74,219,713            |
 | 2        | micro-memoize                                | 68,119,837            |
-| 3        | memoize-one (v7)                             | 66,542,477            |
-| 4        | memoize-one (v6)                             | 57,819,807            |
-| 5        | memoizee                                     | 38,166,401            |
-| 6        | lodash memoize (JSON.stringify key resolver) | 9,530,612             |
-| 7        | memoize (JSON.stringify cache key)           | 8,665,297             |
-| 8        | no memoization                               | 500                   |
+| 3        | memoize-one                                  | 66,542,477            |
+| 4        | memoizee                                     | 38,166,401            |
+| 5        | lodash memoize (JSON.stringify key resolver) | 9,530,612             |
+| 6        | memoize (JSON.stringify cache key)           | 8,665,297             |
+| 7        | no memoization                               | 500                   |
 
 **single complex argument**
 
 | Position | Library                                      | Operations per second |
 | -------- | -------------------------------------------- | --------------------- |
 | 1        | micro-memoize                                | 67,250,155            |
-| 2        | memoize-one (v7)                             | 66,619,381            |
-| 3        | memoize-one (v6)                             | 52,464,376            |
-| 4        | memoizee                                     | 29,420,344            |
-| 5        | lodash memoize (JSON.stringify key resolver) | 6,159,758             |
-| 6        | memoize (JSON.stringify cache key)           | 5,493,077             |
-| 7        | fast-memoize                                 | 4,032,231             |
-| 8        | no memoization                               | 500                   |
+| 2        | memoize-one                                  | 66,619,381            |
+| 3        | memoizee                                     | 29,420,344            |
+| 4        | lodash memoize (JSON.stringify key resolver) | 6,159,758             |
+| 5        | memoize (JSON.stringify cache key)           | 5,493,077             |
+| 6        | fast-memoize                                 | 4,032,231             |
+| 7        | no memoization                               | 500                   |
 
 **multiple primitive arguments**
 
 | Position | Library                                      | Operations per second |
 | -------- | -------------------------------------------- | --------------------- |
 | 1        | micro-memoize                                | 43,955,216            |
-| 2        | memoize-one (v7)                             | 41,135,924            |
-| 3        | memoize-one (v6)                             | 33,377,384            |
-| 4        | memoizee                                     | 17,383,751            |
-| 5        | lodash memoize (JSON.stringify key resolver) | 6,815,389             |
-| 6        | memoize (JSON.stringify cache key)           | 6,008,881             |
-| 7        | fast-memoize                                 | 3,560,268             |
-| 8        | no memoization                               | 500                   |
+| 2        | memoize-one                                  | 41,135,924            |
+| 3        | memoizee                                     | 17,383,751            |
+| 4        | lodash memoize (JSON.stringify key resolver) | 6,815,389             |
+| 5        | memoize (JSON.stringify cache key)           | 6,008,881             |
+| 6        | fast-memoize                                 | 3,560,268             |
+| 7        | no memoization                               | 500                   |
 
 **multiple complex arguments**
 
 | Position | Library                                      | Operations per second |
 | -------- | -------------------------------------------- | --------------------- |
 | 1        | micro-memoize                                | 44,009,357            |
-| 2        | memoize-one (v7)                             | 41,421,767            |
-| 3        | memoize-one (v6)                             | 34,158,257            |
-| 4        | memoizee                                     | 13,019,308            |
-| 5        | lodash memoize (JSON.stringify key resolver) | 3,802,209             |
-| 6        | memoize (JSON.stringify cache key)           | 3,558,650             |
-| 7        | fast-memoize                                 | 2,399,614             |
-| 8        | no memoization                               | 500                   |
+| 2        | memoize-one                                  | 41,421,767            |
+| 3        | memoizee                                     | 13,019,308            |
+| 4        | lodash memoize (JSON.stringify key resolver) | 3,802,209             |
+| 5        | memoize (JSON.stringify cache key)           | 3,558,650             |
+| 6        | fast-memoize                                 | 2,399,614             |
+| 7        | no memoization                               | 500                   |
 
 **multiple complex arguments (spreading arguments)**
 
 | Position | Library                                      | Operations per second |
 | -------- | -------------------------------------------- | --------------------- |
 | 1        | micro-memoize                                | 44,077,011            |
-| 2        | memoize-one (v7)                             | 41,380,234            |
-| 3        | memoize-one (v6)                             | 34,204,518            |
-| 4        | memoizee                                     | 31,624,028            |
-| 5        | lodash memoize (JSON.stringify key resolver) | 3,795,985             |
-| 6        | memoize (JSON.stringify cache key)           | 3,578,317             |
-| 7        | fast-memoize                                 | 2,397,002             |
-| 8        | no memoization                               | 500                   |
+| 2        | memoize-one                                  | 41,380,234            |
+| 3        | memoizee                                     | 31,624,028            |
+| 4        | lodash memoize (JSON.stringify key resolver) | 3,795,985             |
+| 5        | memoize (JSON.stringify cache key)           | 3,578,317             |
+| 6        | fast-memoize                                 | 2,397,002             |
+| 7        | no memoization                               | 500                   |
 
   </p>
 </details>

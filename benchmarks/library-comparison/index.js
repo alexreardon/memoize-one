@@ -3,7 +3,6 @@ import { styleText } from 'node:util';
 import { Bench } from 'tinybench';
 import { markdownTable } from 'markdown-table';
 import { memoizeOne } from 'memoize-one';
-import memoizeOneV6 from 'memoize-one-v6';
 import { memoize as lodashMemoize } from 'lodash-es';
 import fastMemoize from 'fast-memoize';
 import { memoize as microMemoize } from 'micro-memoize';
@@ -16,12 +15,8 @@ const libraries = [
     memoize: (fn) => fn,
   },
   {
-    name: 'memoize-one (v7)',
+    name: 'memoize-one',
     memoize: memoizeOne,
-  },
-  {
-    name: 'memoize-one (v6)',
-    memoize: memoizeOneV6,
   },
   {
     name: 'lodash memoize (JSON.stringify key resolver)',
