@@ -20,7 +20,7 @@
   },
   "overrides": [
     {
-      "files": ["test/**", "**/*.bench.ts"],
+      "files": ["test/**"],
       "plugins": ["vitest"],
       "rules": {
         "vitest/require-mock-type-parameters": "off",
