@@ -1,5 +1,5 @@
 import { expect, it, vi } from 'vitest';
-import memoize from '../src/memoize-one';
+import memoize from '../src/memoize-one.js';
 
 it('should enable cache clearing', () => {
   const underlyingFn = vi.fn(function add(a: number, b: number) {

@@ -1,9 +1,9 @@
 // Type tests declare functions and values only to check their types
 /* oxlint-disable no-unused-vars */
 import isDeepEqual from 'lodash.isequal';
-import type { EqualityFn, MemoizedFn } from './../src/memoize-one';
+import type { EqualityFn, MemoizedFn } from '../src/memoize-one.js';
 import { expect, expectTypeOf, it } from 'vitest';
-import memoize from '../src/memoize-one';
+import memoize from '../src/memoize-one.js';
 
 it('should maintain the types of the original function', () => {
   function getLocation(this: Window, value: number) {

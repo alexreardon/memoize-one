@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
-import memoize, { EqualityFn } from '../src/memoize-one';
+import memoize, { type EqualityFn } from '../src/memoize-one.js';
 import isDeepEqual from 'lodash.isequal';
 
 type HasA = {

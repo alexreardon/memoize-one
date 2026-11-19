@@ -1,4 +1,4 @@
-import areInputsEqual from './are-inputs-equal';
+import areInputsEqual from './are-inputs-equal.js';
 
 export type EqualityFn<TFunc extends (...args: any[]) => any> = (
   newArgs: Parameters<TFunc>,

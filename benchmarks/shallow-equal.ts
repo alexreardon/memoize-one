@@ -2,7 +2,7 @@ import benchmark from 'benchmark';
 
 const suite = new benchmark.Suite();
 
-import areInputsEqual from '../src/are-inputs-equal';
+import areInputsEqual from '../src/are-inputs-equal.ts';
 
 function shallowEvery(a: unknown[], b: unknown[]): boolean {
   if (a.length !== b.length) {

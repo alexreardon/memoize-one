@@ -1,14 +1,14 @@
 {
-  "compileOnSave": true,
   "compilerOptions": {
-    "outDir": "dist",
     "target": "ES2022",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "removeComments": true,
-    "esModuleInterop": true
+    "verbatimModuleSyntax": true,
+    "isolatedDeclarations": true,
+    "declaration": true,
+    "declarationMap": true,
+    "noEmit": true
   },
-  "include": ["src/", "test/"]
+  "include": ["src", "test"]
 }
