@@ -36,7 +36,17 @@ jobs:
           fi
       - run: npm ci
       - run: npm test
-      # Run explicitly: `ignore-scripts=true` in .npmrc skips prepublishOnly
+      # Run explicitly: `ignore-scripts=true` in .npmrc skips lifecycle scripts like prepublishOnly
       - run: npm run build
       - run: npm run check:package
-      - run: npm publish
+      # npm requires a dist-tag for prerelease versions (such as 7.0.0-beta.0)
+      - name: Publish
+        env:
+          PRERELEASE: ${{ github.event.release.prerelease }}
+        run: |
+          VERSION="$(node -p "require('./package.json').version")"
+          if [ "$PRERELEASE" = "true" ] || [[ "$VERSION" == *-* ]]; then
+            npm publish --tag next
+          else
+            npm publish
+          fi
