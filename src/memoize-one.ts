@@ -70,6 +70,8 @@ export function memoizeOne<TFunc extends (this: any, ...newArgs: any[]) => any>(
   // `TFunc & {}` makes TypeScript infer `TFunc` from `resultFn` first. Without it, an
   // equality function typed as `EqualityFn` or `EqualityFn<any>` would change `TFunc`.
   // The equality function is still used when `resultFn` has no parameter types.
+  // The TypeScript team says `T & {}` is a lower priority inference site by design:
+  // https://github.com/microsoft/TypeScript/issues/14829#issuecomment-320754731
   isEqual: EqualityFn<TFunc & {}> = areInputsEqual,
 ): MemoizedFn<TFunc> {
   let cache: Cache<TFunc> | null = null;
