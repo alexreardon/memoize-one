@@ -1,6 +1,11 @@
-import memoize, { EqualityFn } from '../src/memoize-one';
-import isDeepEqual from 'lodash.isequal';
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Mock } from 'vitest';
+import memoizeOneDefault, {
+  areInputsEqual,
+  memoizeOne,
+  type EqualityFn,
+} from '../src/memoize-one.js';
+import { isEqual as isDeepEqual } from 'es-toolkit';
 
 type HasA = {
   a: number;
@@ -20,8 +25,8 @@ describe('standard behaviour - baseline', () => {
   let memoizedAdd: AddFn;
 
   beforeEach(() => {
-    add = jest.fn().mockImplementation((value1: number, value2: number): number => value1 + value2);
-    memoizedAdd = memoize(add);
+    add = vi.fn().mockImplementation((value1: number, value2: number): number => value1 + value2);
+    memoizedAdd = memoizeOne(add);
   });
 
   it('should return the result of a function', () => {
@@ -68,11 +73,12 @@ describe('standard behaviour - dynamic', () => {
     second: Expectation;
   };
 
-  // [JavaScript defines seven built-in types:](https://github.com/getify/You-Dont-Know-JS/blob/master/types%20%26%20grammar/ch1.md)
+  // JavaScript has eight built-in types:
   //    - null
   //    - undefined
   //    - boolean
   //    - number
+  //    - bigint
   //    - string
   //    - object
   //    - symbol
@@ -133,6 +139,29 @@ describe('standard behaviour - dynamic', () => {
       },
     },
     {
+      // Object.is treats +0 and -0 as different values (=== does not)
+      name: 'number (+0 and -0 are different)',
+      first: {
+        args: [0, 2],
+        result: 'positive zero',
+      },
+      second: {
+        args: [-0, 2],
+        result: 'negative zero',
+      },
+    },
+    {
+      name: 'bigint',
+      first: {
+        args: [1n, 2n],
+        result: 3n,
+      },
+      second: {
+        args: [1n, 5n],
+        result: 6n,
+      },
+    },
+    {
       name: 'string',
       first: {
         args: ['hi', 'there'],
@@ -184,18 +213,7 @@ describe('standard behaviour - dynamic', () => {
       return true;
     }
 
-    return (
-      array1.length === array2.length &&
-      array1.every((item, i) => {
-        if (array2[i] === item) {
-          return true;
-        }
-        if (Number.isNaN(array2[i]) && Number.isNaN(item)) {
-          return true;
-        }
-        return false;
-      })
-    );
+    return array1.length === array2.length && array1.every((item, i) => Object.is(item, array2[i]));
   };
 
   inputs.forEach(({ name, first, second }) => {
@@ -204,7 +222,7 @@ describe('standard behaviour - dynamic', () => {
       let memoized: (...args: any[]) => unknown;
 
       beforeEach(() => {
-        mock = jest.fn().mockImplementation((...args) => {
+        mock = vi.fn().mockImplementation((...args) => {
           if (isShallowEqual(args, first.args)) {
             return first.result;
           }
@@ -214,7 +232,7 @@ describe('standard behaviour - dynamic', () => {
           throw new Error('unmatched argument');
         });
 
-        memoized = memoize(mock);
+        memoized = memoizeOne(mock);
       });
 
       it('should return the result of a function', () => {
@@ -260,7 +278,7 @@ describe('respecting "this" context', () => {
       const Foo = function (this: HasBar, bar: string): void {
         this.bar = bar;
       };
-      const memoized = memoize(function (bar) {
+      const memoized = memoizeOne(function (bar) {
         // @ts-ignore
         return new Foo(bar);
       });
@@ -276,7 +294,7 @@ describe('respecting "this" context', () => {
         a: 10,
       };
 
-      const memoized = memoize(function () {
+      const memoized = memoizeOne(function () {
         return getA.call(temp);
       });
 
@@ -288,7 +306,7 @@ describe('respecting "this" context', () => {
         a: 20,
       };
 
-      const memoized = memoize(getA.bind(temp));
+      const memoized = memoizeOne(getA.bind(temp));
 
       expect(memoized()).toBe(20);
     });
@@ -299,7 +317,7 @@ describe('respecting "this" context', () => {
         getA,
       };
 
-      const memoized = memoize(function () {
+      const memoized = memoizeOne(function () {
         return temp.getA();
       });
 
@@ -319,14 +337,14 @@ describe('respecting "this" context', () => {
         };
       }
       const bound = foo.call(temp);
-      const memoized = memoize(bound);
+      const memoized = memoizeOne(bound);
 
       expect(memoized()).toBe(50);
     });
 
     it('should respect ignored bindings', () => {
       const bound = getA.bind(null);
-      const memoized = memoize(bound);
+      const memoized = memoizeOne(bound);
 
       expect(memoized).toThrow(TypeError);
     });
@@ -334,7 +352,7 @@ describe('respecting "this" context', () => {
 
   describe('memoized function', () => {
     it('should respect new bindings', () => {
-      const memoizedGetA = memoize(getA);
+      const memoizedGetA = memoizeOne(getA);
       interface FooInterface {
         a: number;
         result: number;
@@ -355,7 +373,7 @@ describe('respecting "this" context', () => {
     });
 
     it('should respect implicit bindings', () => {
-      const getAMemoized = memoize(getA);
+      const getAMemoized = memoizeOne(getA);
       const temp = {
         a: 5,
         getAMemoized,
@@ -369,7 +387,7 @@ describe('respecting "this" context', () => {
         a: 10,
       };
 
-      const memoized = memoize(getA);
+      const memoized = memoizeOne(getA);
 
       expect(memoized.call(temp)).toBe(10);
     });
@@ -379,7 +397,7 @@ describe('respecting "this" context', () => {
         a: 20,
       };
 
-      const getAMemoized = memoize(getA).bind(temp);
+      const getAMemoized = memoizeOne(getA).bind(temp);
 
       expect(getAMemoized()).toBe(20);
     });
@@ -388,30 +406,20 @@ describe('respecting "this" context', () => {
       const temp = {
         a: 40,
       };
-      const spy = jest.fn().mockImplementation(getA);
+      const spy = vi.fn().mockImplementation(getA);
 
-      const getAMemoized = memoize(spy).bind(temp);
+      const getAMemoized = memoizeOne(spy).bind(temp);
 
       expect(getAMemoized()).toBe(40);
       expect(getAMemoized()).toBe(40);
       expect(spy).toHaveBeenCalledTimes(1);
     });
 
-    it('should respect implicit bindings', () => {
-      const getAMemoized = memoize(getA);
-      const temp = {
-        a: 2,
-        getAMemoized,
-      };
-
-      expect(temp.getAMemoized()).toBe(2);
-    });
-
     it('should respect fat arrow bindings', () => {
       const temp: HasA = {
         a: 50,
       };
-      const memoizedGetA = memoize(getA);
+      const memoizedGetA = memoizeOne(getA);
       function foo() {
         // return an arrow function
         return (): number => {
@@ -421,13 +429,13 @@ describe('respecting "this" context', () => {
         };
       }
       const bound = foo.call(temp);
-      const memoized = memoize(bound);
+      const memoized = memoizeOne(bound);
 
       expect(memoized()).toBe(50);
     });
 
     it('should respect ignored bindings', () => {
-      const memoized = memoize(getA);
+      const memoized = memoizeOne(getA);
 
       const getResult = function (): number {
         return memoized.call(null);
@@ -440,7 +448,7 @@ describe('respecting "this" context', () => {
 
 describe('context change', () => {
   it('should break the memoization cache if the execution context changes', () => {
-    const memoized = memoize(getA);
+    const memoized = memoizeOne(getA);
     const temp1 = {
       a: 20,
       getMemoizedA: memoized,
@@ -453,12 +461,85 @@ describe('context change', () => {
     expect(temp1.getMemoizedA()).toBe(20);
     expect(temp2.getMemoizedA()).toBe(30);
   });
+
+  it('should compare the execution context with Object.is', () => {
+    const spy = vi.fn(function (this: unknown) {
+      return this;
+    });
+    const memoized = memoizeOne(spy);
+
+    // NaN is the same value as NaN according to Object.is
+    memoized.call(NaN);
+    memoized.call(NaN);
+    expect(spy).toHaveBeenCalledTimes(1);
+
+    // +0 and -0 are different values according to Object.is
+    memoized.call(0);
+    memoized.call(-0);
+    expect(spy).toHaveBeenCalledTimes(3);
+  });
+});
+
+describe('areInputsEqual', () => {
+  it('should return true when each input is the same value according to Object.is', () => {
+    const obj = {};
+    expect(areInputsEqual([1, 'a', obj, NaN, undefined], [1, 'a', obj, NaN, undefined])).toBe(true);
+    expect(areInputsEqual([], [])).toBe(true);
+  });
+
+  it('should compare bigint inputs by value', () => {
+    // separately created bigints with the same value are the same value
+    expect(areInputsEqual([10n], [BigInt(10)])).toBe(true);
+    expect(areInputsEqual([10n], [11n])).toBe(false);
+    // a bigint is never the same value as a number
+    expect(areInputsEqual([1n], [1])).toBe(false);
+  });
+
+  it('should use the cache for bigint arguments with the same value', () => {
+    const double = vi.fn((value: bigint) => value * 2n);
+    const memoized = memoizeOne(double);
+
+    expect(memoized(10n)).toBe(20n);
+    expect(memoized(BigInt(10))).toBe(20n);
+    expect(double).toHaveBeenCalledTimes(1);
+
+    expect(memoized(11n)).toBe(22n);
+    expect(double).toHaveBeenCalledTimes(2);
+  });
+
+  it('should return false when the inputs have different lengths', () => {
+    expect(areInputsEqual([1], [1, 2])).toBe(false);
+    expect(areInputsEqual([undefined], [])).toBe(false);
+  });
+
+  it('should return false when an input is a different value according to Object.is', () => {
+    expect(areInputsEqual([{}], [{}])).toBe(false);
+    expect(areInputsEqual([0], [-0])).toBe(false);
+    expect(areInputsEqual([1, 2], [1, 3])).toBe(false);
+  });
+
+  it('should be usable inside a custom equality function', () => {
+    const format = vi.fn(
+      (value: number, options: { label: string }) => `${options.label}: ${value}`,
+    );
+    // only compare the first argument
+    const memoized = memoizeOne(format, (newArgs, lastArgs) =>
+      areInputsEqual(newArgs.slice(0, 1), lastArgs.slice(0, 1)),
+    );
+
+    expect(memoized(1, { label: 'a' })).toBe('a: 1');
+    expect(memoized(1, { label: 'b' })).toBe('a: 1');
+    expect(format).toHaveBeenCalledTimes(1);
+
+    expect(memoized(2, { label: 'b' })).toBe('b: 2');
+    expect(format).toHaveBeenCalledTimes(2);
+  });
 });
 
 describe('skip equality check', () => {
   it('should not run any equality checks if the "this" context changes', () => {
-    const isEqual = jest.fn().mockReturnValue(true);
-    const memoized = memoize(getA, isEqual);
+    const isEqual = vi.fn().mockReturnValue(true);
+    const memoized = memoizeOne(getA, isEqual);
     const obj1: HasA = {
       a: 10,
     };
@@ -478,9 +559,9 @@ describe('skip equality check', () => {
   });
 
   it('should run a custom equality check if the arguments length changes', () => {
-    const mock = jest.fn();
-    const isEqual = jest.fn().mockReturnValue(true);
-    const memoized = memoize(mock, isEqual);
+    const mock = vi.fn();
+    const isEqual = vi.fn().mockReturnValue(true);
+    const memoized = memoizeOne(mock, isEqual);
 
     memoized(1, 2);
     // not executed on original call
@@ -498,13 +579,13 @@ describe('custom equality function', () => {
   let equalityStub: EqualityFn<AddFn>;
 
   beforeEach(() => {
-    add = jest.fn().mockImplementation((value1: number, value2: number): number => value1 + value2);
-    equalityStub = jest.fn();
-    memoizedAdd = memoize(add, equalityStub);
+    add = vi.fn().mockImplementation((value1: number, value2: number): number => value1 + value2);
+    equalityStub = vi.fn();
+    memoizedAdd = memoizeOne(add, equalityStub);
   });
 
-  it('should call the equality function with the newArgs, lastArgs and lastValue', () => {
-    (equalityStub as jest.Mock).mockReturnValue(true);
+  it('should call the equality function with the new arguments and the last arguments', () => {
+    (equalityStub as Mock).mockReturnValue(true);
 
     // first call does not trigger equality check
     memoizedAdd(1, 2);
@@ -529,12 +610,12 @@ describe('custom equality function', () => {
       age: 1,
     };
 
-    const addAges = jest
+    const addAges = vi
       .fn()
       .mockImplementation((...people: Person[]): number =>
         people.reduce((sum: number, person: Person) => sum + person.age, 0),
       );
-    const memoized = memoize(addAges, isDeepEqual);
+    const memoized = memoizeOne(addAges, isDeepEqual);
 
     // addAges executed on first call
     expect(memoized(clone(bob), clone(jane))).toBe(12);
@@ -545,13 +626,13 @@ describe('custom equality function', () => {
     expect(memoized(clone(bob), clone(jane))).toBe(12);
     expect(addAges).not.toHaveBeenCalled();
 
-    // memoized function called (we lodash happily handled argument change)
+    // memoized function called (isDeepEqual handled the argument change)
     expect(memoized(clone(bob), clone(jane), clone(tim))).toBe(13);
     expect(addAges).toHaveBeenCalled();
   });
 
   it('should return the previous value without executing the result fn if the equality fn returns true', () => {
-    (equalityStub as jest.Mock).mockReturnValue(true);
+    (equalityStub as Mock).mockReturnValue(true);
 
     // hydrate the first value
     const first: number = memoizedAdd(1, 2);
@@ -572,7 +653,7 @@ describe('custom equality function', () => {
   });
 
   it('should return execute and return the result of the result fn if the equality fn returns false', () => {
-    (equalityStub as jest.Mock).mockReturnValue(false);
+    (equalityStub as Mock).mockReturnValue(false);
 
     // hydrate the first value
     const first: number = memoizedAdd(1, 2);
@@ -590,6 +671,25 @@ describe('custom equality function', () => {
     // underlying function called
     expect(add).toHaveBeenCalledTimes(2);
   });
+
+  it('should pass on an error thrown by the equality function, and keep the cache', () => {
+    const error = new Error('equality function failed');
+    memoizedAdd(1, 2);
+    expect(add).toHaveBeenCalledTimes(1);
+
+    (equalityStub as Mock).mockImplementationOnce(() => {
+      throw error;
+    });
+    expect(() => memoizedAdd(1, 2)).toThrow(error);
+    // the result function was not called
+    expect(add).toHaveBeenCalledTimes(1);
+
+    // the cache from the first call is still used
+    (equalityStub as Mock).mockReturnValue(true);
+    expect(memoizedAdd(1, 2)).toBe(3);
+    expect(add).toHaveBeenCalledTimes(1);
+    expect(equalityStub).toHaveBeenLastCalledWith([1, 2], [1, 2]);
+  });
 });
 
 describe('throwing', () => {
@@ -597,16 +697,16 @@ describe('throwing', () => {
     const willThrow = (message: string): never => {
       throw new Error(message);
     };
-    const memoized = memoize(willThrow);
+    const memoized = memoizeOne(willThrow);
 
     expect(memoized).toThrow();
   });
 
   it('should not memoize a thrown result', () => {
-    const willThrow = jest.fn().mockImplementation((message: string) => {
+    const willThrow = vi.fn().mockImplementation((message: string) => {
       throw new Error(message);
     });
-    const memoized = memoize(willThrow);
+    const memoized = memoizeOne(willThrow);
     let firstError;
     let secondError;
 
@@ -628,14 +728,14 @@ describe('throwing', () => {
   });
 
   it('should not break the memoization cache of a successful call', () => {
-    const canThrow = jest.fn().mockImplementation((shouldThrow: boolean) => {
+    const canThrow = vi.fn().mockImplementation((shouldThrow: boolean) => {
       if (shouldThrow) {
         throw new Error('hey friend');
       }
       // will return a new object reference each time
       return { hello: 'world' };
     });
-    const memoized = memoize(canThrow);
+    const memoized = memoizeOne(canThrow);
     let firstError;
     let secondError;
 
@@ -682,11 +782,12 @@ describe('throwing', () => {
   });
 
   it('should throw regardless of the type of the thrown value', () => {
-    // [JavaScript defines seven built-in types:](https://github.com/getify/You-Dont-Know-JS/blob/master/types%20%26%20grammar/ch1.md)
+    // JavaScript has eight built-in types:
     //    - null
     //    - undefined
     //    - boolean
     //    - number
+    //    - bigint
     //    - string
     //    - object
     //    - symbol
@@ -696,16 +797,17 @@ describe('throwing', () => {
       true,
       false,
       10,
+      10n,
       'hi',
       { name: 'Alex' },
       Symbol('sup'),
     ];
 
     values.forEach((value: unknown) => {
-      const throwValue = jest.fn().mockImplementation(() => {
+      const throwValue = vi.fn().mockImplementation(() => {
         throw value;
       });
-      const memoized = memoize(throwValue);
+      const memoized = memoizeOne(throwValue);
       let firstError;
       let secondError;
 
@@ -738,10 +840,10 @@ describe('typing', () => {
     const subtract: SubtractFn = (a: number, b: number): number => a - b;
     const requiresASubtractFn = (fn: SubtractFn): number => fn(2, 1);
 
-    const memoizedSubtract: SubtractFn = memoize(subtract);
+    const memoizedSubtract: SubtractFn = memoizeOne(subtract);
 
     const result1 = requiresASubtractFn(memoizedSubtract);
-    const result2 = requiresASubtractFn(memoize(subtract));
+    const result2 = requiresASubtractFn(memoizeOne(subtract));
 
     expect(result1).toBe(1);
     expect(result2).toBe(1);
@@ -758,8 +860,14 @@ describe('typing', () => {
     ];
 
     valid.forEach((isEqual) => {
-      const memoized = memoize(subtract, isEqual);
+      const memoized = memoizeOne(subtract, isEqual);
       expect(memoized(3, 1)).toBe(2);
     });
+  });
+});
+
+describe('exports', () => {
+  it('should export memoizeOne as the default export', () => {
+    expect(memoizeOneDefault).toBe(memoizeOne);
   });
 });
