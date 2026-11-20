@@ -11,8 +11,6 @@ A memoization library that only caches the result of the most recent arguments.
 
 Unlike other memoization libraries, `memoize-one` only remembers the latest arguments and result. No need to worry about cache busting mechanisms such as `maxAge`, `maxSize`, `exclusions` and so on, which can be prone to memory leaks. A function memoized with `memoize-one` simply remembers the last arguments, and if the memoized function is next called with the same arguments then it returns the previous result.
 
-> For working with promises, [@Kikobeats](https://github.com/Kikobeats) has built [async-memoize-one](https://github.com/microlinkhq/async-memoize-one).
-
 ## Usage
 
 ```js
