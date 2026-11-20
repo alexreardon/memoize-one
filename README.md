@@ -197,7 +197,7 @@ The equality function needs to conform to the `EqualityFn` `type`:
 
 ```ts
 // TFunc is the function being memoized
-type EqualityFn<TFunc extends (...args: any[]) => any = (...args: unknown[]) => unknown> = (
+type EqualityFn<TFunc extends (...args: any[]) => any = (...args: any[]) => any> = (
   newArgs: Parameters<TFunc>,
   lastArgs: Parameters<TFunc>,
 ) => boolean;

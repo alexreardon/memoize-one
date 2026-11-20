@@ -86,6 +86,12 @@ const ignoreLastArg: EqualityFn = (newArgs, lastArgs) =>
 const format = memoizeOne((value: number, unit: string) => value + unit, ignoreLastArg);
 check(format(1, 'px') === '1px' && format(1, 'em') === '1px', 'reusable equality function');
 
+// The result function has no parameter types: they come from the equality function
+const addEqual: EqualityFn<(a: number, b: number) => number> = (newArgs, lastArgs) =>
+  newArgs[0] === lastArgs[0] && newArgs[1] === lastArgs[1];
+const sum: MemoizedFn<(a: number, b: number) => number> = memoizeOne((a, b) => a + b, addEqual);
+check(sum(1, 2) === 3, 'parameter types from the equality function');
+
 // Only checks types: never called
 export function typeErrors(): void {
   // @ts-expect-error: wrong argument type

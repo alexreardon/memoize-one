@@ -286,7 +286,7 @@ it('should allow a reusable equality function with no type argument', () => {
   const ignoreLastArg: EqualityFn = (newArgs, lastArgs) =>
     areInputsEqual(newArgs.slice(0, -1), lastArgs.slice(0, -1));
 
-  expectTypeOf<Parameters<typeof ignoreLastArg>>().toEqualTypeOf<[unknown[], unknown[]]>();
+  expectTypeOf<Parameters<typeof ignoreLastArg>>().toEqualTypeOf<[any[], any[]]>();
   expectTypeOf(ignoreLastArg).toExtend<EqualityFn<(a: number, b: string) => string>>();
   expectTypeOf(ignoreLastArg).toExtend<EqualityFn<() => void>>();
 
@@ -303,4 +303,24 @@ it('should infer the memoized function type from the result function only', () =
 
   expectTypeOf(memoizeOne(add, anyEqual)).toEqualTypeOf<MemoizedFn<typeof add>>();
   expectTypeOf(memoizeOne(add, areInputsEqual)).toEqualTypeOf<MemoizedFn<typeof add>>();
+});
+
+it('should take the parameter types from the equality function when the result function has none', () => {
+  type Add = (a: number, b: number) => number;
+  const addEqual: EqualityFn<Add> = (newArgs, lastArgs) => newArgs[0] === lastArgs[0];
+
+  const memoized = memoizeOne((a, b) => a + b, addEqual);
+  expectTypeOf(memoized).toEqualTypeOf<MemoizedFn<(a: number, b: number) => number>>();
+  expect(memoized(1, 2)).toBe(3);
+});
+
+it('should not accept an equality function for a different function', () => {
+  const stringEqual: EqualityFn<(value: string) => string> = () => true;
+
+  // only checks types: never called
+  const checkTypes = () => {
+    // @ts-expect-error: the equality function is for a different function
+    memoizeOne((value: number) => value, stringEqual);
+  };
+  expect(checkTypes).toBeTypeOf('function');
 });

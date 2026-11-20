@@ -5,7 +5,7 @@
  * `TFunc` is the function being memoized. Without it, `EqualityFn` accepts the
  * arguments of any function, so you can write one equality function and reuse it.
  */
-export type EqualityFn<TFunc extends (...args: any[]) => any = (...args: unknown[]) => unknown> = (
+export type EqualityFn<TFunc extends (...args: any[]) => any = (...args: any[]) => any> = (
   newArgs: Parameters<TFunc>,
   lastArgs: Parameters<TFunc>,
 ) => boolean;
@@ -67,10 +67,10 @@ export function areInputsEqual(
  */
 export function memoizeOne<TFunc extends (this: any, ...newArgs: any[]) => any>(
   resultFn: TFunc,
-  // Written out in full instead of `EqualityFn<TFunc>`, so that TypeScript infers `TFunc`
-  // from `resultFn` only. An equality function typed as `EqualityFn` or `EqualityFn<any>`
-  // would otherwise change `TFunc`.
-  isEqual: (newArgs: Parameters<TFunc>, lastArgs: Parameters<TFunc>) => boolean = areInputsEqual,
+  // `TFunc & {}` makes TypeScript infer `TFunc` from `resultFn` first. Without it, an
+  // equality function typed as `EqualityFn` or `EqualityFn<any>` would change `TFunc`.
+  // The equality function is still used when `resultFn` has no parameter types.
+  isEqual: EqualityFn<TFunc & {}> = areInputsEqual,
 ): MemoizedFn<TFunc> {
   let cache: Cache<TFunc> | null = null;
 
