@@ -28,15 +28,17 @@ assert.equal(areInputsEqual([0], [-0]), false);
 const esm = `
 import assert from 'node:assert/strict';
 import * as namespace from 'memoize-one';
-import { memoizeOne, areInputsEqual } from 'memoize-one';
-assert.deepEqual(Object.keys(namespace).sort(), ['areInputsEqual', 'memoizeOne']);
+import memoizeOneDefault, { memoizeOne, areInputsEqual } from 'memoize-one';
+assert.deepEqual(Object.keys(namespace).sort(), ['areInputsEqual', 'default', 'memoizeOne']);
+assert.equal(memoizeOneDefault, memoizeOne);
 ${checks}
 console.log('ESM import: ok');
 `;
 
 const cjs = `
 const assert = require('node:assert/strict');
-const { memoizeOne, areInputsEqual } = require('memoize-one');
+const { memoizeOne, areInputsEqual, default: memoizeOneDefault } = require('memoize-one');
+assert.equal(memoizeOneDefault, memoizeOne);
 ${checks}
 console.log('CommonJS require: ok');
 `;

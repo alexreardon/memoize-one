@@ -92,3 +92,9 @@ export function memoizeOne<TFunc extends (this: any, ...newArgs: any[]) => any>(
 
   return memoized;
 }
+
+/**
+ * The same function as the named `memoizeOne` export.
+ * Kept so that `import memoizeOne from 'memoize-one'` from v6 still works.
+ */
+export default memoizeOne;

@@ -1,6 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
-import { areInputsEqual, memoizeOne, type EqualityFn } from '../src/memoize-one.js';
+import memoizeOneDefault, {
+  areInputsEqual,
+  memoizeOne,
+  type EqualityFn,
+} from '../src/memoize-one.js';
 import { isEqual as isDeepEqual } from 'es-toolkit';
 
 type HasA = {
@@ -847,5 +851,11 @@ describe('typing', () => {
       const memoized = memoizeOne(subtract, isEqual);
       expect(memoized(3, 1)).toBe(2);
     });
+  });
+});
+
+describe('exports', () => {
+  it('should export memoizeOne as the default export', () => {
+    expect(memoizeOneDefault).toBe(memoizeOne);
   });
 });

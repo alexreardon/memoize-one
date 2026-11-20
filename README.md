@@ -670,16 +670,9 @@ You can run this test in the repo with `npm run bench:library-comparison`
 
 ## Upgrading from v6
 
-1. **Named export.** There is no default export anymore:
-
-   ```diff
-   - import memoizeOne from 'memoize-one';
-   + import { memoizeOne } from 'memoize-one';
-   ```
-
-2. **Arguments are compared with `Object.is`.** `NaN` is still equal to `NaN`. The only change is that `+0` and `-0` are now treated as different arguments, so `memoized(0)` followed by `memoized(-0)` will call your function again. The `this` context is also compared with `Object.is`.
-3. **ES module only.** The CommonJS and UMD builds are gone. CommonJS users on Node.js 20.19+ and 22.12+ can still `require()` the package. TypeScript projects that compile to CommonJS need `"module": "nodenext"` (TypeScript 5.8+) or `"node20"` (TypeScript 5.9+). If you used the UMD build from a CDN, load the module instead: `<script type="module">import { memoizeOne } from 'https://cdn.jsdelivr.net/npm/memoize-one@7/+esm';</script>`
-4. **Jest needs extra setup.** Jest uses its own module loader, not Node's `require(esm)`. So tests that run as CommonJS fail with "Must use import to load ES Module". Pick one fix:
+1. **Arguments are compared with `Object.is`.** `NaN` is still equal to `NaN`. The only change is that `+0` and `-0` are now treated as different arguments, so `memoized(0)` followed by `memoized(-0)` will call your function again. The `this` context is also compared with `Object.is`.
+2. **ES module only.** The CommonJS and UMD builds are gone. CommonJS users on Node.js 20.19+ and 22.12+ can still `require()` the package, but `require()` now returns the module, not the function. Use `const { memoizeOne } = require('memoize-one')`. TypeScript projects that compile to CommonJS need `"module": "nodenext"` (TypeScript 5.8+) or `"node20"` (TypeScript 5.9+). If you used the UMD build from a CDN, load the module instead: `<script type="module">import { memoizeOne } from 'https://cdn.jsdelivr.net/npm/memoize-one@7/+esm';</script>`
+3. **Jest needs extra setup.** Jest uses its own module loader, not Node's `require(esm)`. So tests that run as CommonJS fail with "Must use import to load ES Module". Pick one fix:
 
    - **Node.js 24.9+**: run Jest with `NODE_OPTIONS=--experimental-vm-modules`. Node.js prints an `ExperimentalWarning`.
    - **Any Node.js version**: let Babel transform `memoize-one`. Use a `babel.config.js` file, because a `.babelrc` file does not apply to `node_modules`. With pnpm, see the [Jest docs](https://jestjs.io/docs/configuration#transformignorepatterns-arraystring) for the pattern.
@@ -691,10 +684,11 @@ You can run this test in the repo with `npm run bench:library-comparison`
    };
    ```
 
-5. **Only the package entry can be imported.** The `exports` map blocks deep imports such as `memoize-one/dist/memoize-one.esm.js`. Import from `memoize-one` instead.
-6. **ES2022 syntax.** Internet Explorer 11 is no longer supported (see [supported environments](#supported-environments)).
-7. **No Flow types.** The Flow type definitions are no longer included.
-8. **New: `areInputsEqual` is exported**, so you can build on the default equality check (see [custom equality function](#custom-equality-function)).
+4. **Only the package entry can be imported.** The `exports` map blocks deep imports such as `memoize-one/dist/memoize-one.esm.js`. Import from `memoize-one` instead.
+5. **ES2022 syntax.** Internet Explorer 11 is no longer supported (see [supported environments](#supported-environments)).
+6. **No Flow types.** The Flow type definitions are no longer included.
+7. **New: `areInputsEqual` is exported**, so you can build on the default equality check (see [custom equality function](#custom-equality-function)).
+8. **New: `memoizeOne` is also a named export.** The default export still works, so you do not need to change your imports. The examples in this README use the named export: `import { memoizeOne } from 'memoize-one'`.
 
 ## Code health 👍
 

@@ -34,7 +34,7 @@
     {
       "name": "whole module",
       "path": "dist/memoize-one.js",
-      "limit": "225 B"
+      "limit": "230 B"
     }
   ],
   "devDependencies": {
