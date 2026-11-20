@@ -691,12 +691,19 @@ You can run this test in the repo with `npm run bench:library-comparison`
 3. **Jest needs extra setup.** Jest uses its own module loader, not Node's `require(esm)`. So tests that run as CommonJS fail with "Must use import to load ES Module". Pick one fix:
 
    - **Node.js 24.9+**: run Jest with `NODE_OPTIONS=--experimental-vm-modules`. Node.js prints an `ExperimentalWarning`.
-   - **Any Node.js version**: let Babel transform `memoize-one`. Use a `babel.config.js` file, because a `.babelrc` file does not apply to `node_modules`. With pnpm, see the [Jest docs](https://jestjs.io/docs/configuration#transformignorepatterns-arraystring) for the pattern.
+   - **Any Node.js version**: let Babel transform `memoize-one` into CommonJS. You need both files below. Use a `babel.config.js` file, because a `.babelrc` file does not apply to `node_modules`. If you use another transformer (such as `ts-jest` or `@swc/jest`), it must also transform this `.js` file. With pnpm, see the [Jest docs](https://jestjs.io/docs/configuration#transformignorepatterns-arraystring) for the pattern.
 
    ```js
    // jest.config.js
    module.exports = {
      transformIgnorePatterns: ['/node_modules/(?!memoize-one/)'],
+   };
+   ```
+
+   ```js
+   // babel.config.js
+   module.exports = {
+     presets: [['@babel/preset-env', { targets: { node: 'current' } }]],
    };
    ```
 
