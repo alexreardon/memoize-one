@@ -1,15 +1,23 @@
 /**
  * A function that decides if the new arguments are equal to the last arguments.
  * Return `true` to use the cached result, or `false` to call the result function again.
+ *
+ * `TFunc` is the function being memoized. Without it, `EqualityFn` accepts the
+ * arguments of any function, so you can write one equality function and reuse it.
  */
-export type EqualityFn<TFunc extends (...args: any[]) => any> = (
+export type EqualityFn<TFunc extends (...args: any[]) => any = (...args: unknown[]) => unknown> = (
   newArgs: Parameters<TFunc>,
   lastArgs: Parameters<TFunc>,
 ) => boolean;
 
 /**
- * A memoized version of `TFunc`. It has the same call signature as `TFunc`,
- * plus a `.clear()` function to clear the cache.
+ * A memoized version of `TFunc`. It has the same `this` type, parameters and
+ * return type as `TFunc`, plus a `.clear()` function to clear the cache.
+ *
+ * Other properties of `TFunc` are not copied. Because the call signature is
+ * rebuilt from `Parameters` and `ReturnType`, only the last overload of `TFunc`
+ * is kept, generic type parameters become `unknown`, and type predicates and
+ * assertion signatures no longer narrow.
  */
 export type MemoizedFn<TFunc extends (this: any, ...args: any[]) => any> = {
   /** Clear the cache, so that the next call will call the result function again */
@@ -59,7 +67,10 @@ export function areInputsEqual(
  */
 export function memoizeOne<TFunc extends (this: any, ...newArgs: any[]) => any>(
   resultFn: TFunc,
-  isEqual: EqualityFn<TFunc> = areInputsEqual,
+  // Written out in full instead of `EqualityFn<TFunc>`, so that TypeScript infers `TFunc`
+  // from `resultFn` only. An equality function typed as `EqualityFn` or `EqualityFn<any>`
+  // would otherwise change `TFunc`.
+  isEqual: (newArgs: Parameters<TFunc>, lastArgs: Parameters<TFunc>) => boolean = areInputsEqual,
 ): MemoizedFn<TFunc> {
   let cache: Cache<TFunc> | null = null;
 

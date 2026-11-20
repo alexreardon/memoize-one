@@ -191,13 +191,25 @@ The equality function needs to conform to the `EqualityFn` `type`:
 
 ```ts
 // TFunc is the function being memoized
-type EqualityFn<TFunc extends (...args: any[]) => any> = (
+type EqualityFn<TFunc extends (...args: any[]) => any = (...args: unknown[]) => unknown> = (
   newArgs: Parameters<TFunc>,
   lastArgs: Parameters<TFunc>,
 ) => boolean;
 
 // You can import this type
 import type { EqualityFn } from 'memoize-one';
+```
+
+Without a type argument, `EqualityFn` accepts the arguments of any function. Use it to write one equality function that you can reuse:
+
+```ts
+import { memoizeOne, areInputsEqual, type EqualityFn } from 'memoize-one';
+
+const ignoreLastArg: EqualityFn = (newArgs, lastArgs) =>
+  areInputsEqual(newArgs.slice(0, -1), lastArgs.slice(0, -1));
+
+const memoizedFormat = memoizeOne(format, ignoreLastArg);
+const memoizedParse = memoizeOne(parse, ignoreLastArg);
 ```
 
 The `EqualityFn` type allows you to create equality functions that are extremely typesafe. You are welcome to provide your own less type safe equality functions.
@@ -223,7 +235,7 @@ function add(first: number, second: number): number {
   const isEqual = function (first: Parameters<typeof add>, second: Parameters<typeof add>) {
     return true;
   };
-  expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+  expectTypeOf<typeof isEqual>().toExtend<EqualityFn<typeof add>>();
 }
 
 // ✅ tuple of the correct types
@@ -231,7 +243,7 @@ function add(first: number, second: number): number {
   const isEqual = function (first: [number, number], second: [number, number]) {
     return true;
   };
-  expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+  expectTypeOf<typeof isEqual>().toExtend<EqualityFn<typeof add>>();
 }
 
 // ❌ tuple of incorrect types
@@ -239,7 +251,7 @@ function add(first: number, second: number): number {
   const isEqual = function (first: [number, string], second: [number, number]) {
     return true;
   };
-  expectTypeOf<typeof isEqual>().not.toMatchTypeOf<EqualityFn<typeof add>>();
+  expectTypeOf<typeof isEqual>().not.toExtend<EqualityFn<typeof add>>();
 }
 
 // ✅ array of the correct types
@@ -247,7 +259,7 @@ function add(first: number, second: number): number {
   const isEqual = function (first: number[], second: number[]) {
     return true;
   };
-  expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+  expectTypeOf<typeof isEqual>().toExtend<EqualityFn<typeof add>>();
 }
 
 // ❌ array of incorrect types
@@ -255,7 +267,7 @@ function add(first: number, second: number): number {
   const isEqual = function (first: string[], second: number[]) {
     return true;
   };
-  expectTypeOf<typeof isEqual>().not.toMatchTypeOf<EqualityFn<typeof add>>();
+  expectTypeOf<typeof isEqual>().not.toExtend<EqualityFn<typeof add>>();
 }
 
 // ✅ tuple of 'unknown'
@@ -263,7 +275,7 @@ function add(first: number, second: number): number {
   const isEqual = function (first: [unknown, unknown], second: [unknown, unknown]) {
     return true;
   };
-  expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+  expectTypeOf<typeof isEqual>().toExtend<EqualityFn<typeof add>>();
 }
 
 // ❌ tuple of 'unknown' of incorrect length
@@ -271,7 +283,7 @@ function add(first: number, second: number): number {
   const isEqual = function (first: [unknown, unknown, unknown], second: [unknown, unknown]) {
     return true;
   };
-  expectTypeOf<typeof isEqual>().not.toMatchTypeOf<EqualityFn<typeof add>>();
+  expectTypeOf<typeof isEqual>().not.toExtend<EqualityFn<typeof add>>();
 }
 
 // ✅ array of 'unknown'
@@ -279,7 +291,7 @@ function add(first: number, second: number): number {
   const isEqual = function (first: unknown[], second: unknown[]) {
     return true;
   };
-  expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+  expectTypeOf<typeof isEqual>().toExtend<EqualityFn<typeof add>>();
 }
 
 // ✅ spread of 'unknown'
@@ -287,7 +299,7 @@ function add(first: number, second: number): number {
   const isEqual = function (...first: unknown[]) {
     return !!first;
   };
-  expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+  expectTypeOf<typeof isEqual>().toExtend<EqualityFn<typeof add>>();
 }
 
 // ✅ tuple of 'any'
@@ -295,7 +307,7 @@ function add(first: number, second: number): number {
   const isEqual = function (first: [any, any], second: [any, any]) {
     return true;
   };
-  expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+  expectTypeOf<typeof isEqual>().toExtend<EqualityFn<typeof add>>();
 }
 
 // ❌ tuple of 'any' or incorrect size
@@ -303,7 +315,7 @@ function add(first: number, second: number): number {
   const isEqual = function (first: [any, any, any], second: [any, any]) {
     return true;
   };
-  expectTypeOf<typeof isEqual>().not.toMatchTypeOf<EqualityFn<typeof add>>();
+  expectTypeOf<typeof isEqual>().not.toExtend<EqualityFn<typeof add>>();
 }
 
 // ✅ array of 'any'
@@ -311,7 +323,7 @@ function add(first: number, second: number): number {
   const isEqual = function (first: any[], second: any[]) {
     return true;
   };
-  expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+  expectTypeOf<typeof isEqual>().toExtend<EqualityFn<typeof add>>();
 }
 
 // ✅ two arguments of type any
@@ -319,7 +331,7 @@ function add(first: number, second: number): number {
   const isEqual = function (first: any, second: any) {
     return true;
   };
-  expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+  expectTypeOf<typeof isEqual>().toExtend<EqualityFn<typeof add>>();
 }
 
 // ✅ a single argument of type any
@@ -327,7 +339,7 @@ function add(first: number, second: number): number {
   const isEqual = function (first: any) {
     return true;
   };
-  expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+  expectTypeOf<typeof isEqual>().toExtend<EqualityFn<typeof add>>();
 }
 
 // ✅ spread of any type
@@ -335,7 +347,7 @@ function add(first: number, second: number): number {
   const isEqual = function (...first: any[]) {
     return true;
   };
-  expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+  expectTypeOf<typeof isEqual>().toExtend<EqualityFn<typeof add>>();
 }
 ```
 
@@ -524,9 +536,15 @@ declare type MemoizedFn<TFunc extends (this: any, ...args: any[]) => any> = {
 };
 ```
 
-- the same call signature as the function being memoized
+- the same `this` type, parameters and return type as the function being memoized
 - a `.clear()` function property added
-- other function object properties on `TFunc` as not carried over
+- other function object properties on `TFunc` are not carried over
+
+Because the call signature is rebuilt from `Parameters` and `ReturnType`, some signatures are simplified:
+
+- only the last overload of an overloaded function is kept
+- generic type parameters become `unknown`. For example, `<T>(value: T) => T` becomes `(value: unknown) => unknown`
+- type predicates (`value is string`) and assertion signatures (`asserts value is string`) no longer narrow
 
 You are welcome to use the `MemoizedFn` generic directly from `memoize-one` if you like:
 
@@ -685,8 +703,9 @@ You can run this test in the repo with `npm run bench:library-comparison`
 4. **Only the package entry can be imported.** The `exports` map blocks deep imports such as `memoize-one/dist/memoize-one.esm.js`. Import from `memoize-one` instead.
 5. **ES2022 syntax.** Internet Explorer 11 is no longer supported (see [supported environments](#supported-environments)).
 6. **No Flow types.** The Flow type definitions are no longer included.
-7. **New: `areInputsEqual` is exported**, so you can build on the default equality check (see [custom equality function](#custom-equality-function)).
-8. **New: `memoizeOne` is also a named export.** The default export still works, so you do not need to change your imports. The examples in this README use the named export: `import { memoizeOne } from 'memoize-one'`.
+7. **Stricter types with `EqualityFn<any>`.** If you typed your equality function as `EqualityFn<any>`, the memoized function used to be `any`. It now keeps the type of the function you memoize, so TypeScript can report errors that were hidden before.
+8. **New: `areInputsEqual` is exported**, so you can build on the default equality check (see [custom equality function](#custom-equality-function)).
+9. **New: `memoizeOne` is also a named export.** The default export still works, so you do not need to change your imports. The examples in this README use the named export: `import { memoizeOne } from 'memoize-one'`.
 
 ## Code health 👍
 
