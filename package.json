@@ -19,6 +19,8 @@
   },
   "type": "module",
   "exports": "./dist/memoize-one.js",
+  "main": "./dist/memoize-one.js",
+  "types": "./dist/memoize-one.d.ts",
   "sideEffects": false,
   "files": [
     "dist",
