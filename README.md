@@ -46,6 +46,12 @@ memoizedAdd(1, 2);
 // so the previous cached result of `(1, 2)` was lost
 ```
 
+You can also use the default export:
+
+```js
+import memoizeOne from 'memoize-one';
+```
+
 ## Installation
 
 ```bash
