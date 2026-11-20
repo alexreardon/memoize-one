@@ -63,7 +63,8 @@
     "build:clean": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\"",
     "bench": "node benchmarks/comparison/run.ts",
     "bench:library-comparison": "npm run build && cd benchmarks/library-comparison && npm ci && npm start",
-    "check:package": "publint --strict && attw --pack . --profile esm-only",
-    "test:smoke": "node scripts/smoke-test.js"
+    "check:package": "npm run build && publint --strict && attw --pack . --profile esm-only",
+    "test:smoke": "npm run build && node scripts/smoke-test.js",
+    "release": "npm run validate && npm test && npm run check:package && npm run test:smoke && npm publish"
   }
 }
