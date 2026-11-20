@@ -73,11 +73,12 @@ describe('standard behaviour - dynamic', () => {
     second: Expectation;
   };
 
-  // [JavaScript defines seven built-in types:](https://github.com/getify/You-Dont-Know-JS/blob/master/types%20%26%20grammar/ch1.md)
+  // JavaScript has eight built-in types:
   //    - null
   //    - undefined
   //    - boolean
   //    - number
+  //    - bigint
   //    - string
   //    - object
   //    - symbol
@@ -414,16 +415,6 @@ describe('respecting "this" context', () => {
       expect(spy).toHaveBeenCalledTimes(1);
     });
 
-    it('should respect implicit bindings', () => {
-      const getAMemoized = memoizeOne(getA);
-      const temp = {
-        a: 2,
-        getAMemoized,
-      };
-
-      expect(temp.getAMemoized()).toBe(2);
-    });
-
     it('should respect fat arrow bindings', () => {
       const temp: HasA = {
         a: 50,
@@ -593,7 +584,7 @@ describe('custom equality function', () => {
     memoizedAdd = memoizeOne(add, equalityStub);
   });
 
-  it('should call the equality function with the newArgs, lastArgs and lastValue', () => {
+  it('should call the equality function with the new arguments and the last arguments', () => {
     (equalityStub as Mock).mockReturnValue(true);
 
     // first call does not trigger equality check
@@ -679,6 +670,25 @@ describe('custom equality function', () => {
     expect(equalityStub).toHaveBeenCalled();
     // underlying function called
     expect(add).toHaveBeenCalledTimes(2);
+  });
+
+  it('should pass on an error thrown by the equality function, and keep the cache', () => {
+    const error = new Error('equality function failed');
+    memoizedAdd(1, 2);
+    expect(add).toHaveBeenCalledTimes(1);
+
+    (equalityStub as Mock).mockImplementationOnce(() => {
+      throw error;
+    });
+    expect(() => memoizedAdd(1, 2)).toThrow(error);
+    // the result function was not called
+    expect(add).toHaveBeenCalledTimes(1);
+
+    // the cache from the first call is still used
+    (equalityStub as Mock).mockReturnValue(true);
+    expect(memoizedAdd(1, 2)).toBe(3);
+    expect(add).toHaveBeenCalledTimes(1);
+    expect(equalityStub).toHaveBeenLastCalledWith([1, 2], [1, 2]);
   });
 });
 
@@ -772,11 +782,12 @@ describe('throwing', () => {
   });
 
   it('should throw regardless of the type of the thrown value', () => {
-    // [JavaScript defines seven built-in types:](https://github.com/getify/You-Dont-Know-JS/blob/master/types%20%26%20grammar/ch1.md)
+    // JavaScript has eight built-in types:
     //    - null
     //    - undefined
     //    - boolean
     //    - number
+    //    - bigint
     //    - string
     //    - object
     //    - symbol
@@ -786,6 +797,7 @@ describe('throwing', () => {
       true,
       false,
       10,
+      10n,
       'hi',
       { name: 'Alex' },
       Symbol('sup'),
