@@ -4,12 +4,17 @@ A memoization library that only caches the result of the most recent arguments.
 
 [![npm](https://img.shields.io/npm/v/memoize-one.svg)](https://www.npmjs.com/package/memoize-one)
 ![types](https://img.shields.io/badge/types-typescript-blueviolet)
-[![minzip](https://img.shields.io/bundlephobia/minzip/memoize-one.svg)](https://www.npmjs.com/package/memoize-one)
 [![Downloads per month](https://img.shields.io/npm/dm/memoize-one.svg)](https://www.npmjs.com/package/memoize-one)
 
 ## Rationale
 
-Unlike other memoization libraries, `memoize-one` only remembers the latest arguments and result. No need to worry about cache busting mechanisms such as `maxAge`, `maxSize`, `exclusions` and so on, which can be prone to memory leaks. A function memoized with `memoize-one` simply remembers the last arguments, and if the memoized function is next called with the same arguments then it returns the previous result.
+Memoization is a technique where a function avoids doing work it has done before by caching results. You are trading memory (cached results) for execution speed (don't need to recompute the result). A memoization cache can quickly use a lot of memory, and so memoization libraries usually to have ways to purge older cache values (eg `maxAge`, `maxSize`, `exclusions` and so on).
+
+`memoize-one` takes a simpler approach: only remember the _latest_ arguments and their result. If a function is called again with the previous arguments, then return the previously calculated result. This approach ensure there is no need to worry about run away memory costs, and this library can stay extremely small 🙌.
+
+`memoize-one` covers a surprisingly large amount of real world use cases for memoization - however, there will be cases where a more general purpose memoization library is a better fit (ie when you want a function to cache multiple results and arguments at the same time).
+
+If you have used [`useMemo`](https://react.dev/reference/react/useMemo) and [`useCallback`](https://react.dev/reference/react/useCallback) then you are familiar with how `memoize-one` works.
 
 ## Usage
 
