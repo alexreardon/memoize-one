@@ -696,6 +696,10 @@ You can run this test in the repo with `npm run bench:library-comparison`
 
 ## Upgrading from v6
 
+<details>
+  <summary>Expand for upgrade notes</summary>
+  <p>
+
 1. **Arguments are compared with `Object.is`.** `NaN` is still equal to `NaN`. The only change is that `+0` and `-0` are now treated as different arguments, so `memoized(0)` followed by `memoized(-0)` will call your function again. The `this` context is also compared with `Object.is`.
 2. **ES module only.** The CommonJS and UMD builds are gone. CommonJS users on Node.js 20.19+ and 22.12+ can still `require()` the package, but `require()` now returns the module, not the function. Use `const { memoizeOne } = require('memoize-one')`. TypeScript projects that compile to CommonJS need `"module": "nodenext"` (TypeScript 5.8+) or `"node20"` (TypeScript 5.9+). If you used the UMD build from a CDN, load the module instead: `<script type="module">import { memoizeOne } from 'https://cdn.jsdelivr.net/npm/memoize-one@7/+esm';</script>`
 3. **Jest needs extra setup.** Jest uses its own module loader, not Node's `require(esm)`. So tests that run as CommonJS fail with "Must use import to load ES Module". Pick one fix:
@@ -723,6 +727,9 @@ You can run this test in the repo with `npm run bench:library-comparison`
 7. **Stricter types with `EqualityFn<any>`.** If you typed your equality function as `EqualityFn<any>`, the memoized function used to be `any`. It now keeps the type of the function you memoize, so TypeScript can report errors that were hidden before.
 8. **New: `areInputsEqual` is exported**, so you can build on the default equality check (see [custom equality function](#custom-equality-function)).
 9. **New: `memoizeOne` is also a named export.** The default export still works, so you do not need to change your imports. The examples in this README use the named export: `import { memoizeOne } from 'memoize-one'`.
+
+  </p>
+</details>
 
 ## Code health 👍
 
