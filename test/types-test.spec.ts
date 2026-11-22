@@ -1,15 +1,19 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import isDeepEqual from 'lodash.isequal';
-import type { EqualityFn, MemoizedFn } from './../src/memoize-one';
-import { expectTypeOf } from 'expect-type';
-import memoize from '../src/memoize-one';
+// Type tests declare functions and values only to check their types
+/* oxlint-disable no-unused-vars */
+import { isEqual as isDeepEqual } from 'es-toolkit';
+import { expect, expectTypeOf, it } from 'vitest';
+import memoizeOneDefault, {
+  areInputsEqual,
+  memoizeOne,
+  type EqualityFn,
+  type MemoizedFn,
+} from '../src/memoize-one.js';
 
 it('should maintain the types of the original function', () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   function getLocation(this: Window, value: number) {
     return this.location;
   }
-  const memoized = memoize(getLocation);
+  const memoized = memoizeOne(getLocation);
 
   expectTypeOf<ThisParameterType<typeof getLocation>>().toEqualTypeOf<
     ThisParameterType<typeof memoized>
@@ -22,7 +26,7 @@ it('should add a .clear function property', () => {
   function add(first: number, second: number) {
     return first + second;
   }
-  const memoized = memoize(add);
+  const memoized = memoizeOne(add);
   memoized.clear();
 
   // @ts-expect-error
@@ -36,14 +40,14 @@ it('should return a `MemoizedFn<T>`', () => {
     return first + second;
   }
 
-  const memoized = memoize(add);
+  const memoized = memoizeOne(add);
 
   expectTypeOf<typeof memoized>().toEqualTypeOf<MemoizedFn<typeof add>>();
 });
 
 it('should allow you to leverage the MemoizedFn generic to allow many memoized functions', () => {
   function withDeepEqual<TFunc extends (...args: any[]) => any>(fn: TFunc): MemoizedFn<TFunc> {
-    return memoize(fn, isDeepEqual);
+    return memoizeOne(fn, isDeepEqual);
   }
   function add(first: number, second: number): number {
     return first + second;
@@ -61,7 +65,7 @@ it('should return a memoized function that satisies a typeof check for the origi
   function caller(fn: typeof add) {
     return fn(1, 2);
   }
-  const memoized = memoize(add);
+  const memoized = memoizeOne(add);
 
   // this line is the actual type test
   const result = caller(memoized);
@@ -75,36 +79,39 @@ it('should allow casting back to the original function type', () => {
   }
   // baseline
   {
-    const memoized = memoize(add);
-    expectTypeOf<typeof memoized>().toEqualTypeOf<AddFn>();
+    const memoized = memoizeOne(add);
+    // a memoized function is assignable to the original function type,
+    // but is not equal to it (it has an extra `.clear()` property)
+    expectTypeOf<typeof memoized>().not.toEqualTypeOf<AddFn>();
+    expectTypeOf<typeof memoized>().toExtend<AddFn>();
     expectTypeOf<typeof memoized>().toEqualTypeOf<MemoizedFn<typeof add>>();
     expectTypeOf<typeof memoized>().toEqualTypeOf<MemoizedFn<AddFn>>();
-    expectTypeOf<typeof memoized>().toMatchTypeOf<MemoizedFn<typeof add>>();
-    expectTypeOf<typeof memoized>().toMatchTypeOf<MemoizedFn<AddFn>>();
+    expectTypeOf<typeof memoized>().toExtend<MemoizedFn<typeof add>>();
+    expectTypeOf<typeof memoized>().toExtend<MemoizedFn<AddFn>>();
   }
   {
-    const memoized: typeof add = memoize(add);
+    const memoized: typeof add = memoizeOne(add);
     expectTypeOf<typeof memoized>().toEqualTypeOf<AddFn>();
-    expectTypeOf<typeof memoized>().not.toMatchTypeOf<MemoizedFn<typeof add>>();
-    expectTypeOf<typeof memoized>().not.toMatchTypeOf<MemoizedFn<AddFn>>();
+    expectTypeOf<typeof memoized>().not.toExtend<MemoizedFn<typeof add>>();
+    expectTypeOf<typeof memoized>().not.toExtend<MemoizedFn<AddFn>>();
   }
   {
-    const memoized: AddFn = memoize(add);
+    const memoized: AddFn = memoizeOne(add);
     expectTypeOf<typeof memoized>().toEqualTypeOf<AddFn>();
-    expectTypeOf<typeof memoized>().not.toMatchTypeOf<MemoizedFn<typeof add>>();
-    expectTypeOf<typeof memoized>().not.toMatchTypeOf<MemoizedFn<AddFn>>();
+    expectTypeOf<typeof memoized>().not.toExtend<MemoizedFn<typeof add>>();
+    expectTypeOf<typeof memoized>().not.toExtend<MemoizedFn<AddFn>>();
   }
   {
-    const memoized = memoize(add) as typeof add;
+    const memoized = memoizeOne(add) as typeof add;
     expectTypeOf<typeof memoized>().toEqualTypeOf<AddFn>();
-    expectTypeOf<typeof memoized>().not.toMatchTypeOf<MemoizedFn<typeof add>>();
-    expectTypeOf<typeof memoized>().not.toMatchTypeOf<MemoizedFn<AddFn>>();
+    expectTypeOf<typeof memoized>().not.toExtend<MemoizedFn<typeof add>>();
+    expectTypeOf<typeof memoized>().not.toExtend<MemoizedFn<AddFn>>();
   }
   {
-    const memoized = memoize(add) as AddFn;
+    const memoized = memoizeOne(add) as AddFn;
     expectTypeOf<typeof memoized>().toEqualTypeOf<AddFn>();
-    expectTypeOf<typeof memoized>().not.toMatchTypeOf<MemoizedFn<typeof add>>();
-    expectTypeOf<typeof memoized>().not.toMatchTypeOf<MemoizedFn<AddFn>>();
+    expectTypeOf<typeof memoized>().not.toExtend<MemoizedFn<typeof add>>();
+    expectTypeOf<typeof memoized>().not.toExtend<MemoizedFn<AddFn>>();
   }
 });
 
@@ -131,7 +138,7 @@ it('should allow weaker equality function types', () => {
     const isEqual = function (first: Parameters<typeof add>, second: Parameters<typeof add>) {
       return true;
     };
-    expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+    expectTypeOf<typeof isEqual>().toExtend<EqualityFn<typeof add>>();
   }
 
   // ✅ tuple of the correct types
@@ -139,7 +146,7 @@ it('should allow weaker equality function types', () => {
     const isEqual = function (first: [number, number], second: [number, number]) {
       return true;
     };
-    expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+    expectTypeOf<typeof isEqual>().toExtend<EqualityFn<typeof add>>();
   }
 
   // ❌ tuple of incorrect types
@@ -147,7 +154,7 @@ it('should allow weaker equality function types', () => {
     const isEqual = function (first: [number, string], second: [number, number]) {
       return true;
     };
-    expectTypeOf<typeof isEqual>().not.toMatchTypeOf<EqualityFn<typeof add>>();
+    expectTypeOf<typeof isEqual>().not.toExtend<EqualityFn<typeof add>>();
   }
 
   // ✅ array of the correct types
@@ -155,7 +162,7 @@ it('should allow weaker equality function types', () => {
     const isEqual = function (first: number[], second: number[]) {
       return true;
     };
-    expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+    expectTypeOf<typeof isEqual>().toExtend<EqualityFn<typeof add>>();
   }
 
   // ❌ array of incorrect types
@@ -163,7 +170,7 @@ it('should allow weaker equality function types', () => {
     const isEqual = function (first: string[], second: number[]) {
       return true;
     };
-    expectTypeOf<typeof isEqual>().not.toMatchTypeOf<EqualityFn<typeof add>>();
+    expectTypeOf<typeof isEqual>().not.toExtend<EqualityFn<typeof add>>();
   }
 
   // ✅ tuple of 'unknown'
@@ -171,7 +178,7 @@ it('should allow weaker equality function types', () => {
     const isEqual = function (first: [unknown, unknown], second: [unknown, unknown]) {
       return true;
     };
-    expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+    expectTypeOf<typeof isEqual>().toExtend<EqualityFn<typeof add>>();
   }
 
   // ❌ tuple of 'unknown' of incorrect length
@@ -179,7 +186,7 @@ it('should allow weaker equality function types', () => {
     const isEqual = function (first: [unknown, unknown, unknown], second: [unknown, unknown]) {
       return true;
     };
-    expectTypeOf<typeof isEqual>().not.toMatchTypeOf<EqualityFn<typeof add>>();
+    expectTypeOf<typeof isEqual>().not.toExtend<EqualityFn<typeof add>>();
   }
 
   // ✅ array of 'unknown'
@@ -187,7 +194,7 @@ it('should allow weaker equality function types', () => {
     const isEqual = function (first: unknown[], second: unknown[]) {
       return true;
     };
-    expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+    expectTypeOf<typeof isEqual>().toExtend<EqualityFn<typeof add>>();
   }
 
   // ✅ spread of 'unknown'
@@ -195,7 +202,7 @@ it('should allow weaker equality function types', () => {
     const isEqual = function (...first: unknown[]) {
       return !!first;
     };
-    expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+    expectTypeOf<typeof isEqual>().toExtend<EqualityFn<typeof add>>();
   }
 
   // ✅ tuple of 'any'
@@ -203,7 +210,7 @@ it('should allow weaker equality function types', () => {
     const isEqual = function (first: [any, any], second: [any, any]) {
       return true;
     };
-    expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+    expectTypeOf<typeof isEqual>().toExtend<EqualityFn<typeof add>>();
   }
 
   // ❌ tuple of 'any' or incorrect size
@@ -211,7 +218,7 @@ it('should allow weaker equality function types', () => {
     const isEqual = function (first: [any, any, any], second: [any, any]) {
       return true;
     };
-    expectTypeOf<typeof isEqual>().not.toMatchTypeOf<EqualityFn<typeof add>>();
+    expectTypeOf<typeof isEqual>().not.toExtend<EqualityFn<typeof add>>();
   }
 
   // ✅ array of 'any'
@@ -219,7 +226,7 @@ it('should allow weaker equality function types', () => {
     const isEqual = function (first: any[], second: any[]) {
       return true;
     };
-    expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+    expectTypeOf<typeof isEqual>().toExtend<EqualityFn<typeof add>>();
   }
 
   // ✅ two arguments of type any
@@ -227,7 +234,7 @@ it('should allow weaker equality function types', () => {
     const isEqual = function (first: any, second: any) {
       return true;
     };
-    expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+    expectTypeOf<typeof isEqual>().toExtend<EqualityFn<typeof add>>();
   }
 
   // ✅ a single argument of type any
@@ -235,7 +242,7 @@ it('should allow weaker equality function types', () => {
     const isEqual = function (first: any) {
       return true;
     };
-    expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+    expectTypeOf<typeof isEqual>().toExtend<EqualityFn<typeof add>>();
   }
 
   // ✅ spread of any type
@@ -243,6 +250,77 @@ it('should allow weaker equality function types', () => {
     const isEqual = function (...first: any[]) {
       return true;
     };
-    expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+    expectTypeOf<typeof isEqual>().toExtend<EqualityFn<typeof add>>();
   }
+});
+
+it('should give the default export the same type as the named export', () => {
+  expectTypeOf(memoizeOneDefault).toEqualTypeOf(memoizeOne);
+});
+
+it('should require a "this" context when the original function declares one', () => {
+  function getA(this: { a: number }) {
+    return this.a;
+  }
+  const memoized = memoizeOne(getA);
+
+  expectTypeOf<ThisParameterType<typeof memoized>>().toEqualTypeOf<{ a: number }>();
+  // only checks types: never called
+  const checkTypes = () => {
+    // @ts-expect-error: no "this" context
+    memoized();
+    memoized.call({ a: 1 });
+  };
+  expect(checkTypes).toBeTypeOf('function');
+});
+
+it('should not require a "this" context when the original function does not declare one', () => {
+  const memoized = memoizeOne((a: number) => a);
+
+  expectTypeOf<ThisParameterType<typeof memoized>>().toEqualTypeOf<unknown>();
+  expect(memoized(1)).toBe(1);
+  expect(memoized.call({ unrelated: true }, 2)).toBe(2);
+});
+
+it('should allow a reusable equality function with no type argument', () => {
+  const ignoreLastArg: EqualityFn = (newArgs, lastArgs) =>
+    areInputsEqual(newArgs.slice(0, -1), lastArgs.slice(0, -1));
+
+  expectTypeOf<Parameters<typeof ignoreLastArg>>().toEqualTypeOf<[any[], any[]]>();
+  expectTypeOf(ignoreLastArg).toExtend<EqualityFn<(a: number, b: string) => string>>();
+  expectTypeOf(ignoreLastArg).toExtend<EqualityFn<() => void>>();
+
+  const memoized = memoizeOne((a: number, b: string) => `${a}${b}`, ignoreLastArg);
+  expectTypeOf(memoized).toEqualTypeOf<MemoizedFn<(a: number, b: string) => string>>();
+  expect(memoized(1, 'a')).toBe('1a');
+  // the last argument is ignored
+  expect(memoized(1, 'b')).toBe('1a');
+});
+
+it('should infer the memoized function type from the result function only', () => {
+  const add = (a: number, b: number) => a + b;
+  const anyEqual: EqualityFn<any> = () => true;
+
+  expectTypeOf(memoizeOne(add, anyEqual)).toEqualTypeOf<MemoizedFn<typeof add>>();
+  expectTypeOf(memoizeOne(add, areInputsEqual)).toEqualTypeOf<MemoizedFn<typeof add>>();
+});
+
+it('should take the parameter types from the equality function when the result function has none', () => {
+  type Add = (a: number, b: number) => number;
+  const addEqual: EqualityFn<Add> = (newArgs, lastArgs) => newArgs[0] === lastArgs[0];
+
+  const memoized = memoizeOne((a, b) => a + b, addEqual);
+  expectTypeOf(memoized).toEqualTypeOf<MemoizedFn<(a: number, b: number) => number>>();
+  expect(memoized(1, 2)).toBe(3);
+});
+
+it('should not accept an equality function for a different function', () => {
+  const stringEqual: EqualityFn<(value: string) => string> = () => true;
+
+  // only checks types: never called
+  const checkTypes = () => {
+    // @ts-expect-error: the equality function is for a different function
+    memoizeOne((value: number) => value, stringEqual);
+  };
+  expect(checkTypes).toBeTypeOf('function');
 });

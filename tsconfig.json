@@ -1,14 +1,16 @@
 {
-  "compileOnSave": true,
   "compilerOptions": {
-    "outDir": "dist",
-    "target": "es5",
-    "module": "commonjs",
-    "moduleResolution": "node",
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "removeComments": true,
-    "esModuleInterop": true
+    "verbatimModuleSyntax": true,
+    "isolatedDeclarations": true,
+    "declaration": true,
+    "declarationMap": true,
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "types": ["node"]
   },
-  "include": ["src/", "test/"]
+  "include": ["src", "test", "benchmarks/comparison"]
 }

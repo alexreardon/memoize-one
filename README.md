@@ -3,7 +3,7 @@
 A memoization library that only caches the result of the most recent arguments.
 
 [![npm](https://img.shields.io/npm/v/memoize-one.svg)](https://www.npmjs.com/package/memoize-one)
-![types](https://img.shields.io/badge/types-typescript%20%7C%20flow-blueviolet)
+![types](https://img.shields.io/badge/types-typescript-blueviolet)
 [![minzip](https://img.shields.io/bundlephobia/minzip/memoize-one.svg)](https://www.npmjs.com/package/memoize-one)
 [![Downloads per month](https://img.shields.io/npm/dm/memoize-one.svg)](https://www.npmjs.com/package/memoize-one)
 
@@ -11,13 +11,10 @@ A memoization library that only caches the result of the most recent arguments.
 
 Unlike other memoization libraries, `memoize-one` only remembers the latest arguments and result. No need to worry about cache busting mechanisms such as `maxAge`, `maxSize`, `exclusions` and so on, which can be prone to memory leaks. A function memoized with `memoize-one` simply remembers the last arguments, and if the memoized function is next called with the same arguments then it returns the previous result.
 
-> For working with promises, [@Kikobeats](https://github.com/Kikobeats) has built [async-memoize-one](https://github.com/microlinkhq/async-memoize-one).
-
 ## Usage
 
 ```js
-// memoize-one uses the default import
-import memoizeOne from 'memoize-one';
+import { memoizeOne } from 'memoize-one';
 
 function add(a, b) {
   return a + b;
@@ -49,30 +46,56 @@ memoizedAdd(1, 2);
 // so the previous cached result of `(1, 2)` was lost
 ```
 
+You can also use the default export:
+
+```js
+import memoizeOne from 'memoize-one';
+```
+
 ## Installation
 
 ```bash
-# yarn
-yarn add memoize-one
-
-# npm
-npm install memoize-one --save
+npm install memoize-one
 ```
+
+## Supported environments
+
+- `memoize-one@7+` is an [ES module only package](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules), written in ES2022 syntax
+- **Browsers**: browsers that are [Baseline widely available](https://web.dev/baseline) (Chrome, Edge and Firefox 111+, Safari 16.4+), with any modern bundler
+- **Node.js**: `import` works in all supported versions. `require()` works in Node.js 20.19+ and 22.12+ (through [`require(esm)`](https://nodejs.org/api/modules.html#loading-ecmascript-modules-using-require))
+- **TypeScript projects that compile to CommonJS**: use `"module": "nodenext"` (TypeScript 5.8+) or `"module": "node20"` (TypeScript 5.9+). With `node16` or `node18`, TypeScript reports error TS1479 for `require()` of an ES module. You can use a dynamic `import()` instead
+- **Jest**: needs extra setup (see [upgrading from v6](#upgrading-from-v6))
+
+```js
+// ES modules
+import { memoizeOne } from 'memoize-one';
+
+// CommonJS (Node.js 20.19+ and 22.12+)
+const { memoizeOne } = require('memoize-one');
+```
+
+If you need to support older environments, please use `memoize-one` v6.
 
 ## Function argument equality
 
-By default, we apply our own _fast_ and _relatively naive_ equality function to determine whether the arguments provided to your function are equal. You can see the full code here: [are-inputs-equal.ts](https://github.com/alexreardon/memoize-one/blob/master/src/are-inputs-equal.ts).
+By default, we apply our own _fast_ and _relatively naive_ equality function (`areInputsEqual`) to determine whether the arguments provided to your function are equal. You can see the full code here: [memoize-one.ts](https://github.com/alexreardon/memoize-one/blob/master/src/memoize-one.ts).
 
 (By default) function arguments are considered equal if:
 
 1. there is same amount of arguments
-2. each new argument has strict equality (`===`) with the previous argument
-3. **[special case]** if two arguments are not `===` and they are both `NaN` then the two arguments are treated as equal
+2. each new argument is the same value as the previous argument, according to [`Object.is`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is)
+
+`Object.is` is the same as strict equality (`===`), except for two special cases:
+
+- `NaN` is equal to `NaN`
+- `+0` and `-0` are not equal
+
+This is the same comparison that React uses for hook dependencies (such as in `useMemo`).
 
 What this looks like in practice:
 
 ```js
-import memoizeOne from 'memoize-one';
+import { memoizeOne } from 'memoize-one';
 
 // add all numbers provided to the function
 const add = (...args = []) =>
@@ -90,26 +113,35 @@ memoizedAdd(1, 2);
 memoizedAdd(1, 2, 3);
 ```
 
-> 2. new arguments have strict equality (`===`) with the previous argument
+> 2. each new argument is the same value as the previous argument, according to `Object.is`
 
 ```js
 memoizedAdd(1, 2);
-// each argument is `===` to the last argument, so cache is used
+// each argument is the same value as the last argument, so cache is used
 memoizedAdd(1, 2);
 // second argument has changed, so add function is called again
 memoizedAdd(1, 3);
-// the first value is not `===` to the previous first value (1 !== 3)
+// the first value is not the same value as the previous first value (1 !== 3)
 // so add function is called again
 memoizedAdd(3, 1);
 ```
 
-> 3. **[special case]** if the arguments are not `===` and they are both `NaN` then the argument is treated as equal
+> **[special case]** `NaN` is equal to `NaN`
 
 ```js
 memoizedAdd(NaN);
-// Even though NaN !== NaN these arguments are
-// treated as equal as they are both `NaN`
+// Even though NaN !== NaN, Object.is(NaN, NaN) is true
+// so the cache is used
 memoizedAdd(NaN);
+```
+
+> **[special case]** `+0` and `-0` are not equal
+
+```js
+memoizedAdd(0);
+// Even though 0 === -0, Object.is(0, -0) is false
+// so add function is called again
+memoizedAdd(-0);
 ```
 
 ## Custom equality function
@@ -126,13 +158,13 @@ An equality function should return `true` if the arguments are equal. If `true` 
 
 Equality functions are not called if the `this` context of the function has changed (see below).
 
-Here is an example that uses a [lodash.isEqual](https://lodash.com/docs/4.17.15#isEqual) deep equal equality check
+Here is an example that uses [`isEqual` from es-toolkit](https://es-toolkit.dev/reference/predicate/isEqual.html) as a deep equal equality check
 
-> `lodash.isequal` correctly handles deep comparing two arrays
+> `isEqual` from `es-toolkit` correctly handles deep comparing two arrays
 
 ```js
-import memoizeOne from 'memoize-one';
-import isDeepEqual from 'lodash.isequal';
+import { memoizeOne } from 'memoize-one';
+import { isEqual as isDeepEqual } from 'es-toolkit';
 
 const identity = (x) => x;
 
@@ -150,17 +182,39 @@ const result4 = deepMemoized({ foo: 'bar' });
 result3 === result4; // true - arguments are deep equal
 ```
 
+You can build on the default equality check with `areInputsEqual`. For example, to ignore the last argument:
+
+```js
+import { memoizeOne, areInputsEqual } from 'memoize-one';
+
+const memoized = memoizeOne(format, (newArgs, lastArgs) =>
+  areInputsEqual(newArgs.slice(0, -1), lastArgs.slice(0, -1)),
+);
+```
+
 The equality function needs to conform to the `EqualityFn` `type`:
 
 ```ts
 // TFunc is the function being memoized
-type EqualityFn<TFunc extends (...args: any[]) => any> = (
+type EqualityFn<TFunc extends (...args: any[]) => any = (...args: any[]) => any> = (
   newArgs: Parameters<TFunc>,
   lastArgs: Parameters<TFunc>,
 ) => boolean;
 
 // You can import this type
 import type { EqualityFn } from 'memoize-one';
+```
+
+Without a type argument, `EqualityFn` accepts the arguments of any function. Use it to write one equality function that you can reuse:
+
+```ts
+import { memoizeOne, areInputsEqual, type EqualityFn } from 'memoize-one';
+
+const ignoreLastArg: EqualityFn = (newArgs, lastArgs) =>
+  areInputsEqual(newArgs.slice(0, -1), lastArgs.slice(0, -1));
+
+const memoizedFormat = memoizeOne(format, ignoreLastArg);
+const memoizedParse = memoizeOne(parse, ignoreLastArg);
 ```
 
 The `EqualityFn` type allows you to create equality functions that are extremely typesafe. You are welcome to provide your own less type safe equality functions.
@@ -186,7 +240,7 @@ function add(first: number, second: number): number {
   const isEqual = function (first: Parameters<typeof add>, second: Parameters<typeof add>) {
     return true;
   };
-  expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+  expectTypeOf<typeof isEqual>().toExtend<EqualityFn<typeof add>>();
 }
 
 // ✅ tuple of the correct types
@@ -194,7 +248,7 @@ function add(first: number, second: number): number {
   const isEqual = function (first: [number, number], second: [number, number]) {
     return true;
   };
-  expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+  expectTypeOf<typeof isEqual>().toExtend<EqualityFn<typeof add>>();
 }
 
 // ❌ tuple of incorrect types
@@ -202,7 +256,7 @@ function add(first: number, second: number): number {
   const isEqual = function (first: [number, string], second: [number, number]) {
     return true;
   };
-  expectTypeOf<typeof isEqual>().not.toMatchTypeOf<EqualityFn<typeof add>>();
+  expectTypeOf<typeof isEqual>().not.toExtend<EqualityFn<typeof add>>();
 }
 
 // ✅ array of the correct types
@@ -210,7 +264,7 @@ function add(first: number, second: number): number {
   const isEqual = function (first: number[], second: number[]) {
     return true;
   };
-  expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+  expectTypeOf<typeof isEqual>().toExtend<EqualityFn<typeof add>>();
 }
 
 // ❌ array of incorrect types
@@ -218,7 +272,7 @@ function add(first: number, second: number): number {
   const isEqual = function (first: string[], second: number[]) {
     return true;
   };
-  expectTypeOf<typeof isEqual>().not.toMatchTypeOf<EqualityFn<typeof add>>();
+  expectTypeOf<typeof isEqual>().not.toExtend<EqualityFn<typeof add>>();
 }
 
 // ✅ tuple of 'unknown'
@@ -226,7 +280,7 @@ function add(first: number, second: number): number {
   const isEqual = function (first: [unknown, unknown], second: [unknown, unknown]) {
     return true;
   };
-  expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+  expectTypeOf<typeof isEqual>().toExtend<EqualityFn<typeof add>>();
 }
 
 // ❌ tuple of 'unknown' of incorrect length
@@ -234,7 +288,7 @@ function add(first: number, second: number): number {
   const isEqual = function (first: [unknown, unknown, unknown], second: [unknown, unknown]) {
     return true;
   };
-  expectTypeOf<typeof isEqual>().not.toMatchTypeOf<EqualityFn<typeof add>>();
+  expectTypeOf<typeof isEqual>().not.toExtend<EqualityFn<typeof add>>();
 }
 
 // ✅ array of 'unknown'
@@ -242,7 +296,7 @@ function add(first: number, second: number): number {
   const isEqual = function (first: unknown[], second: unknown[]) {
     return true;
   };
-  expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+  expectTypeOf<typeof isEqual>().toExtend<EqualityFn<typeof add>>();
 }
 
 // ✅ spread of 'unknown'
@@ -250,7 +304,7 @@ function add(first: number, second: number): number {
   const isEqual = function (...first: unknown[]) {
     return !!first;
   };
-  expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+  expectTypeOf<typeof isEqual>().toExtend<EqualityFn<typeof add>>();
 }
 
 // ✅ tuple of 'any'
@@ -258,7 +312,7 @@ function add(first: number, second: number): number {
   const isEqual = function (first: [any, any], second: [any, any]) {
     return true;
   };
-  expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+  expectTypeOf<typeof isEqual>().toExtend<EqualityFn<typeof add>>();
 }
 
 // ❌ tuple of 'any' or incorrect size
@@ -266,7 +320,7 @@ function add(first: number, second: number): number {
   const isEqual = function (first: [any, any, any], second: [any, any]) {
     return true;
   };
-  expectTypeOf<typeof isEqual>().not.toMatchTypeOf<EqualityFn<typeof add>>();
+  expectTypeOf<typeof isEqual>().not.toExtend<EqualityFn<typeof add>>();
 }
 
 // ✅ array of 'any'
@@ -274,7 +328,7 @@ function add(first: number, second: number): number {
   const isEqual = function (first: any[], second: any[]) {
     return true;
   };
-  expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+  expectTypeOf<typeof isEqual>().toExtend<EqualityFn<typeof add>>();
 }
 
 // ✅ two arguments of type any
@@ -282,7 +336,7 @@ function add(first: number, second: number): number {
   const isEqual = function (first: any, second: any) {
     return true;
   };
-  expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+  expectTypeOf<typeof isEqual>().toExtend<EqualityFn<typeof add>>();
 }
 
 // ✅ a single argument of type any
@@ -290,7 +344,7 @@ function add(first: number, second: number): number {
   const isEqual = function (first: any) {
     return true;
   };
-  expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+  expectTypeOf<typeof isEqual>().toExtend<EqualityFn<typeof add>>();
 }
 
 // ✅ spread of any type
@@ -298,7 +352,7 @@ function add(first: number, second: number): number {
   const isEqual = function (...first: any[]) {
     return true;
   };
-  expectTypeOf<typeof isEqual>().toMatchTypeOf<EqualityFn<typeof add>>();
+  expectTypeOf<typeof isEqual>().toExtend<EqualityFn<typeof add>>();
 }
 ```
 
@@ -338,7 +392,7 @@ getA.call(temp1); // 20
 getA.call(temp2); // 30
 ```
 
-Therefore, in order to prevent against unexpected results, `memoize-one` takes into account the current execution context (`this`) of the memoized function. If `this` is different to the previous invocation then it is considered a change in argument. [further discussion](https://github.com/alexreardon/memoize-one/issues/3).
+Therefore, in order to prevent against unexpected results, `memoize-one` takes into account the current execution context (`this`) of the memoized function. If `this` is different to the previous invocation (according to `Object.is`) then it is considered a change in argument. [further discussion](https://github.com/alexreardon/memoize-one/issues/3).
 
 Generally this will be of no impact if you are not explicity controlling the `this` context of functions you want to memoize with [explicit binding](https://github.com/getify/You-Dont-Know-JS/blob/master/this%20%26%20object%20prototypes/ch2.md#explicit-binding) or [implicit binding](https://github.com/getify/You-Dont-Know-JS/blob/master/this%20%26%20object%20prototypes/ch2.md#implicit-binding). `memoize-One` will detect when you are manipulating `this` and will then consider the `this` context as an argument. If `this` changes, it will re-execute the original function even if the arguments have not changed.
 
@@ -352,7 +406,7 @@ This is helpful if you want to:
 - Allow the result function to be called again without having to change arguments
 
 ```ts
-import memoizeOne from 'memoize-one';
+import { memoizeOne } from 'memoize-one';
 
 function add(a: number, b: number): number {
   return a + b;
@@ -432,7 +486,7 @@ Functions memoized with `memoize-one` do not preserve any properties on the func
 > This behaviour is correctly reflected in the TypeScript types
 
 ```ts
-import memoizeOne from 'memoize-one';
+import { memoizeOne } from 'memoize-one';
 
 function add(a, b) {
   return a + b;
@@ -449,10 +503,10 @@ console.log(typeof memoized.hello); // undefined
 
 > If you feel strongly that `memoize-one` _should_ preserve function properties, please raise an issue. This decision was made in order to keep `memoize-one` as light as possible.
 
-For _now_, the `.length` property of a function is not preserved on the memoized function
+The `.length` property of a function is not preserved on the memoized function
 
 ```ts
-import memoizeOne from 'memoize-one';
+import { memoizeOne } from 'memoize-one';
 
 function add(a, b) {
   return a + b;
@@ -465,9 +519,16 @@ const memoized = memoizeOne(add);
 console.log(memoized.length); // 0
 ```
 
-There is no (great) way to correctly set the `.length` property of the memoized function while also supporting ie11. Once we [remove ie11 support](https://github.com/alexreardon/memoize-one/issues/125) then we plan on setting the `.length` property of the memoized function to match the original function
+If you need it, you can set the `.length` property yourself:
 
-[→ discussion](https://github.com/alexreardon/memoize-one/pull/124).
+```ts
+const memoized = memoizeOne(add);
+Object.defineProperty(memoized, 'length', { value: add.length });
+
+console.log(memoized.length); // 2
+```
+
+[→ discussion](https://github.com/alexreardon/memoize-one/issues/38).
 
 ## Memoized function `type`
 
@@ -480,20 +541,26 @@ declare type MemoizedFn<TFunc extends (this: any, ...args: any[]) => any> = {
 };
 ```
 
-- the same call signature as the function being memoized
+- the same `this` type, parameters and return type as the function being memoized
 - a `.clear()` function property added
-- other function object properties on `TFunc` as not carried over
+- other function object properties on `TFunc` are not carried over
+
+Because the call signature is rebuilt from `Parameters` and `ReturnType`, some signatures are simplified:
+
+- only the last overload of an overloaded function is kept
+- generic type parameters become `unknown`. For example, `<T>(value: T) => T` becomes `(value: unknown) => unknown`
+- type predicates (`value is string`) and assertion signatures (`asserts value is string`) no longer narrow
 
 You are welcome to use the `MemoizedFn` generic directly from `memoize-one` if you like:
 
 ```ts
-import memoize, { MemoizedFn } from 'memoize-one';
-import isDeepEqual from 'lodash.isequal';
+import { memoizeOne, type MemoizedFn } from 'memoize-one';
+import { isEqual as isDeepEqual } from 'es-toolkit';
 import { expectTypeOf } from 'expect-type';
 
 // Takes any function: TFunc, and returns a Memoized<TFunc>
 function withDeepEqual<TFunc extends (...args: any[]) => any>(fn: TFunc): MemoizedFn<TFunc> {
-  return memoize(fn, isDeepEqual);
+  return memoizeOne(fn, isDeepEqual);
 }
 
 function add(first: number, second: number): number {
@@ -508,13 +575,13 @@ expectTypeOf<typeof memoized>().toEqualTypeOf<MemoizedFn<typeof add>>();
 In this specific example, this type would have been correctly inferred too
 
 ```ts
-import memoize, { MemoizedFn } from 'memoize-one';
-import isDeepEqual from 'lodash.isequal';
+import { memoizeOne, type MemoizedFn } from 'memoize-one';
+import { isEqual as isDeepEqual } from 'es-toolkit';
 import { expectTypeOf } from 'expect-type';
 
 // return type of MemoizedFn<TFunc> is inferred
 function withDeepEqual<TFunc extends (...args: any[]) => any>(fn: TFunc) {
-  return memoize(fn, isDeepEqual);
+  return memoizeOne(fn, isDeepEqual);
 }
 
 function add(first: number, second: number): number {
@@ -535,7 +602,7 @@ expectTypeOf<typeof memoized>().toEqualTypeOf<MemoizedFn<typeof add>>();
 
 ### Extremely fast
 
-`memoize-one` performs better or on par with than other popular memoization libraries for the purpose of remembering the latest invocation.
+`memoize-one` performs as fast as other popular memoization libraries for remembering the latest invocation.
 
 The comparisons are not exhaustive and are primarily to show that `memoize-one` accomplishes remembering the latest invocation really fast. There is variability between runs. The benchmarks do not take into account the differences in feature sets, library sizes, parse time, and so on.
 
@@ -543,91 +610,119 @@ The comparisons are not exhaustive and are primarily to show that `memoize-one` 
   <summary>Expand for results</summary>
   <p>
 
-node version `16.11.1`
+node version `24.22.3`
 
-You can run this test in the repo by:
-
-1. Add `"type": "module"` to the `package.json` (why is things so hard)
-2. Run `yarn perf:library-comparison`
+You can run this test in the repo with `npm run bench:library-comparison`
 
 **no arguments**
 
 | Position | Library                                      | Operations per second |
 | -------- | -------------------------------------------- | --------------------- |
-| 1        | memoize-one                                  | 80,112,981            |
-| 2        | moize                                        | 72,885,631            |
-| 3        | memoizee                                     | 35,550,009            |
-| 4        | mem (JSON.stringify strategy)                | 4,610,532             |
-| 5        | lodash.memoize (JSON.stringify key resolver) | 3,708,945             |
-| 6        | no memoization                               | 505                   |
-| 7        | fast-memoize                                 | 504                   |
+| 1        | micro-memoize                                | 141,030,495           |
+| 2        | memoize-one                                  | 106,945,637           |
+| 3        | memoizee                                     | 41,745,115            |
+| 4        | lodash memoize (JSON.stringify key resolver) | 10,825,368            |
+| 5        | memoize (JSON.stringify cache key)           | 10,210,920            |
+| 6        | fast-memoize                                 | 5,026,269             |
+| 7        | no memoization                               | 500                   |
 
 **single primitive argument**
 
 | Position | Library                                      | Operations per second |
 | -------- | -------------------------------------------- | --------------------- |
-| 1        | fast-memoize                                 | 45,482,711            |
-| 2        | moize                                        | 34,810,659            |
-| 3        | memoize-one                                  | 29,030,828            |
-| 4        | memoizee                                     | 23,467,065            |
-| 5        | mem (JSON.stringify strategy)                | 3,985,223             |
-| 6        | lodash.memoize (JSON.stringify key resolver) | 3,369,297             |
-| 7        | no memoization                               | 507                   |
+| 1        | fast-memoize                                 | 74,219,713            |
+| 2        | micro-memoize                                | 68,119,837            |
+| 3        | memoize-one                                  | 66,542,477            |
+| 4        | memoizee                                     | 38,166,401            |
+| 5        | lodash memoize (JSON.stringify key resolver) | 9,530,612             |
+| 6        | memoize (JSON.stringify cache key)           | 8,665,297             |
+| 7        | no memoization                               | 500                   |
 
 **single complex argument**
 
 | Position | Library                                      | Operations per second |
 | -------- | -------------------------------------------- | --------------------- |
-| 1        | moize                                        | 27,660,856            |
-| 2        | memoize-one                                  | 22,407,916            |
-| 3        | memoizee                                     | 19,546,835            |
-| 4        | mem (JSON.stringify strategy)                | 2,068,038             |
-| 5        | lodash.memoize (JSON.stringify key resolver) | 1,911,335             |
-| 6        | fast-memoize                                 | 1,633,855             |
-| 7        | no memoization                               | 504                   |
+| 1        | micro-memoize                                | 67,250,155            |
+| 2        | memoize-one                                  | 66,619,381            |
+| 3        | memoizee                                     | 29,420,344            |
+| 4        | lodash memoize (JSON.stringify key resolver) | 6,159,758             |
+| 5        | memoize (JSON.stringify cache key)           | 5,493,077             |
+| 6        | fast-memoize                                 | 4,032,231             |
+| 7        | no memoization                               | 500                   |
 
 **multiple primitive arguments**
 
 | Position | Library                                      | Operations per second |
 | -------- | -------------------------------------------- | --------------------- |
-| 1        | moize                                        | 22,366,497            |
-| 2        | memoize-one                                  | 17,241,995            |
-| 3        | memoizee                                     | 9,789,442             |
-| 4        | mem (JSON.stringify strategy)                | 3,065,328             |
-| 5        | lodash.memoize (JSON.stringify key resolver) | 2,663,599             |
-| 6        | fast-memoize                                 | 1,219,548             |
-| 7        | no memoization                               | 504                   |
+| 1        | micro-memoize                                | 43,955,216            |
+| 2        | memoize-one                                  | 41,135,924            |
+| 3        | memoizee                                     | 17,383,751            |
+| 4        | lodash memoize (JSON.stringify key resolver) | 6,815,389             |
+| 5        | memoize (JSON.stringify cache key)           | 6,008,881             |
+| 6        | fast-memoize                                 | 3,560,268             |
+| 7        | no memoization                               | 500                   |
 
 **multiple complex arguments**
 
 | Position | Library                                      | Operations per second |
 | -------- | -------------------------------------------- | --------------------- |
-| 1        | moize                                        | 21,788,081            |
-| 2        | memoize-one                                  | 17,321,248            |
-| 3        | memoizee                                     | 9,595,420             |
-| 4        | lodash.memoize (JSON.stringify key resolver) | 873,283               |
-| 5        | mem (JSON.stringify strategy)                | 850,779               |
-| 6        | fast-memoize                                 | 687,863               |
-| 7        | no memoization                               | 504                   |
+| 1        | micro-memoize                                | 44,009,357            |
+| 2        | memoize-one                                  | 41,421,767            |
+| 3        | memoizee                                     | 13,019,308            |
+| 4        | lodash memoize (JSON.stringify key resolver) | 3,802,209             |
+| 5        | memoize (JSON.stringify cache key)           | 3,558,650             |
+| 6        | fast-memoize                                 | 2,399,614             |
+| 7        | no memoization                               | 500                   |
 
 **multiple complex arguments (spreading arguments)**
 
 | Position | Library                                      | Operations per second |
 | -------- | -------------------------------------------- | --------------------- |
-| 1        | moize                                        | 21,701,537            |
-| 2        | memoizee                                     | 19,463,942            |
-| 3        | memoize-one                                  | 17,027,544            |
-| 4        | lodash.memoize (JSON.stringify key resolver) | 887,816               |
-| 5        | mem (JSON.stringify strategy)                | 849,244               |
-| 6        | fast-memoize                                 | 691,512               |
-| 7        | no memoization                               | 504                   |
+| 1        | micro-memoize                                | 44,077,011            |
+| 2        | memoize-one                                  | 41,380,234            |
+| 3        | memoizee                                     | 31,624,028            |
+| 4        | lodash memoize (JSON.stringify key resolver) | 3,795,985             |
+| 5        | memoize (JSON.stringify cache key)           | 3,578,317             |
+| 6        | fast-memoize                                 | 2,397,002             |
+| 7        | no memoization                               | 500                   |
 
   </p>
 </details>
+
+## Upgrading from v6
+
+1. **Arguments are compared with `Object.is`.** `NaN` is still equal to `NaN`. The only change is that `+0` and `-0` are now treated as different arguments, so `memoized(0)` followed by `memoized(-0)` will call your function again. The `this` context is also compared with `Object.is`.
+2. **ES module only.** The CommonJS and UMD builds are gone. CommonJS users on Node.js 20.19+ and 22.12+ can still `require()` the package, but `require()` now returns the module, not the function. Use `const { memoizeOne } = require('memoize-one')`. TypeScript projects that compile to CommonJS need `"module": "nodenext"` (TypeScript 5.8+) or `"node20"` (TypeScript 5.9+). If you used the UMD build from a CDN, load the module instead: `<script type="module">import { memoizeOne } from 'https://cdn.jsdelivr.net/npm/memoize-one@7/+esm';</script>`
+3. **Jest needs extra setup.** Jest uses its own module loader, not Node's `require(esm)`. So tests that run as CommonJS fail with "Must use import to load ES Module". Pick one fix:
+
+   - **Node.js 24.9+**: run Jest with `NODE_OPTIONS=--experimental-vm-modules`. Node.js prints an `ExperimentalWarning`.
+   - **Any Node.js version**: let Babel transform `memoize-one` into CommonJS. You need both files below. Use a `babel.config.js` file, because a `.babelrc` file does not apply to `node_modules`. If you use another transformer (such as `ts-jest` or `@swc/jest`), it must also transform this `.js` file. With pnpm, see the [Jest docs](https://jestjs.io/docs/configuration#transformignorepatterns-arraystring) for the pattern.
+
+   ```js
+   // jest.config.js
+   module.exports = {
+     transformIgnorePatterns: ['/node_modules/(?!memoize-one/)'],
+   };
+   ```
+
+   ```js
+   // babel.config.js
+   module.exports = {
+     presets: [['@babel/preset-env', { targets: { node: 'current' } }]],
+   };
+   ```
+
+4. **Only the package entry can be imported.** The `exports` map blocks deep imports such as `memoize-one/dist/memoize-one.esm.js`. Import from `memoize-one` instead.
+5. **ES2022 syntax.** Internet Explorer 11 is no longer supported (see [supported environments](#supported-environments)).
+6. **No Flow types.** The Flow type definitions are no longer included.
+7. **Stricter types with `EqualityFn<any>`.** If you typed your equality function as `EqualityFn<any>`, the memoized function used to be `any`. It now keeps the type of the function you memoize, so TypeScript can report errors that were hidden before.
+8. **New: `areInputsEqual` is exported**, so you can build on the default equality check (see [custom equality function](#custom-equality-function)).
+9. **New: `memoizeOne` is also a named export.** The default export still works, so you do not need to change your imports. The examples in this README use the named export: `import { memoizeOne } from 'memoize-one'`.
 
 ## Code health 👍
 
 - Tested with all built in [JavaScript types](https://github.com/getify/You-Dont-Know-JS/blob/1st-ed/types%20%26%20grammar/ch1.md)
 - Written in `Typescript`
-- Correct typing for `Typescript` and `flow` type systems
+- Correct typing for `Typescript`, checked with [`publint`](https://publint.dev) and [`arethetypeswrong`](https://arethetypeswrong.github.io)
+- ES module only
 - No dependencies
