@@ -60,8 +60,7 @@ npm install memoize-one
 
 ## Supported environments
 
-`memoize-one` v7 is an [ES module](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules) only package, written in ES2022 syntax.
-
+- `memoize-one@7+` is an [ESM only package](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules), written in ES2022 syntax
 - **Browsers**: browsers that are [Baseline widely available](https://web.dev/baseline) (Chrome, Edge and Firefox 111+, Safari 16.4+), with any modern bundler
 - **Node.js**: `import` works in all supported versions. `require()` works in Node.js 20.19+ and 22.12+ (through [`require(esm)`](https://nodejs.org/api/modules.html#loading-ecmascript-modules-using-require))
 - **TypeScript projects that compile to CommonJS**: use `"module": "nodenext"` (TypeScript 5.8+) or `"module": "node20"` (TypeScript 5.9+). With `node16` or `node18`, TypeScript reports error TS1479 for `require()` of an ES module. You can use a dynamic `import()` instead
