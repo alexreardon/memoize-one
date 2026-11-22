@@ -1,6 +1,6 @@
 {
   "name": "memoize-one",
-  "version": "6.0.0",
+  "version": "7.0.0",
   "description": "A memoization library which only remembers the latest invocation",
   "author": "Alex Reardon <alexreardon@gmail.com>",
   "license": "MIT",
