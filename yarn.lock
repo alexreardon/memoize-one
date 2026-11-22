@@ -694,10 +694,10 @@
   dependencies:
     "@babel/types" "^7.3.0"
 
-"@types/benchmark@^2.1.1":
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/@types/benchmark/-/benchmark-2.1.1.tgz#d763df29717d93aa333eb11f421ef383a5df5673"
-  integrity sha512-XmdNOarpSSxnb3DE2rRFOFsEyoqXLUL+7H8nSGS25vs+JS0018bd+cW5Ma9vdlkPmoTHSQ6e8EUFMFMxeE4l+g==
+"@types/benchmark@^2.1.5":
+  version "2.1.5"
+  resolved "https://registry.yarnpkg.com/@types/benchmark/-/benchmark-2.1.5.tgz#940c1850c18fdfdaee3fd6ed29cd92ae0d445b45"
+  integrity sha512-cKio2eFB3v7qmKcvIHLUMw/dIx/8bhWPuzpzRT4unCPRTD8VdA9Zb0afxpcxOqR4PixRS7yT42FqGS8BYL8g1w==
 
 "@types/estree@0.0.39":
   version "0.0.39"
