@@ -603,7 +603,7 @@ expectTypeOf<typeof memoized>().toEqualTypeOf<MemoizedFn<typeof add>>();
 
 ### Tiny
 
-`memoize-one` is super lightweight at [![min](https://img.shields.io/bundlephobia/min/memoize-one.svg?label=)](https://www.npmjs.com/package/memoize-one) minified and [![minzip](https://img.shields.io/bundlephobia/minzip/memoize-one.svg?label=)](https://www.npmjs.com/package/memoize-one) gzipped. (`1KB` = `1,024 Bytes`)
+`memoize-one` is super lightweight at `400 B` minified and `262 B` gzipped.
 
 ### Extremely fast
 
