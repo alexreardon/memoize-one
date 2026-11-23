@@ -65,8 +65,8 @@ npm install memoize-one
 
 ## Supported environments
 
-- `memoize-one@7+` is an [ES module only package](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules), written in ES2022 syntax
-- **Browsers**: browsers that are [Baseline widely available](https://web.dev/baseline) (Chrome, Edge and Firefox 111+, Safari 16.4+), with any modern bundler
+- `memoize-one@7+` is an [ES module only package](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules)
+- **Browsers**: all browsers that support ES2022
 - **Node.js**: `import` works in all supported versions. `require()` works in Node.js 20.19+ and 22.12+ (through [`require(esm)`](https://nodejs.org/api/modules.html#loading-ecmascript-modules-using-require))
 - **TypeScript projects that compile to CommonJS**: use `"module": "nodenext"` (TypeScript 5.8+) or `"module": "node20"` (TypeScript 5.9+). With `node16` or `node18`, TypeScript reports error TS1479 for `require()` of an ES module. You can use a dynamic `import()` instead
 - **Jest**: needs extra setup (see [upgrading from v6](#upgrading-from-v6))
@@ -722,7 +722,7 @@ You can run this test in the repo with `npm run bench:library-comparison`
    ```
 
 4. **Only the package entry can be imported.** The `exports` map blocks deep imports such as `memoize-one/dist/memoize-one.esm.js`. Import from `memoize-one` instead.
-5. **ES2022 syntax.** Internet Explorer 11 is no longer supported (see [supported environments](#supported-environments)).
+5. **No Internet Explorer 11.** The build now targets ES2022 (see [supported environments](#supported-environments)).
 6. **No Flow types.** The Flow type definitions are no longer included.
 7. **Stricter types with `EqualityFn<any>`.** If you typed your equality function as `EqualityFn<any>`, the memoized function used to be `any`. It now keeps the type of the function you memoize, so TypeScript can report errors that were hidden before.
 8. **New: `areInputsEqual` is exported**, so you can build on the default equality check (see [custom equality function](#custom-equality-function)).
