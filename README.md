@@ -603,7 +603,7 @@ expectTypeOf<typeof memoized>().toEqualTypeOf<MemoizedFn<typeof add>>();
 
 ### Tiny
 
-`memoize-one` is super lightweight at `400 B` minified and `262 B` gzipped.
+`memoize-one` is super lightweight at `400 B` minified and `226 B` with brotli compression.
 
 ### Extremely fast
 
